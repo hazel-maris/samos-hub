@@ -406,42 +406,116 @@ blockquote {
 
 
 /* ============================================================
-   SMALL SCREENS ONLY
+   PHONE PORTRAIT
    ============================================================ */
 
-@media (max-width: 900px) {
+@media (max-width: 900px) and (orientation: portrait) {
 
-  .home {
-    flex-direction: column;
+  body {
+    height: auto;
+    min-height: 100vh;
 
-    gap: 55px;
-
-    padding: 50px 30px;
+    overflow-y: auto;
+    overflow-x: hidden;
   }
 
+  .home {
+    min-height: 100vh;
+    height: auto;
+
+    flex-direction: column;
+
+    gap: 50px;
+
+    padding: 40px 24px;
+  }
 
   .orientation {
     width: 100%;
-
     flex-basis: auto;
   }
-
 
   .media-area {
     width: 100%;
-
     flex-basis: auto;
   }
 
-
   .mini-player {
-    width:
-      min(300px, 90vw);
+    width: min(300px, 90vw);
   }
 
+  #time {
+    font-size: clamp(4.5rem, 20vw, 8rem);
+  }
+}
+
+
+/* ============================================================
+   PHONE LANDSCAPE
+   ============================================================ */
+
+@media (max-width: 900px) and (orientation: landscape) {
+
+  body {
+    width: 100vw;
+    height: 100vh;
+
+    overflow: hidden;
+  }
+
+  .home {
+    width: 100%;
+    height: 100vh;
+
+    flex-direction: row;
+
+    justify-content: center;
+    align-items: center;
+
+    gap: 50px;
+
+    padding: 20px 30px;
+  }
+
+  .orientation {
+    width: 55%;
+
+    flex: 0 1 55%;
+  }
+
+  .media-area {
+    width: 260px;
+
+    flex: 0 0 260px;
+  }
+
+  .mini-player {
+    width: 260px;
+  }
 
   #time {
-    font-size:
-      clamp(5rem, 18vw, 9rem);
+    font-size: clamp(4rem, 11vw, 7rem);
+  }
+
+  #date {
+    font-size: 1.2rem;
+  }
+
+  .weather {
+    margin-top: 28px;
+  }
+
+  #weather-current {
+    font-size: 2rem;
+  }
+
+  #weather-range {
+    font-size: 1rem;
+  }
+
+  blockquote {
+    margin-top: 32px;
+
+    font-size: 1.2rem;
   }
 }
