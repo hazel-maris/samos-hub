@@ -445,7 +445,7 @@ blockquote {
   }
 
   #time {
-    font-size: clamp(4.5rem, 20vw, 8rem);
+    display: none;
   }
 }
 
@@ -503,9 +503,7 @@ blockquote {
   }
 
   #time {
-    font-size: clamp(4.5rem, 20vw, 8rem);
-
-    white-space: nowrap;
+    display: none;
   }
 
   #date {
