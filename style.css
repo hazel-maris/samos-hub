@@ -520,28 +520,37 @@ blockquote {
 }
 @media (max-width: 900px) {
 
+  #time {
+    display: none !important;
+  }
+
   .home {
     justify-content: flex-start;
     padding-top: 24px;
   }
 
-  .orientation {
-    margin-top: 0;
-  }
-
   #date {
     margin-top: 0;
 
-    font-size: clamp(2rem, 8vw, 3rem);
+    font-size: clamp(2.4rem, 9vw, 3.5rem);
     font-weight: 700;
     line-height: 1.1;
   }
 
   .weather {
-    margin-top: 28px;
+    margin-top: 26px;
+  }
+
+  #weather-current {
+    font-size: clamp(1.6rem, 6vw, 2.2rem);
+    font-weight: 600;
+  }
+
+  #weather-range {
+    font-size: clamp(1rem, 4vw, 1.3rem);
   }
 
   blockquote {
-    margin-top: 34px;
+    margin-top: 32px;
   }
 }
