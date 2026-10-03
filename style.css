@@ -518,3 +518,30 @@ blockquote {
     margin-top: 45px;
   }
 }
+@media (max-width: 900px) {
+
+  .home {
+    justify-content: flex-start;
+    padding-top: 24px;
+  }
+
+  .orientation {
+    margin-top: 0;
+  }
+
+  #date {
+    margin-top: 0;
+
+    font-size: clamp(2rem, 8vw, 3rem);
+    font-weight: 700;
+    line-height: 1.1;
+  }
+
+  .weather {
+    margin-top: 28px;
+  }
+
+  blockquote {
+    margin-top: 34px;
+  }
+}
