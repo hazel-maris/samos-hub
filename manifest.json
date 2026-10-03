@@ -1,0 +1,21 @@
+{
+  "name": "SamOS Hub",
+  "short_name": "SamOS",
+  "start_url": "/samos-hub/",
+  "scope": "/samos-hub/",
+  "display": "fullscreen",
+  "background_color": "#e4d4b8",
+  "theme_color": "#e4d4b8",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
