@@ -36,7 +36,7 @@ function updateClock() {
 
   // Leaving this here in case I decide to
   // revert time back to a single variable.
-  
+
   // document.getElementById("time").textContent = time;
 }
 
@@ -58,6 +58,7 @@ async function updateWeather() {
       `?latitude=${latitude}` +
       `&longitude=${longitude}` +
       `&current=temperature_2m,weather_code` +
+      `&hourly=temperature_2m,precipitation_probability,weather_code` +
       `&daily=temperature_2m_max,temperature_2m_min` +
       `&temperature_unit=fahrenheit` +
       `&timezone=America%2FNew_York`;
@@ -89,6 +90,8 @@ async function updateWeather() {
     ).textContent =
       `High ${high}° · Low ${low}°`;
 
+    updateWeatherImpacts(data);
+
   } catch (error) {
     console.error(
       "Weather error:",
@@ -102,6 +105,166 @@ async function updateWeather() {
   }
 }
 
+function updateWeatherImpacts(data) {
+  const afternoonElement =
+    document.getElementById("weather-afternoon");
+
+  const overnightElement =
+    document.getElementById("weather-overnight");
+
+  const today =
+    data.daily.time[0];
+
+  const tomorrow =
+    data.daily.time[1];
+
+  const afternoonHours =
+    getWeatherHours(
+      data,
+      today,
+      12,
+      18
+    );
+
+  const overnightHours = [
+    ...getWeatherHours(
+      data,
+      today,
+      20,
+      23
+    ),
+
+    ...getWeatherHours(
+      data,
+      tomorrow,
+      0,
+      6
+    )
+  ];
+
+  const afternoonImpact =
+    getWeatherImpact(afternoonHours);
+
+  const overnightImpact =
+    getWeatherImpact(overnightHours);
+
+  if (afternoonImpact) {
+    const startTime =
+      formatWeatherTime(
+        afternoonImpact.time
+      );
+
+    afternoonElement.textContent =
+      `${afternoonImpact.text} likely after ${startTime}`;
+
+    afternoonElement.hidden = false;
+  } else {
+    afternoonElement.hidden = true;
+  }
+
+  const overnightLow =
+    Math.round(
+      Math.min(
+        ...overnightHours.map(
+          hour => hour.temperature
+        )
+      )
+    );
+
+  if (overnightImpact) {
+    overnightElement.textContent =
+      `${overnightImpact.text} overnight · Low ${overnightLow}°`;
+
+    overnightElement.hidden = false;
+
+  } else if (overnightLow <= 32) {
+    overnightElement.textContent =
+      `Freezing overnight · Low ${overnightLow}°`;
+
+    overnightElement.hidden = false;
+
+  } else {
+    overnightElement.hidden = true;
+  }
+}
+
+function getWeatherHours(
+  data,
+  date,
+  startHour,
+  endHour
+) {
+  return data.hourly.time
+    .map((time, index) => ({
+      time: time,
+      hour: Number(
+        time.slice(11, 13)
+      ),
+      temperature:
+        data.hourly.temperature_2m[index],
+      precipitation:
+        data.hourly.precipitation_probability[index],
+      weatherCode:
+        data.hourly.weather_code[index]
+    }))
+    .filter(hour =>
+      hour.time.startsWith(date) &&
+      hour.hour >= startHour &&
+      hour.hour <= endHour
+    );
+}
+
+function getWeatherImpact(hours) {
+  for (const hour of hours) {
+    const code = hour.weatherCode;
+
+    if ([95, 96, 99].includes(code)) {
+      return {
+        text: "Thunderstorms",
+        time: hour.time
+      };
+    }
+
+    if ([71, 73, 75, 77, 85, 86].includes(code)) {
+      return {
+        text: "Snow",
+        time: hour.time
+      };
+    }
+
+    if (
+      [
+        51, 53, 55,
+        56, 57,
+        61, 63, 65,
+        66, 67,
+        80, 81, 82
+      ].includes(code)
+    ) {
+      return {
+        text: "Rain",
+        time: hour.time
+      };
+    }
+  }
+
+  return null;
+}
+
+function formatWeatherTime(time) {
+  const hour =
+    Number(
+      time.slice(11, 13)
+    );
+
+  const period =
+    hour >= 12 ? "PM" : "AM";
+
+  const displayHour =
+    hour % 12 || 12;
+
+  return `${displayHour} ${period}`;
+}
 
 function getWeatherDescription(code) {
   const weatherCodes = {
