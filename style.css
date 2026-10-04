@@ -1,3 +1,16 @@
+/* ============================================================
+   FONTS
+   ============================================================ */
+
+@font-face {
+  font-family: "Voltaire";
+  src: url("fonts/voltaire-latin-400-normal.woff2") format("woff2");
+}
+
+/* ============================================================
+   GENERAL STYLES
+   ============================================================ */
+
 * {
   box-sizing: border-box;
 }
@@ -46,7 +59,7 @@ body {
   min-height: 100dvh;
 
   overflow: hidden;
-  font-family: system-ui, sans-serif;
+  font-family: "Voltaire", sans-serif;
   color: #2f2a24;
 }
 
@@ -78,14 +91,26 @@ body {
   text-align: center;
 }
 
+/* Leaving this here in case I decide to
+revert time back to a single variable. */
 
 #time {
-  font-size: clamp(5rem, 10vw, 9rem);
-  font-weight: 700;
+  margin-top: clamp(8px, 1.5vh, 18px);
+
+  /* font-size: clamp(rem, 10vw, 9rem);
   line-height: 1;
-  white-space: nowrap;
+  white-space: nowrap; */
 }
 
+#time-numbers {
+  font-family: sans-serif, monospace;
+}
+
+#time-period {
+  font-family: "Voltaire", sans-serif;
+  font-size: 0.35em;
+  margin-left: 0.2em;
+} 
 
 #date {
   margin-top: clamp(10px, 1.5vh, 18px);
@@ -451,13 +476,13 @@ blockquote {
 
   #time {
     display: block !important;
-    font-size: clamp(3.5rem, 6vw, 6rem);
+    font-size: clamp(2rem, 4.5vw, 4.5rem);
     line-height: 0.9;
   }
 
   #date {
     margin-top: clamp(10px, 1.5vh, 16px);
-    font-size: clamp(4rem, 7vw, 7rem);
+    font-size: clamp(3rem, 6vw, 6rem);
     font-weight: 700;
   }
 

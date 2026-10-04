@@ -18,8 +18,11 @@
 <body>
     <main class="home">
         <section class="orientation">
-            <div id="time">--:--</div>
             <div id="date">Loading...</div>
+            <div id="time">
+                <span id="time-numbers"></span>
+                <span id="time-period"></span>
+            </div>
 
             <div class="weather">
             <div id="weather-current">Loading weather...</div>
@@ -33,10 +36,10 @@
 
         <section class="media-area">
 
-            <div id=""spotify-login-message" hidden>
+            <div id="spotify-login-message" hidden>
                 Spotify connection expired. Please reconnect.
             </div>
-            
+
             <button id="spotify-login">
                 Connect Spotify
             </button>

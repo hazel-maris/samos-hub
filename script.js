@@ -15,15 +15,29 @@ function updateClock() {
     minute: "2-digit"
   });
 
+  const timeParts = time.split(" ");
+
+  const timeNumbers = timeParts[0];
+  const timePeriod = timeParts[1] || "";
+
+  const isPortrait =
+    window.matchMedia("(orientation: portrait)").matches;
+
   const date = now.toLocaleDateString([], {
-    weekday: "long",
+    weekday: isPortrait ? "short" : "long",
     month: "long",
     day: "numeric",
-    year: "numeric"
+    // year: "numeric"
   });
 
-  document.getElementById("time").textContent = time;
+  document.getElementById("time-numbers").textContent = timeNumbers;
+  document.getElementById("time-period").textContent = timePeriod;
   document.getElementById("date").textContent = date;
+
+  // Leaving this here in case I decide to
+  // revert time back to a single variable.
+  
+  // document.getElementById("time").textContent = time;
 }
 
 updateClock();
@@ -816,6 +830,7 @@ async function transferPlaybackToSamOS() {
 // ============================================================
 // LOAD USER PLAYLISTS
 // ============================================================
+
 async function loadPlaylists() {
   const token =
     await getValidSpotifyToken();
@@ -1091,6 +1106,7 @@ document.getElementById(
 );
 
 // PLAYLIST BUTTON
+
 document.getElementById(
   "playlist-button"
 ).addEventListener(
@@ -1108,6 +1124,7 @@ document.getElementById(
 );
 
 // CLICK TO LEAVE PLAYLIST MENU
+
 document.addEventListener(
   "click",
   event => {
