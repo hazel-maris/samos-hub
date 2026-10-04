@@ -17,99 +17,145 @@
 
 <body>
     <main class="home">
-        <section class="orientation">
-            <div id="date">Loading...</div>
-            <div id="time">
-                <span id="time-numbers"></span>
-                <span id="time-period"></span>
+        <div class="journal-shell">
+            <div class="journal-tabs">
+                <button class="journal-tab active">Home</button>
+                <button class="journal-tab">Journal</button>
+                <button class="journal-tab">Stats</button>
             </div>
 
-            <div class="weather">
-            <div id="weather-current">Loading weather...</div>
-            <div id="weather-range"></div>
-            <div id="weather-afternoon" hidden></div>
-            <div id="weather-overnight" hidden></div>
-            </div>
-
-            <blockquote>
-            “You will be warm again. This is a test.”
-            </blockquote>
-        </section>
-
-        <section class="media-area">
-
-            <div id="spotify-login-message" hidden>
-                Spotify connection expired. Please reconnect.
-            </div>
-
-            <button id="spotify-login">
-                Connect Spotify
-            </button>
-
-            <div id="spotify-player" class="mini-player" hidden>
-
-                <div class="playlist-picker">
-
-                    <button id="playlist-button" class="playlist-button">
-                            Choose a playlist...
-                    </button>
-
-                    <div id="playlist-menu" class="playlist-menu" hidden></div>
-                    
-                </div>
-
-                <div class="album-container">
-
-                    <img
-                    id="album-art"
-                    src=""
-                    alt="Album art"
-                    hidden
-                    >
-
-                    <div id="album-placeholder">
-
-                        <div class="placeholder-icon">♫</div>
-
-                        <div>Select a playlist<br>to hear something</div>
-                        
-                    </div>
-
-                </div>
-
-                <div class="track-info">
-                    <div id="track-name">
-                    Nothing playing
-                    </div>
-
-                    <div id="track-artist">
-                    Spotify
+            <div class="journal">
+            <section class="orientation">
+                <div class="game-panel date-panel">
+                    <div id="date">Loading...</div>
+                    <div id="time">
+                        <span id="time-numbers"></span>
+                        <span id="time-period"></span>
                     </div>
                 </div>
 
-                <div class="player-controls">
+                <div class="game-panel weather-panel">
+                    <div class="weather">
+                        <div class="weather-current-row">
 
-                    <button id="previous-track">
-                    ⏮
-                    </button>
+                        <div id="weather-current">
 
-                    <button id="play-pause">
-                    ▶
-                    </button>
+                            <img
+                            id="temp-icon"
+                            src=""
+                            alt=""
+                            hidden
+                            >
+                            <span id="weather-temp"></span>
+                            <!-- <span class="weather-separator">·</span> -->
 
-                    <button id="next-track">
-                    ⏭
-                    </button>
+                            <img
+                            id="weather-icon"
+                            src=""
+                            alt=""
+                            hidden
+                            >
+                            <span id="weather-condition"></span>
+                        </div>                
+                    </div>
 
+                    <div id="weather-event" hidden>
+                        <img
+                            id="weather-event-icon"
+                            src=""
+                            alt=""
+                        >
+                        <span id="weather-event-text"></span>
+                    </div>
+
+                        <div id="weather-range"></div>
+                        <div id="weather-afternoon" hidden></div>
+                        <div id="weather-overnight" hidden></div>
+                        <div id="weather-alerts" hidden></div>
+                        <div id="weather-tropical" hidden></div>
+                    </div>
                 </div>
+            </section>
 
-                <div id="spotify-status">
-                    SamOS Hub connected
+            <section class="media-area">
+                <div class="game-panel spotify-panel">
+                    <div id="spotify-login-message" hidden>
+                        Spotify connection expired. <br> Please reconnect.
+                    </div>
+
+                    <button id="spotify-login">
+                        Connect Spotify
+                    </button>
+
+                    <div id="spotify-player" class="mini-player" hidden>
+
+                        <div class="playlist-picker">
+
+                            <button id="playlist-button" class="playlist-button">
+                                    Choose a playlist...
+                            </button>
+
+                            <div id="playlist-menu" class="playlist-menu" hidden></div>
+                            
+                        </div>
+
+                        <div class="album-container">
+
+                            <img
+                            id="album-art"
+                            src=""
+                            alt="Album art"
+                            hidden
+                            >
+
+                            <div id="album-placeholder">
+
+                                <div class="placeholder-icon">♫</div>
+
+                                <div>Select a playlist<br>to hear something</div>
+                                
+                            </div>
+
+                        </div>
+
+                        <div class="track-info">
+                            <div id="track-name">
+                            Nothing playing
+                            </div>
+
+                            <div id="track-artist">
+                            Spotify
+                            </div>
+                        </div>
+
+                        <div class="player-controls">
+
+                            <button id="previous-track">
+                            ⏮
+                            </button>
+
+                            <button id="play-pause">
+                            ▶
+                            </button>
+
+                            <button id="next-track">
+                            ⏭
+                            </button>
+
+                        </div>
+
+                        <div id="spotify-status">
+                            SamOS Hub connected
+                        </div>
+                    </div>
                 </div>
+            </section>
+                <blockquote>
+                    “You will be warm again. This is a test.”
+                </blockquote>
 
             </div>
-
-        </section>
+        </div>
     </main>
 
     <script src="script.js"></script>  

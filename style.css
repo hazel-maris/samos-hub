@@ -1,14 +1,53 @@
 /* ============================================================
-   FONTS
+   SAMOS HUB — CLEAN STYLESHEET
+   ============================================================ */
+
+/* ============================================================
+   FONT
    ============================================================ */
 
 @font-face {
-  font-family: "Voltaire";
-  src: url("fonts/voltaire-latin-400-normal.woff2") format("woff2");
+  font-family: "Pixelify Sans";
+  src: url("fonts/pixelify-sans-latin-400-normal.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
 }
 
+@font-face {
+  font-family: "VT323";
+  src: url("fonts/vt323-latin-400-normal.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+
 /* ============================================================
-   GENERAL STYLES
+   THEME
+   ============================================================ */
+
+:root {
+  --paper: #f3e8c8;
+  --paper-dark: #ead8af;
+
+  --tab: #d9b566;
+  --tab-hover: #e3c37a;
+
+  --button: #e6cc93;
+  --button-hover: #efd9ab;
+
+  --border: #7a5a3a;
+  --shadow: #b69a73;
+  --text: #2f2a24;
+
+  --journal-gap: clamp(28px, 3vw, 48px);
+  --panel-gap: 14px;
+}
+
+
+/* ============================================================
+   RESET / PAGE
    ============================================================ */
 
 * {
@@ -24,6 +63,16 @@ body {
   margin: 0;
   width: 100%;
   min-height: 100%;
+}
+
+body {
+  min-height: 100vh;
+  min-height: 100dvh;
+
+  overflow: hidden;
+
+  font-family: "VT323", sans-serif;
+  color: var(--text);
 
   background-color: #e4d4b8;
 
@@ -54,123 +103,466 @@ body {
     96px 96px;
 }
 
-body {
-  min-height: 100vh;
-  min-height: 100dvh;
-
-  overflow: hidden;
-  font-family: "Voltaire", sans-serif;
-  color: #2f2a24;
-}
-
 
 /* ============================================================
-   MAIN LAYOUT
+   APP / JOURNAL SHELL
    ============================================================ */
 
 .home {
   width: 100%;
   min-height: 100dvh;
-  min-height: 100dvh;
-  display: grid;
-  grid-template-columns: 60% 40%;
-  align-content: start;
+
+  display: flex;
   align-items: center;
-  padding:
-    clamp(24px, 4vh, 60px)
-    clamp(20px, 3vw, 40px);
+  justify-content: center;
+}
+
+.journal-shell {
+  width: 97vw;
+  height: 92dvh;
+  min-height: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  margin: auto;
 }
 
 
 /* ============================================================
-   LEFT SIDE — ORIENTATION
+   JOURNAL TABS
    ============================================================ */
 
-.orientation {
+.journal-tabs {
+  display: flex;
+  gap: 6px;
+
+  padding-left: 24px;
+
+  transform: translateY(2px);
+
+  z-index: 2;
+}
+
+.journal-tab {
+  padding: 10px 18px;
+
+  font-family: "VT323", sans-serif;
+  font-size: clamp(1.1rem, 1.4vw, 1.5rem);
+
+  color: var(--text);
+  background: var(--tab);
+
+  border: 3px solid var(--border);
+  border-bottom: none;
+
+  box-shadow:
+    2px -2px 0 rgba(79, 57, 38, 0.35);
+
+  cursor: pointer;
+}
+
+.journal-tab:hover {
+  background: var(--tab-hover);
+}
+
+.journal-tab.active {
+  position: relative;
+
+  background: var(--paper);
+
+  transform: translateY(2px);
+
+  z-index: 3;
+}
+
+.journal-tab.active::after {
+  content: "";
+
+  position: absolute;
+
+  left: 0;
+  right: 0;
+  bottom: -4px;
+
+  height: 5px;
+
+  background: var(--paper);
+}
+
+
+/* ============================================================
+   JOURNAL PAGE
+   ============================================================ */
+
+.journal {
+  flex: 1;
+
   width: 100%;
+  min-height: 0;
+
+  margin: 0;
+
+  display: grid;
+
+  /*
+    Remove the column gap first, then split the
+    remaining width 60 / 40.
+  */
+  grid-template-columns:
+    calc((100% - var(--journal-gap)) * 0.6)
+    calc((100% - var(--journal-gap)) * 0.4);
+
+  grid-template-rows:
+    auto
+    auto;
+
+  column-gap: var(--journal-gap);
+  row-gap: 28px;
+
+  align-items: stretch;
+
+  padding: clamp(36px, 4vw, 64px);
+
+  background: var(--paper);
+
+  border: 4px solid var(--border);
+
+  box-shadow:
+    6px 6px 0 var(--shadow);
+}
+
+
+/* ============================================================
+   QUOTE
+   ============================================================ */
+
+.journal > blockquote {
+  grid-column: 1 / -1;
+
+  width: 100%;
+
+  margin: 0;
+
   text-align: center;
-}
+  justify-self: center;
 
-/* Leaving this here in case I decide to
-revert time back to a single variable. */
-
-#time {
-  margin-top: clamp(8px, 1.5vh, 18px);
-
-  /* font-size: clamp(rem, 10vw, 9rem);
-  line-height: 1;
-  white-space: nowrap; */
-}
-
-#time-numbers {
-  font-family: sans-serif, monospace;
-}
-
-#time-period {
-  font-family: "Voltaire", sans-serif;
-  font-size: 0.35em;
-  margin-left: 0.2em;
-} 
-
-#date {
-  margin-top: clamp(10px, 1.5vh, 18px);
-  font-size: clamp(1.5rem, 2.5vw, 2rem);
-}
-
-
-.weather {
-  margin-top: clamp(24px, 4vh, 54px);
-}
-
-
-#weather-current {
-  font-size: clamp(2rem, 4vw, 3rem);
-  font-weight: 600;
-}
-
-
-#weather-range {
-  margin-top: clamp(6px, 1vh, 10px);
-  font-size: clamp(1.1rem, 2vw, 1.6rem);
-}
-
-
-blockquote {
-  width: min(90%, 45vw);
-  margin: clamp(28px, 4vh, 62px) auto 0;
   font-size: clamp(1.25rem, 2vw, 1.8rem);
   font-style: italic;
 }
 
 
 /* ============================================================
-   RIGHT SIDE — MEDIA
+   GAME PANELS
+   ============================================================ */
+
+.game-panel {
+  position: relative;
+
+  min-width: 0;
+  min-height: 0;
+
+  padding:
+    30px
+    24px
+    24px;
+
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.12),
+      rgba(122, 90, 58, 0.06)
+    );
+
+  border: 3px solid var(--border);
+
+  box-shadow:
+    inset 2px 2px 0 rgba(255, 255, 255, 0.3),
+    inset -2px -2px 0 rgba(79, 57, 38, 0.12),
+    3px 3px 0 rgba(79, 57, 38, 0.18);
+}
+
+.date-panel,
+.weather-panel,
+.spotify-panel {
+  width: 100%;
+  height: 100%;
+
+  min-height: 0;
+}
+
+
+/* ============================================================
+   LEFT COLUMN — DATE / TIME / WEATHER
+   ============================================================ */
+
+.orientation {
+  grid-column: 1;
+  grid-row: 1;
+
+  display: grid;
+
+  grid-template-rows:
+    minmax(0, 1fr)
+    minmax(0, 1fr);
+
+  gap: var(--panel-gap);
+
+  width: 100%;
+  height: 100%;
+
+  min-width: 0;
+  min-height: 0;
+}
+
+
+/* ============================================================
+   DATE
+   ============================================================ */
+
+#date {
+  margin-top: clamp(10px, 1.5vh, 18px);
+
+  font-size: clamp(1rem, 2.5vw, 2rem);
+  font-weight: 400;
+}
+
+
+/* ============================================================
+   TIME
+   ============================================================ */
+
+#time {
+  margin-top: 28px;
+
+  display: flex;
+
+  align-items: baseline;
+  justify-content: flex-start;
+
+  gap: 8px;
+
+  font-family: "VT323", sans-serif;
+}
+
+#time-numbers {
+  font-family: "VT323", monospace;
+}
+
+#time-period {
+  margin-left: 0;
+
+  font-family: "VT323", sans-serif;
+  font-size: 0.5em;
+}
+
+
+/* ============================================================
+   WEATHER
+   ============================================================ */
+
+.weather {
+  margin-top: clamp(24px, 4vh, 54px);
+}
+
+.weather-current-row {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 12px;
+}
+
+#weather-temp {
+  font-family: "VT323", sans-serif;
+}
+
+#weather-current {
+  display: flex;
+
+  align-items: center;
+
+  gap: 6px;
+
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 400;
+}
+
+
+/* ============================================================
+   WEATHER ICONS
+   ============================================================ */
+
+#temp-icon {
+  width: 40px;
+  height: 40px;
+
+  image-rendering: pixelated;
+}
+
+#weather-icon {
+  width: 56px;
+  height: 56px;
+
+  image-rendering: pixelated;
+}
+
+
+/* ============================================================
+   WEATHER SECONDARY INFO
+   ============================================================ */
+
+#weather-range {
+  margin-top: clamp(6px, 1vh, 10px);
+
+  font-size: clamp(1.1rem, 2vw, 1.6rem);
+}
+
+#weather-afternoon,
+#weather-overnight,
+.weather-alert-line,
+#weather-event {
+  display: flex;
+
+  align-items: flex-start;
+  justify-content: flex-start;
+
+  font-size: clamp(1.35rem, 2.25vw, 1.5rem);
+
+  line-height: 1.25;
+}
+
+#weather-afternoon {
+  align-items: center;
+  justify-content: center;
+  margin-top: 10px;
+  margin-bottom: 15px;
+}
+
+
+/* ============================================================
+   WEATHER ALERTS
+   ============================================================ */
+
+.weather-alert-line,
+#weather-event {
+  gap: 6px;
+}
+
+.weather-alert-icon {
+  width: 30px;
+  height: 30px;
+
+  flex: 0 0 auto;
+
+  image-rendering: pixelated;
+}
+
+#weather-event-icon {
+  width: 28px;
+  height: 28px;
+
+  flex: 0 0 auto;
+
+  image-rendering: pixelated;
+}
+
+
+/* ============================================================
+   RIGHT COLUMN — SPOTIFY
    ============================================================ */
 
 .media-area {
+  grid-column: 2;
+  grid-row: 1;
+
   width: 100%;
+  height: 100%;
+
+  min-width: 0;
+  min-height: 0;
+
   display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  justify-self: center;
+
+  align-items: stretch;
 }
 
+.spotify-panel {
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+}
+
+
+/* ============================================================
+   SPOTIFY LOGIN
+   ============================================================ */
+
 #spotify-login-message {
-  margin-bottom: 12px;
-  font-size: 0.9rem;
+  margin-bottom: 14px;
+
+  font-size: clamp(1.2rem, 1.35vw, 1.5rem);
+
   text-align: center;
+  line-height: 1.25;
+
   opacity: 0.7;
 }
 
 #spotify-login {
-  border: none;
-  cursor: pointer;
   padding:
-    clamp(10px, 1vh, 12px)
-    clamp(16px, 2vw, 20px);
-  border-radius: clamp(8px, 1vw, 10px);
-  font-size: clamp(0.9rem, 1.2vw, 1rem);
+    12px
+    20px;
+
+  background:
+    linear-gradient(
+      to bottom,
+      #f8eac8 0%,
+      #f1dcae 55%,
+      #e7cb92 100%
+    );
+
+  color: var(--text);
+
+  border: 2px solid var(--text);
+  border-radius: 0;
+
+  font-family: "VT323", sans-serif;
+  font-size: clamp(1.15rem, 1.5vw, 1.6rem);
+
+  line-height: 1;
+
+  box-shadow:
+    3px 3px 0 #7a5833,
+    5px 5px 0 rgba(47, 42, 36, 0.18);
+
+  cursor: pointer;
+
+  transition:
+    transform 0.08s ease,
+    box-shadow 0.08s ease,
+    background 0.08s ease;
+}
+
+#spotify-login:hover {
+  background:
+    linear-gradient(
+      to bottom,
+      #fff1d0 0%,
+      #f6e1b4 55%,
+      #ecd19a 100%
+    );
+}
+
+#spotify-login:active {
+  transform: translate(3px, 3px);
+
+  box-shadow:
+    1px 1px 0 #7a5833;
 }
 
 
@@ -180,12 +572,19 @@ blockquote {
 
 .mini-player {
   width: min(75%, 360px);
+
   display: flex;
+
   flex-direction: column;
+
   gap: clamp(8px, 1.2vw, 12px);
+
   padding: clamp(10px, 1.5vw, 14px);
+
   border-radius: clamp(12px, 1.5vw, 18px);
-  background: rgba(255, 255, 255, 0.24);
+
+  background:
+    rgba(255, 255, 255, 0.24);
 }
 
 
@@ -197,60 +596,84 @@ blockquote {
   position: relative;
 }
 
-
 .playlist-button {
   width: 100%;
-  border: none;
-  border-radius: 10px;
-  background:
-    rgba(255, 255, 255, 0.75);
-  color: #2f2a24;
-  text-align: left;
-  cursor: pointer;
+
   padding:
     clamp(8px, 1vh, 10px)
     clamp(10px, 1vw, 12px);
-  font-size: clamp(0.8rem, 1vw, 0.9rem);
-}
 
-
-.playlist-button::after {
-  content: "⌄";
-  float: right;
-  opacity: 0.5;
-}
-
-
-.playlist-menu {
-  position: absolute;
-  top: calc(100% + 8px);
-  left: 0;
-  right: 0;
-  max-height: min(40vh, 300px);
-  overflow-y: auto;
-  padding: 6px;
-  border-radius: 12px;
-  background:
-    rgba(250, 246, 236, 0.98);
-  box-shadow:
-    0 12px 30px
-    rgba(47, 42, 36, 0.15);
-  z-index: 10;
-}
-
-
-.playlist-item {
-  width: 100%;
-  padding: 9px 10px;
   border: none;
-  border-radius: 8px;
-  background: transparent;
-  color: #2f2a24;
-  font-size: 0.88rem;
+  border-radius: 10px;
+
+  background:
+    rgba(255, 255, 255, 0.75);
+
+  color: var(--text);
+
+  font-family: inherit;
+  font-size: clamp(0.8rem, 1vw, 0.9rem);
+
   text-align: left;
+
   cursor: pointer;
 }
 
+.playlist-button::after {
+  content: "⌄";
+
+  float: right;
+
+  opacity: 0.5;
+}
+
+.playlist-menu {
+  position: absolute;
+
+  top: calc(100% + 8px);
+
+  left: 0;
+  right: 0;
+
+  z-index: 10;
+
+  max-height: min(40vh, 300px);
+
+  overflow-y: auto;
+
+  padding: 6px;
+
+  border-radius: 12px;
+
+  background:
+    rgba(250, 246, 236, 0.98);
+
+  box-shadow:
+    0 12px 30px
+    rgba(47, 42, 36, 0.15);
+}
+
+.playlist-item {
+  width: 100%;
+
+  padding:
+    9px
+    10px;
+
+  border: none;
+  border-radius: 8px;
+
+  background: transparent;
+
+  color: var(--text);
+
+  font-family: inherit;
+  font-size: 0.88rem;
+
+  text-align: left;
+
+  cursor: pointer;
+}
 
 .playlist-item:hover {
   background:
@@ -264,36 +687,48 @@ blockquote {
 
 .album-container {
   position: relative;
+
   width: 100%;
+
   aspect-ratio: 1 / 1;
+
   overflow: hidden;
+
   border-radius: 12px;
+
   background:
     rgba(47, 42, 36, 0.08);
 }
 
-
 #album-art {
   width: 100%;
   height: 100%;
+
   object-fit: cover;
+
   display: block;
 }
 
-
 #album-placeholder {
   position: absolute;
+
   inset: 0;
+
   display: flex;
+
   flex-direction: column;
+
   justify-content: center;
   align-items: center;
+
   gap: clamp(8px, 1vw, 12px);
+
   text-align: center;
+
   opacity: 0.5;
+
   font-size: clamp(0.9rem, 1vw, 1rem);
 }
-
 
 .placeholder-icon {
   font-size: clamp(2.2rem, 3vw, 3rem);
@@ -305,26 +740,33 @@ blockquote {
    ============================================================ */
 
 .track-info {
-  text-align: center;
   min-width: 0;
-}
 
+  text-align: center;
+}
 
 #track-name {
   font-size: clamp(0.9rem, 1vw, 1rem);
   font-weight: 700;
+
   white-space: nowrap;
+
   overflow: hidden;
+
   text-overflow: ellipsis;
 }
 
-
 #track-artist {
   margin-top: clamp(2px, 0.4vh, 3px);
+
   font-size: clamp(0.78rem, 0.9vw, 0.88rem);
+
   opacity: 0.65;
+
   white-space: nowrap;
+
   overflow: hidden;
+
   text-overflow: ellipsis;
 }
 
@@ -335,23 +777,29 @@ blockquote {
 
 .player-controls {
   display: flex;
+
   justify-content: center;
+
   gap: clamp(8px, 1vw, 10px);
 }
-
 
 .player-controls button {
   width: clamp(32px, 3vw, 36px);
   height: clamp(32px, 3vw, 36px);
-  font-size: clamp(0.9rem, 1vw, 1rem);
+
   border: none;
+
   border-radius: 50%;
-  cursor: pointer;
+
   background:
     rgba(255, 255, 255, 0.75);
-  color: #2f2a24;
-}
 
+  color: var(--text);
+
+  font-size: clamp(0.9rem, 1vw, 1rem);
+
+  cursor: pointer;
+}
 
 .player-controls button:hover {
   background:
@@ -365,21 +813,26 @@ blockquote {
 
 #spotify-status {
   text-align: center;
+
   font-size: 0.72rem;
+
   opacity: 0.45;
 }
 
 
 /* ============================================================
-   PHONE PORTRAIT
+   PHONE / PORTRAIT
    ============================================================ */
 
 @media (max-width: 900px) and (orientation: portrait) {
+
   html,
   body {
     width: 100%;
     height: auto;
+
     min-height: 100%;
+
     overflow-x: hidden;
     overflow-y: auto;
   }
@@ -391,25 +844,125 @@ blockquote {
   .home {
     width: 100%;
     min-height: 100dvh;
+
     height: auto;
-    grid-template-columns: 1fr;
-    align-items: start;
-    align-content: start;
-    gap: clamp(24px, 4vh, 36px);
+
+    align-items: flex-start;
+
     padding:
-      max(28px, calc(env(safe-area-inset-top) + 20px))
-      24px
-      max(40px, calc(env(safe-area-inset-bottom) + 20px));
+      max(18px, calc(env(safe-area-inset-top) + 12px))
+      12px
+      max(28px, calc(env(safe-area-inset-bottom) + 16px));
   }
 
-  .orientation,
-  .media-area {
+  .journal-shell {
     width: 100%;
+
+    height: auto;
+
+    min-height: 0;
   }
 
-  .mini-player {
-    width: min(90vw, 300px);
+
+  /* ------------------------------------------------------------
+     MOBILE TABS
+     ------------------------------------------------------------ */
+
+  .journal-tabs {
+    gap: 4px;
+
+    padding-left: 10px;
+
+    overflow-x: auto;
   }
+
+  .journal-tab {
+    flex: 0 0 auto;
+
+    padding:
+      9px
+      14px;
+
+    font-size: clamp(0.95rem, 4vw, 1.15rem);
+  }
+
+
+  /* ------------------------------------------------------------
+     MOBILE JOURNAL
+     ------------------------------------------------------------ */
+
+  .journal {
+    display: grid;
+
+    grid-template-columns: 1fr;
+
+    grid-template-rows:
+      auto
+      auto
+      auto;
+
+    gap: 18px;
+
+    padding:
+      20px
+      14px
+      18px;
+  }
+
+
+  /* ------------------------------------------------------------
+     MOBILE LEFT COLUMN
+     ------------------------------------------------------------ */
+
+  .orientation {
+    grid-column: 1;
+
+    grid-row: auto;
+
+    grid-template-rows:
+      auto
+      auto;
+
+    gap: 14px;
+
+    height: auto;
+  }
+
+
+  /* ------------------------------------------------------------
+     MOBILE SPOTIFY
+     ------------------------------------------------------------ */
+
+  .media-area {
+    grid-column: 1;
+
+    grid-row: auto;
+
+    height: auto;
+  }
+
+
+  /* ------------------------------------------------------------
+     MOBILE PANELS
+     ------------------------------------------------------------ */
+
+  .date-panel,
+  .weather-panel,
+  .spotify-panel {
+    height: auto;
+  }
+
+  .game-panel {
+    padding:
+      24px
+      16px
+      18px;
+  }
+
+
+  /* ------------------------------------------------------------
+     MOBILE DATE / TIME
+     ------------------------------------------------------------ */
 
   #time {
     display: none !important;
@@ -417,26 +970,98 @@ blockquote {
 
   #date {
     margin-top: 0;
+
     font-size: clamp(2rem, 7.5vw, 2.8rem);
-    font-weight: 700;
+
     line-height: 1.05;
+
+    white-space: normal;
   }
 
+
+  /* ------------------------------------------------------------
+     MOBILE WEATHER
+     ------------------------------------------------------------ */
+
   .weather {
-    margin-top: clamp(24px, 4vh, 32px);
+    margin-top: 8px;
   }
 
   #weather-current {
-    font-size: clamp(1.6rem, 6vw, 2.2rem);
+    flex-wrap: wrap;
+
+    justify-content: center;
+
+    font-size: clamp(1.5rem, 6vw, 2.1rem);
+  }
+
+  #temp-icon {
+    width: 32px;
+    height: 32px;
+  }
+
+  #weather-icon {
+    width: 42px;
+    height: 42px;
   }
 
   #weather-range {
     font-size: clamp(1rem, 4vw, 1.3rem);
   }
 
-  blockquote {
-    width: min(90%, 34rem);
-    margin-top: clamp(28px, 5vh, 40px);
+  #weather-afternoon,
+  #weather-overnight,
+  .weather-alert-line,
+  #weather-event {
+    flex-wrap: wrap;
+
+    text-align: center;
+
+    font-size: clamp(1rem, 4vw, 1.25rem);
+  }
+
+  .weather-alert-icon {
+    width: 24px;
+    height: 24px;
+  }
+
+
+  /* ------------------------------------------------------------
+     MOBILE SPOTIFY
+     ------------------------------------------------------------ */
+
+  .spotify-panel {
+    min-height: 220px;
+  }
+
+  .mini-player {
+    width: min(90vw, 300px);
+  }
+
+
+  /* ------------------------------------------------------------
+     MOBILE QUOTE
+     ------------------------------------------------------------ */
+
+  .journal > blockquote {
+    grid-column: 1;
+
+    width: 100%;
+    height: auto;
+
+    margin: 0;
+
+    padding:
+      8px
+      0
+      2px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    font-size: clamp(1.05rem, 4.5vw, 1.35rem);
   }
 }
 
@@ -446,22 +1071,28 @@ blockquote {
    ============================================================ */
 
 @media (orientation: landscape) and (min-aspect-ratio: 4/3) {
+
   html,
   body {
     width: 100%;
     height: 100%;
+
     min-height: 100%;
+
     overflow: hidden;
   }
 
+
+  /* ------------------------------------------------------------
+     LANDSCAPE APP
+     ------------------------------------------------------------ */
+
   .home {
     width: 100%;
+
     height: 100dvh;
+
     min-height: 0;
-
-    grid-template-columns: 60% 40%;
-
-    align-items: center;
 
     padding:
       max(24px, calc(env(safe-area-inset-top) + 16px))
@@ -470,24 +1101,78 @@ blockquote {
       max(24px, calc(env(safe-area-inset-left) + 16px));
   }
 
-  .orientation {
-    width: 100%;
+
+  /* ------------------------------------------------------------
+     LANDSCAPE JOURNAL
+     ------------------------------------------------------------ */
+
+  .journal {
+    grid-template-rows:
+      minmax(0, 1fr)
+      30px;
+
+    padding:
+      clamp(36px, 4vw, 64px)
+      clamp(36px, 4vw, 64px)
+      20px;
   }
+
+
+  /* ------------------------------------------------------------
+     LANDSCAPE QUOTE
+     ------------------------------------------------------------ */
+
+  .journal > blockquote {
+    width: 100%;
+    height: 100%;
+
+    margin: 0;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+  }
+
+
+  /* ------------------------------------------------------------
+     LANDSCAPE TIME
+     ------------------------------------------------------------ */
 
   #time {
-    display: block !important;
-    font-size: clamp(2rem, 4.5vw, 4.5rem);
-    line-height: 0.9;
+    display: flex !important;
+
+    font-size: clamp(3rem, 3.5vw, 4rem);
+
+    line-height: 1;
   }
+
+
+  /* ------------------------------------------------------------
+     LANDSCAPE DATE
+     ------------------------------------------------------------ */
 
   #date {
-    margin-top: clamp(10px, 1.5vh, 16px);
-    font-size: clamp(3rem, 6vw, 6rem);
-    font-weight: 700;
+    margin-top: clamp(8px, 1vh, 14px);
+
+    font-size: clamp(4rem, 4vw, 5rem);
+
+    font-weight: 400;
+
+    line-height: 1;
+
+    white-space: nowrap;
   }
 
+
+  /* ------------------------------------------------------------
+     LANDSCAPE WEATHER
+     ------------------------------------------------------------ */
+
   .weather {
-    margin-top: clamp(24px, 4vh, 35px);
+    margin-top: 8px;
   }
 
   #weather-current {
@@ -496,18 +1181,14 @@ blockquote {
 
   #weather-range {
     margin-top: clamp(5px, 1vh, 8px);
+
     font-size: clamp(1.2rem, 2vw, 1.6rem);
   }
 
-  blockquote {
-    width: min(80%, 45vw);
-    margin-top: clamp(26px, 4vh, 35px);
-    font-size: clamp(1.25rem, 2vw, 1.8rem);
-  }
 
-  .media-area {
-    width: 100%;
-  }
+  /* ------------------------------------------------------------
+     LANDSCAPE SPOTIFY PLAYER
+     ------------------------------------------------------------ */
 
   .mini-player {
     width: min(75%, 360px);

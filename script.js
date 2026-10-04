@@ -59,8 +59,10 @@ async function updateWeather() {
       `&longitude=${longitude}` +
       `&current=temperature_2m,weather_code` +
       `&hourly=temperature_2m,precipitation_probability,weather_code` +
-      `&daily=temperature_2m_max,temperature_2m_min` +
+      `&daily=temperature_2m_max,temperature_2m_min,weather_code,snowfall_sum,wind_gusts_10m_max` +
       `&temperature_unit=fahrenheit` +
+      `&wind_speed_unit=mph` +
+      `&precipitation_unit=inch` +
       `&timezone=America%2FNew_York`;
 
     const response = await fetch(url);
@@ -68,6 +70,18 @@ async function updateWeather() {
 
     const currentTemp =
       Math.round(data.current.temperature_2m);
+
+    const tempIcon =
+      document.getElementById(
+        "temp-icon"
+      );
+
+    tempIcon.src =
+      getTemperatureIcon(
+        currentTemp
+      );
+
+    tempIcon.hidden = false;
 
     const high =
       Math.round(data.daily.temperature_2m_max[0]);
@@ -80,17 +94,35 @@ async function updateWeather() {
         data.current.weather_code
       );
 
-    document.getElementById(
-      "weather-current"
-    ).textContent =
-      `${currentTemp}° · ${weatherText}`;
+    const weatherIcon =
+      document.getElementById(
+        "weather-icon"
+      );
+
+    weatherIcon.src =
+      getWeatherIcon(
+        data.current.weather_code
+      );
+
+    weatherIcon.hidden = false;
 
     document.getElementById(
+      "weather-temp"
+    ).textContent =
+      `${currentTemp}°`;
+
+    document.getElementById(
+      "weather-condition"
+    ).textContent =
+      weatherText;
+
+    /* document.getElementById(
       "weather-range"
     ).textContent =
-      `High ${high}° · Low ${low}°`;
+      `High ${high}° · Low ${low}°`; */
 
     updateWeatherImpacts(data);
+    updateMajorWeatherEvent(data);
 
   } catch (error) {
     console.error(
@@ -298,13 +330,380 @@ function getWeatherDescription(code) {
   return weatherCodes[code] || "Weather";
 }
 
+function getWeatherIcon(code) {
+  if (code === 0) {
+    return "icons/weather-sunny.png";
+  }
+
+  if ([1, 2, 3, 45, 48].includes(code)) {
+    return "icons/weather-cloudy.png";
+  }
+
+  if (
+    [
+      51, 53, 55,
+      56, 57,
+      61, 63, 65,
+      66, 67,
+      80, 81, 82
+    ].includes(code)
+  ) {
+    return "icons/weather-rainy.png";
+  }
+
+  if (
+    [71, 73, 75, 77, 85, 86]
+      .includes(code)
+  ) {
+    return "icons/weather-snowy.png";
+  }
+
+  if ([95, 96, 99].includes(code)) {
+    return "icons/weather-rainy.png";
+  }
+
+  return "icons/weather-cloudy.png";
+}
+
+function getTemperatureIcon(temperature) {
+  if (temperature < 60) {
+    return "icons/temp-cold.png";
+  }
+
+  if (temperature < 80) {
+    return "icons/temp-mild.png";
+  }
+
+  return "icons/temp-hot.png";
+}
+
+function getAlertIcon(eventName) {
+  if (eventName.includes("Warning")) {
+    return "icons/alert-warning.png";
+  }
+
+  if (eventName.includes("Watch")) {
+    return "icons/alert-watch.png";
+  }
+
+  if (eventName.includes("Advisory")) {
+    return "icons/alert-watch.png";
+  }
+
+  return "icons/alert-watch.png";
+}
+
+async function updateWeatherAlerts() {
+  // console.log("updateWeatherAlerts is running");
+
+  const latitude = 39.92;
+  const longitude = -75.07;
+
+  const alertElement =
+    document.getElementById("weather-alerts");
+
+  try {
+    const url =
+      `https://api.weather.gov/alerts/active` +
+      `?point=${latitude},${longitude}`;
+
+    const response = await fetch(url);
+    const data = await response.json();
+
+    if (
+      !data.features ||
+      data.features.length === 0
+    ) {
+      alertElement.hidden = true;
+      alertElement.textContent = "";
+      return;
+    }
+
+    const alerts =
+      data.features.map(
+        feature => feature.properties
+      );
+
+    const sortedAlerts =
+      getAlertsByPriority(alerts);
+
+    const alertLines =
+      sortedAlerts.map(alert => {
+        const endTime =
+          alert.ends ||
+          alert.expires;
+
+        const endText =
+          formatAlertTime(endTime);
+
+        const alertName =
+          getAlertDisplayName(alert);
+
+        const alertIcon =
+          getAlertIcon(alert.event);
+
+        return `
+          <div class="weather-alert-line">
+            <img
+              src="${alertIcon}"
+              class="weather-alert-icon"
+              alt=""
+            >
+            <span>
+              ${alertName} · until ${endText}
+            </span>
+          </div>
+        `;
+      });
+
+    alertElement.innerHTML =
+      alertLines.join("");
+
+    alertElement.hidden = false;
+      } catch (error) {
+    console.error(
+      "Weather alert error:",
+      error
+    );
+
+    alertElement.hidden = true;
+  }
+}
+
+function getAlertsByPriority(alerts) {
+  const priority = {
+    Warning: 3,
+    Watch: 2,
+    Advisory: 1
+  };
+
+  return alerts.sort((a, b) => {
+    const aPriority =
+      getAlertPriority(
+        a.event,
+        priority
+      );
+
+    const bPriority =
+      getAlertPriority(
+        b.event,
+        priority
+      );
+
+    return bPriority - aPriority;
+  });
+}
+
+function getAlertPriority(
+  eventName,
+  priority
+) {
+  if (eventName.includes("Warning")) {
+    return priority.Warning;
+  }
+
+  if (eventName.includes("Watch")) {
+    return priority.Watch;
+  }
+
+  if (eventName.includes("Advisory")) {
+    return priority.Advisory;
+  }
+
+  return 0;
+}
+
+function getTropicalStormName(alert) {
+  const text =
+    `${alert.headline || ""} ${alert.description || ""}`;
+
+  const hurricaneMatch =
+    text.match(
+      /\bHurricane\s+([A-Z][A-Za-z-]+)\b/i
+    );
+
+  if (
+    hurricaneMatch &&
+    !["warning", "watch"].includes(
+      hurricaneMatch[1].toLowerCase()
+    )
+  ) {
+    return hurricaneMatch[1];
+  }
+
+  const tropicalStormMatch =
+    text.match(
+      /\bTropical Storm\s+([A-Z][A-Za-z-]+)\b/i
+    );
+
+  if (
+    tropicalStormMatch &&
+    !["warning", "watch"].includes(
+      tropicalStormMatch[1].toLowerCase()
+    )
+  ) {
+    return tropicalStormMatch[1];
+  }
+
+  return null;
+}
+
+function getAlertDisplayName(alert) {
+  const stormName =
+    getTropicalStormName(alert);
+
+  if (!stormName) {
+    return alert.event;
+  }
+
+  if (
+    alert.event.startsWith("Hurricane ")
+  ) {
+    return alert.event.replace(
+      "Hurricane ",
+      `Hurricane ${stormName} `
+    );
+  }
+
+  if (
+    alert.event.startsWith("Tropical Storm ")
+  ) {
+    return alert.event.replace(
+      "Tropical Storm ",
+      `Tropical Storm ${stormName} `
+    );
+  }
+
+  return alert.event;
+}
+
+function formatAlertTime(time) {
+  if (!time) {
+    return "later";
+  }
+
+  const date =
+    new Date(time);
+
+  return date.toLocaleTimeString(
+    [],
+    {
+      hour: "numeric",
+      minute: "2-digit"
+    }
+  );
+}
+
+function getMajorWeatherEvent(data) {
+  for (
+    let i = 1;
+    i < data.daily.time.length;
+    i++
+  ) {
+    const date =
+      data.daily.time[i];
+
+    const dayName =
+      formatForecastDay(date);
+
+    const weatherCode =
+      data.daily.weather_code[i];
+
+    const snowfall =
+      data.daily.snowfall_sum[i];
+
+    const windGust =
+      data.daily.wind_gusts_10m_max[i];
+
+    if (snowfall >= 4) {
+      return `Heavy snow possible ${dayName}`;
+    }
+
+    if (
+      [95, 96, 99].includes(weatherCode)
+    ) {
+      return `Strong storms possible ${dayName}`;
+    }
+
+    if (windGust >= 45) {
+      return `Strong winds possible ${dayName}`;
+    }
+  }
+
+  return null;
+}
+
+function updateMajorWeatherEvent(data) {
+  const eventElement =
+    document.getElementById("weather-event");
+
+  const event =
+    getMajorWeatherEvent(data);
+
+  if (!event) {
+    eventElement.hidden = true;
+    document.getElementById(
+      "weather-event-text"
+    ).textContent = "";
+    return;
+  }
+
+  const eventIcon =
+    document.getElementById(
+      "weather-event-icon"
+    );
+
+  const eventText =
+    document.getElementById(
+      "weather-event-text"
+    );
+
+  eventIcon.src =
+    "icons/weather-major-event.png";
+
+  eventText.textContent =
+    event;
+
+  eventElement.hidden = false;
+}
+
+function formatForecastDay(dateString) {
+  const date =
+    new Date(
+      `${dateString}T12:00:00`
+    );
+
+  return date.toLocaleDateString(
+    [],
+    {
+      weekday: "long"
+    }
+  );
+}
+
+function getTropicalClassification(code) {
+  const classifications = {
+    HU: "Hurricane",
+    TS: "Tropical Storm",
+    TD: "Tropical Depression"
+  };
+
+  return classifications[code] || code;
+}
+
 updateWeather();
+updateWeatherAlerts();
+
 
 setInterval(
   updateWeather,
   30 * 60 * 1000
 );
 
+setInterval(
+  updateWeatherAlerts,
+  15 * 60 * 1000
+);
 
 // ============================================================
 // SPOTIFY SETTINGS
