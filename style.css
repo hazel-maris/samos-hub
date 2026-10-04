@@ -6,13 +6,18 @@
   display: none !important;
 }
 
+html,
 body {
   margin: 0;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  min-height: 100%;
+}
+
+body {
+  min-height: 100vh;
+  min-height: 100dvh;
 
   overflow: hidden;
-
   font-family: system-ui, sans-serif;
   color: #2f2a24;
 
@@ -53,17 +58,15 @@ body {
    ============================================================ */
 
 .home {
-  height: 100vh;
-  min-height: 100vh;
-
-  display: flex;
-
-  justify-content: center;
+  width: 100%;
+  min-height: 100dvh;
+  min-height: 100dvh;
+  display: grid;
+  grid-template-columns: 60% 40%;
   align-items: center;
-
-  gap: 190px;
-
-  padding: 60px 40px;
+  padding:
+    clamp(24px, 4vh, 60px)
+    clamp(20px, 3vw, 40px);
 }
 
 
@@ -72,57 +75,46 @@ body {
    ============================================================ */
 
 .orientation {
-  width: 700px;
-
-  flex: 0 0 700px;
-
+  width: 100%;
   text-align: center;
 }
 
 
 #time {
-  font-size: 9rem;
-
+  font-size: clamp(5rem, 10vw, 9rem);
   font-weight: 700;
   line-height: 1;
-
   white-space: nowrap;
 }
 
 
 #date {
-  margin-top: 18px;
-
-  font-size: 2rem;
+  margin-top: clamp(10px, 1.5vh, 18px);
+  font-size: clamp(1.5rem, 2.5vw, 2rem);
 }
 
 
 .weather {
-  margin-top: 54px;
+  margin-top: clamp(24px, 4vh, 54px);
 }
 
 
 #weather-current {
-  font-size: 3rem;
-
+  font-size: clamp(2rem, 4vw, 3rem);
   font-weight: 600;
 }
 
 
 #weather-range {
-  margin-top: 10px;
-
-  font-size: 1.6rem;
+  margin-top: clamp(6px, 1vh, 10px);
+  font-size: clamp(1.1rem, 2vw, 1.6rem);
 }
 
 
 blockquote {
-  max-width: 650px;
-
-  margin: 62px auto 0;
-
-  font-size: 1.8rem;
-
+  width: min(90%, 45vw);
+  margin: clamp(28px, 4vh, 62px) auto 0;
+  font-size: clamp(1.25rem, 2vw, 1.8rem);
   font-style: italic;
 }
 
@@ -132,26 +124,21 @@ blockquote {
    ============================================================ */
 
 .media-area {
-  width: 300px;
-
-  flex: 0 0 300px;
-
+  width: 100%;
   display: flex;
-
   justify-content: center;
   align-items: center;
+  justify-self: center;
 }
 
-
 #spotify-login {
-  padding: 12px 20px;
-
   border: none;
-  border-radius: 10px;
-
-  font-size: 1rem;
-
   cursor: pointer;
+  padding:
+    clamp(10px, 1vh, 12px)
+    clamp(16px, 2vw, 20px);
+  border-radius: clamp(8px, 1vw, 10px);
+  font-size: clamp(0.9rem, 1.2vw, 1rem);
 }
 
 
@@ -160,19 +147,13 @@ blockquote {
    ============================================================ */
 
 .mini-player {
-  width: 300px;
-
+  width: min(75%, 360px);
   display: flex;
   flex-direction: column;
-
-  gap: 12px;
-
-  padding: 14px;
-
-  border-radius: 18px;
-
-  background:
-    rgba(255, 255, 255, 0.24);
+  gap: clamp(8px, 1.2vw, 12px);
+  padding: clamp(10px, 1.5vw, 14px);
+  border-radius: clamp(12px, 1.5vw, 18px);
+  background: rgba(255, 255, 255, 0.24);
 }
 
 
@@ -187,76 +168,54 @@ blockquote {
 
 .playlist-button {
   width: 100%;
-
-  padding: 10px 12px;
-
   border: none;
   border-radius: 10px;
-
   background:
     rgba(255, 255, 255, 0.75);
-
   color: #2f2a24;
-
-  font-size: 0.9rem;
-
   text-align: left;
-
   cursor: pointer;
+  padding:
+    clamp(8px, 1vh, 10px)
+    clamp(10px, 1vw, 12px);
+  font-size: clamp(0.8rem, 1vw, 0.9rem);
 }
 
 
 .playlist-button::after {
   content: "⌄";
-
   float: right;
-
   opacity: 0.5;
 }
 
 
 .playlist-menu {
   position: absolute;
-
   top: calc(100% + 8px);
   left: 0;
   right: 0;
-
-  max-height: 300px;
-
+  max-height: min(40vh, 300px);
   overflow-y: auto;
-
   padding: 6px;
-
   border-radius: 12px;
-
   background:
     rgba(250, 246, 236, 0.98);
-
   box-shadow:
     0 12px 30px
     rgba(47, 42, 36, 0.15);
-
   z-index: 10;
 }
 
 
 .playlist-item {
   width: 100%;
-
   padding: 9px 10px;
-
   border: none;
   border-radius: 8px;
-
   background: transparent;
-
   color: #2f2a24;
-
   font-size: 0.88rem;
-
   text-align: left;
-
   cursor: pointer;
 }
 
@@ -273,14 +232,10 @@ blockquote {
 
 .album-container {
   position: relative;
-
   width: 100%;
   aspect-ratio: 1 / 1;
-
   overflow: hidden;
-
   border-radius: 12px;
-
   background:
     rgba(47, 42, 36, 0.08);
 }
@@ -289,9 +244,7 @@ blockquote {
 #album-art {
   width: 100%;
   height: 100%;
-
   object-fit: cover;
-
   display: block;
 }
 
@@ -299,25 +252,19 @@ blockquote {
 #album-placeholder {
   position: absolute;
   inset: 0;
-
   display: flex;
   flex-direction: column;
-
   justify-content: center;
   align-items: center;
-
-  gap: 12px;
-
+  gap: clamp(8px, 1vw, 12px);
   text-align: center;
-
   opacity: 0.5;
-
-  font-size: 1rem;
+  font-size: clamp(0.9rem, 1vw, 1rem);
 }
 
 
 .placeholder-icon {
-  font-size: 3rem;
+  font-size: clamp(2.2rem, 3vw, 3rem);
 }
 
 
@@ -327,15 +274,13 @@ blockquote {
 
 .track-info {
   text-align: center;
-
   min-width: 0;
 }
 
 
 #track-name {
-  font-size: 1rem;
+  font-size: clamp(0.9rem, 1vw, 1rem);
   font-weight: 700;
-
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -343,12 +288,9 @@ blockquote {
 
 
 #track-artist {
-  margin-top: 3px;
-
-  font-size: 0.88rem;
-
+  margin-top: clamp(2px, 0.4vh, 3px);
+  font-size: clamp(0.78rem, 0.9vw, 0.88rem);
   opacity: 0.65;
-
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -361,27 +303,20 @@ blockquote {
 
 .player-controls {
   display: flex;
-
   justify-content: center;
-
-  gap: 10px;
+  gap: clamp(8px, 1vw, 10px);
 }
 
 
 .player-controls button {
-  width: 36px;
-  height: 36px;
-
+  width: clamp(32px, 3vw, 36px);
+  height: clamp(32px, 3vw, 36px);
+  font-size: clamp(0.9rem, 1vw, 1rem);
   border: none;
   border-radius: 50%;
-
-  font-size: 1rem;
-
   cursor: pointer;
-
   background:
     rgba(255, 255, 255, 0.75);
-
   color: #2f2a24;
 }
 
@@ -398,9 +333,7 @@ blockquote {
 
 #spotify-status {
   text-align: center;
-
   font-size: 0.72rem;
-
   opacity: 0.45;
 }
 
@@ -410,140 +343,62 @@ blockquote {
    ============================================================ */
 
 @media (max-width: 900px) and (orientation: portrait) {
-
-  body {
-    height: auto;
-    min-height: 100vh;
-
-    overflow-y: auto;
-    overflow-x: hidden;
-  }
-
-  .home {
-    min-height: 100vh;
-    height: auto;
-
-    flex-direction: column;
-
-    gap: 50px;
-
-    padding: 40px 24px;
-  }
-
-  .orientation {
-    width: 100%;
-    flex-basis: auto;
-  }
-
-  .media-area {
-    width: 100%;
-    flex-basis: auto;
-  }
-
-  .mini-player {
-    width: min(300px, 90vw);
-  }
-
-  #time {
-    display: none;
-  }
-}
-
-
-/* ============================================================
-   PHONE PORTRAIT
-   ============================================================ */
-
-@media (max-width: 900px) and (orientation: portrait) {
-
   html,
   body {
     width: 100%;
     height: auto;
     min-height: 100%;
-
     overflow-x: hidden;
     overflow-y: auto;
   }
 
+  body {
+    min-height: 100dvh;
+  }
+
   .home {
     width: 100%;
+    min-height: 100dvh;
     height: auto;
-    min-height: 100vh;
 
-    flex-direction: column;
+    grid-template-columns: 1fr;
 
-    /* THIS is the important fix */
-    justify-content: flex-start;
-    align-items: center;
+    align-items: start;
 
-    gap: 50px;
+    gap: clamp(32px, 6vh, 50px);
 
-    padding: 50px 24px 70px;
+    padding:
+      clamp(24px, 5vh, 50px)
+      clamp(16px, 6vw, 24px)
+      clamp(40px, 8vh, 70px);
   }
 
-  .orientation {
-    width: 100%;
-
-    flex: none;
-
-    text-align: center;
-  }
-
+  .orientation,
   .media-area {
     width: 100%;
-
-    flex: none;
-
-    justify-content: center;
   }
 
   .mini-player {
-    width: min(300px, 90vw);
+    width: min(90vw, 300px);
   }
-
-  #time {
-    display: none;
-  }
-
-  #date {
-    font-size: clamp(1.2rem, 5vw, 1.8rem);
-  }
-
-  .weather {
-    margin-top: 40px;
-  }
-
-  blockquote {
-    margin-top: 45px;
-  }
-}
-@media (max-width: 900px) {
 
   #time {
     display: none !important;
   }
 
-  .home {
-    justify-content: flex-start;
-    padding-top: 24px;
-  }
-
   #date {
     margin-top: 0;
-
     font-size: clamp(2.4rem, 9vw, 3.5rem);
     font-weight: 700;
     line-height: 1.1;
   }
 
   .weather {
-    margin-top: 26px;
+    margin-top: clamp(22px, 4vh, 32px);
   }
 
   #weather-current {
     font-size: clamp(1.6rem, 6vw, 2.2rem);
-    font-weight: 600;
   }
 
   #weather-range {
@@ -551,11 +406,15 @@ blockquote {
   }
 
   blockquote {
-    margin-top: 32px;
+    width: min(90%, 34rem);
+    margin-top: clamp(28px, 5vh, 40px);
   }
 }
 
-/* External monitor / landscape SamOS Hub */
+/* ============================================================
+   LANDSCAPE / EXTERNAL DISPLAY
+   ============================================================ */
+
 @media (orientation: landscape) and (min-aspect-ratio: 4/3) {
   html,
   body {
@@ -567,35 +426,35 @@ blockquote {
 
   .home {
     width: 100%;
-    height: 100vh;
+    height: 100dvh;
     min-height: 0;
 
-    flex-direction: row;
-    justify-content: center;
+    grid-template-columns: 60% 40%;
+
     align-items: center;
 
-    gap: clamp(60px, 10vw, 180px);
-    padding: 30px 50px;
+    padding:
+      clamp(20px, 4vh, 40px)
+      clamp(24px, 4vw, 50px);
   }
 
   .orientation {
-    width: min(58vw, 700px);
-    flex: 0 1 auto;
+    width: 100%;
   }
 
   #time {
     display: block !important;
     font-size: clamp(5rem, 10vw, 9rem);
-    line-height: .9;
+    line-height: 0.9;
   }
 
   #date {
-    margin-top: 16px;
+    margin-top: clamp(10px, 1.5vh, 16px);
     font-size: clamp(1.5rem, 2.5vw, 2rem);
   }
 
   .weather {
-    margin-top: 35px;
+    margin-top: clamp(24px, 4vh, 35px);
   }
 
   #weather-current {
@@ -603,17 +462,21 @@ blockquote {
   }
 
   #weather-range {
-    margin-top: 6px;
+    margin-top: clamp(5px, 1vh, 8px);
     font-size: clamp(1.2rem, 2vw, 1.6rem);
   }
 
   blockquote {
-    margin-top: 35px;
+    width: min(80%, 45vw);
+    margin-top: clamp(26px, 4vh, 35px);
     font-size: clamp(1.25rem, 2vw, 1.8rem);
   }
 
   .media-area {
-    width: 300px;
-    flex: 0 0 300px;
+    width: 100%;
+  }
+
+  .mini-player {
+    width: min(75%, 360px);
   }
 }
