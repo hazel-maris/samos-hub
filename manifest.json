@@ -1,6 +1,6 @@
 {
   "name": "SamOS Hub",
-  "short_name": "SamOS",
+  "short_name": "SamOS Hub",
   "start_url": "/samos-hub/",
   "scope": "/samos-hub/",
   "display": "fullscreen",

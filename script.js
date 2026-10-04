@@ -301,9 +301,13 @@ async function getAccessToken(code) {
 
   saveSpotifyTokens(data);
 
+  // Deleting the PKCE verifier because I don't need it anymore.
+  localStorage.removeItem(
+    "spotify_code_verifier"
+  );
+
   return data.access_token;
 }
-
 
 function saveSpotifyTokens(data) {
   spotifyAccessToken =
@@ -330,7 +334,6 @@ function saveSpotifyTokens(data) {
     expiresAt
   );
 }
-
 
 async function refreshSpotifyToken() {
   const refreshToken =
@@ -382,7 +385,6 @@ async function refreshSpotifyToken() {
   return data.access_token;
 }
 
-
 async function getValidSpotifyToken() {
   const storedToken =
     localStorage.getItem(
@@ -424,6 +426,27 @@ async function getValidSpotifyToken() {
 // HANDLE SPOTIFY REDIRECT
 // ============================================================
 
+function showSpotifyLogin() {
+  document.getElementById(
+    "spotify-login-message"
+  ).hidden = false;
+
+  document.getElementById(
+    "spotify-login"
+  ).hidden = false;
+}
+
+function hideSpotifyLogin() {
+  document.getElementById(
+    "spotify-login-message"
+  ).hidden = true;
+
+  document.getElementById(
+    "spotify-login"
+  ).hidden = true;
+}
+
+
 async function handleSpotifyRedirect() {
   const params =
     new URLSearchParams(
@@ -437,6 +460,9 @@ async function handleSpotifyRedirect() {
     try {
       const accessToken =
         await getAccessToken(code);
+
+      // Hide login button in the fresh OAuth callback path.  
+      hideSpotifyLogin();
 
       // Remove ?code=blahblah from URL
       window.history.replaceState(
@@ -457,18 +483,23 @@ async function handleSpotifyRedirect() {
   }
 
 
-  // If we've already connected before,
-  // try using the stored token.
+  // If we've already connected before, try using the stored token.
+  // If no stored token, tell me to reconnect.
   const storedToken =
     await getValidSpotifyToken();
 
   if (storedToken) {
+    hideSpotifyLogin();
+
     initializeSpotifyPlayer(
       storedToken
     );
-  }
-}
 
+    return;
+  }
+
+  showSpotifyLogin();
+}
 
 // ============================================================
 // LOAD SPOTIFY WEB PLAYBACK SDK
@@ -575,11 +606,7 @@ function initializeSpotifyPlayer(
             false;
 
 
-          document.getElementById(
-            "spotify-login"
-          ).hidden =
-            true;
-
+          hideSpotifyLogin();
 
           await transferPlaybackToSamOS();
 

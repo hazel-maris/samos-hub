@@ -125,9 +125,17 @@ blockquote {
 .media-area {
   width: 100%;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   justify-self: center;
+}
+
+#spotify-login-message {
+  margin-bottom: 12px;
+  font-size: 0.9rem;
+  text-align: center;
+  opacity: 0.7;
 }
 
 #spotify-login {
@@ -265,6 +273,7 @@ blockquote {
 .placeholder-icon {
   font-size: clamp(2.2rem, 3vw, 3rem);
 }
+
 
 /* ============================================================
    TRACK INFO
@@ -405,6 +414,7 @@ blockquote {
     margin-top: clamp(28px, 5vh, 40px);
   }
 }
+
 
 /* ============================================================
    LANDSCAPE / EXTERNAL DISPLAY
