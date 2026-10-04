@@ -266,7 +266,6 @@ blockquote {
   font-size: clamp(2.2rem, 3vw, 3rem);
 }
 
-
 /* ============================================================
    TRACK INFO
    ============================================================ */
@@ -359,17 +358,14 @@ blockquote {
     width: 100%;
     min-height: 100dvh;
     height: auto;
-
     grid-template-columns: 1fr;
-
     align-items: start;
-
-    gap: clamp(32px, 6vh, 50px);
-
+    align-content: start;
+    gap: clamp(24px, 4vh, 36px);
     padding:
-      clamp(24px, 5vh, 50px)
-      clamp(16px, 6vw, 24px)
-      clamp(40px, 8vh, 70px);
+      max(28px, calc(env(safe-area-inset-top) + 20px))
+      24px
+      max(40px, calc(env(safe-area-inset-bottom) + 20px));
   }
 
   .orientation,
@@ -387,13 +383,13 @@ blockquote {
 
   #date {
     margin-top: 0;
-    font-size: clamp(2.4rem, 9vw, 3.5rem);
+    font-size: clamp(2rem, 7.5vw, 2.8rem);
     font-weight: 700;
-    line-height: 1.1;
+    line-height: 1.05;
   }
 
   .weather {
-    margin-top: clamp(22px, 4vh, 32px);
+    margin-top: clamp(24px, 4vh, 32px);
   }
 
   #weather-current {
@@ -433,8 +429,10 @@ blockquote {
     align-items: center;
 
     padding:
-      clamp(20px, 4vh, 40px)
-      clamp(24px, 4vw, 50px);
+      max(24px, calc(env(safe-area-inset-top) + 16px))
+      max(24px, calc(env(safe-area-inset-right) + 16px))
+      max(24px, calc(env(safe-area-inset-bottom) + 16px))
+      max(24px, calc(env(safe-area-inset-left) + 16px));
   }
 
   .orientation {
@@ -443,13 +441,14 @@ blockquote {
 
   #time {
     display: block !important;
-    font-size: clamp(5rem, 10vw, 9rem);
+    font-size: clamp(3.5rem, 6vw, 6rem);
     line-height: 0.9;
   }
 
   #date {
     margin-top: clamp(10px, 1.5vh, 16px);
-    font-size: clamp(1.5rem, 2.5vw, 2rem);
+    font-size: clamp(4rem, 7vw, 7rem);
+    font-weight: 700;
   }
 
   .weather {
