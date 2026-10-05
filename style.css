@@ -1014,15 +1014,36 @@ body {
   #weather-event {
     flex-wrap: wrap;
 
-    text-align: center;
+    text-align: left;
 
     font-size: clamp(1rem, 4vw, 1.25rem);
   }
 
-  .weather-alert-icon {
-    width: 24px;
-    height: 24px;
-  }
+#weather-overnight,
+#weather-alerts,
+#weather-event,
+#weather-afternoon {
+  width: fit-content;
+  max-width: 90%;
+
+  margin-left: auto;
+  margin-right: auto;
+
+  text-align: left;
+}
+
+#weather-overnight {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+
+  gap: 8px;
+}
+
+.weather-alert-icon {
+  width: 24px;
+  height: 24px;
+}
 
 
   /* ------------------------------------------------------------
