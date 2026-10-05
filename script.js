@@ -26,6 +26,13 @@ let spotifyPlayer = null;
 let spotifyDeviceId = null;
 let selectedPlaylistUri = null;
 
+// TEMP
+const debugSize = document.getElementById("debug-size");
+
+debugSize.textContent =
+  `${window.innerWidth} × ${window.innerHeight} | DPR ${window.devicePixelRatio}`;
+//
+
 // ============================================================
 // CLOCK
 // ============================================================
