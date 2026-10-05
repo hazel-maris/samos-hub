@@ -36,43 +36,61 @@
 
                 <div class="game-panel weather-panel">
                     <div class="weather">
+
                         <div class="weather-current-row">
+                            <div id="weather-current">
 
-                        <div id="weather-current">
+                                <img
+                                    id="temp-icon"
+                                    src=""
+                                    alt=""
+                                    hidden
+                                >
 
-                            <img
-                            id="temp-icon"
-                            src=""
-                            alt=""
-                            hidden
-                            >
-                            <span id="weather-temp"></span>
-                            <!-- <span class="weather-separator">·</span> -->
+                                <span id="weather-temp"></span>
 
-                            <img
-                            id="weather-icon"
-                            src=""
-                            alt=""
-                            hidden
-                            >
-                            <span id="weather-condition"></span>
-                        </div>                
-                    </div>
+                                <img
+                                    id="weather-icon"
+                                    src=""
+                                    alt=""
+                                    hidden
+                                >
 
-                    <div id="weather-event" hidden>
-                        <img
-                            id="weather-event-icon"
-                            src=""
-                            alt=""
-                        >
-                        <span id="weather-event-text"></span>
-                    </div>
+                                <span id="weather-condition"></span>
+
+                            </div>
+                        </div>
 
                         <div id="weather-range"></div>
-                        <div id="weather-afternoon" hidden></div>
-                        <div id="weather-overnight" hidden></div>
-                        <div id="weather-alerts" hidden></div>
-                        <div id="weather-tropical" hidden></div>
+
+                        <div class="weather-details">
+
+                            <div id="weather-event" hidden>
+                                <img
+                                    id="weather-event-icon"
+                                    src=""
+                                    alt=""
+                                >
+                                <span id="weather-event-text"></span>
+                            </div>
+
+                            <div id="weather-afternoon" hidden></div>
+
+                            <div id="weather-overnight" hidden>
+                                <img
+                                    class="overnight-icon"
+                                    src="icons/weather-moon.png"
+                                    alt=""
+                                >
+                                <span id="weather-overnight-text"></span>
+                            </div>
+
+                            <div id="weather-alerts" hidden></div>
+
+                            <div id="weather-tropical" hidden></div>
+
+                        </div>
+
                     </div>
                 </div>
             </section>

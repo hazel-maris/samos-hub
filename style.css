@@ -322,8 +322,7 @@ body {
 
 #date {
   margin-top: clamp(10px, 1.5vh, 18px);
-
-  font-size: clamp(1rem, 2.5vw, 2rem);
+  font-size: clamp(3rem, 4vw, 5rem);
   font-weight: 400;
 }
 
@@ -336,13 +335,13 @@ body {
   margin-top: 28px;
 
   display: flex;
-
   align-items: baseline;
   justify-content: flex-start;
 
   gap: 8px;
 
   font-family: "VT323", sans-serif;
+  font-size: clamp(2.5rem, 3vw, 3.5rem);
 }
 
 #time-numbers {
@@ -1193,4 +1192,141 @@ body {
   .mini-player {
     width: min(75%, 360px);
   }
+}
+
+/* ============================================================
+   EXTERNAL DESKTOP TUNING
+   ============================================================ */
+
+@media (orientation: landscape) and (min-aspect-ratio: 4/3) {
+
+  .orientation {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    height: 100%;
+    min-height: 0;
+  }
+
+  .date-panel {
+    flex: 0 0 auto;
+    height: auto;
+  }
+
+  .weather-panel {
+    flex: 1 1 auto;
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+  }
+
+  #time {
+    display: flex !important;
+    font-size: clamp(3rem, 3.5vw, 4rem);
+    line-height: 1;
+  }
+
+  #date {
+    margin-top: 8px;
+    font-size: clamp(4.5rem, 5vw, 6rem);
+    font-weight: 400;
+    line-height: 0.95;
+    white-space: nowrap;
+  }
+
+  .weather {
+    margin-top: 4px;
+  }
+
+  #weather-afternoon {
+    margin-top: 6px;
+    margin-bottom: 8px;
+  }
+}
+
+/* ============================================================
+   WEATHER DETAIL LINES
+   Center the group, keep the contents left-aligned
+   ============================================================ */
+
+#weather-afternoon,
+#weather-overnight,
+#weather-alerts,
+#weather-event,
+#weather-tropical {
+  width: fit-content;
+  max-width: 90%;
+
+  margin-left: auto;
+  margin-right: auto;
+
+  text-align: left;
+}
+
+
+/* Keep icon + text lined up nicely */
+
+#weather-overnight,
+#weather-event,
+.weather-alert-line {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+
+  gap: 8px;
+}
+
+
+/* Overnight moon */
+
+.overnight-icon {
+  width: 28px;
+  height: 28px;
+
+  flex: 0 0 28px;
+
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+
+
+/* Keep the "no alerts" message visually aligned
+   with the other weather detail lines */
+
+#weather-alerts {
+  font-size: clamp(1.35rem, 2.25vw, 1.5rem);
+  line-height: 1.25;
+}
+
+
+/* Give the detail section a little breathing room */
+
+#weather-overnight {
+  margin-top: 8px;
+}
+
+#weather-alerts {
+  margin-top: 8px;
+}
+
+/* ============================================================
+   CENTER DATE + TIME
+   ============================================================ */
+
+.date-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+}
+
+#date {
+  text-align: center;
+}
+
+#time {
+  justify-content: center;
+  margin-top: 28px;
 }

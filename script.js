@@ -65,8 +65,13 @@ async function updateWeather() {
       `&precipitation_unit=inch` +
       `&timezone=America%2FNew_York`;
 
-    const response = await fetch(url);
-    const data = await response.json();
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    throw new Error(`Open-Meteo is bwoken :( Error: ${response.status}`);
+  }
+
+  const data = await response.json();
 
     const currentTemp =
       Math.round(data.current.temperature_2m);
@@ -203,6 +208,8 @@ function updateWeatherImpacts(data) {
       )
     );
 
+  const currentHour = new Date().getHours();
+
   if (overnightImpact) {
     overnightElement.textContent =
       `${overnightImpact.text} overnight · Low ${overnightLow}°`;
@@ -212,6 +219,12 @@ function updateWeatherImpacts(data) {
   } else if (overnightLow <= 32) {
     overnightElement.textContent =
       `Freezing overnight · Low ${overnightLow}°`;
+
+    overnightElement.hidden = false;
+
+  } else if (currentHour >= 18) {
+    overnightElement.textContent =
+      `Overnight · Low ${overnightLow}°`;
 
     overnightElement.hidden = false;
 
@@ -410,12 +423,16 @@ async function updateWeatherAlerts() {
     const response = await fetch(url);
     const data = await response.json();
 
+    console.log("NWS alerts:", data.features);
+
     if (
       !data.features ||
       data.features.length === 0
     ) {
-      alertElement.hidden = true;
-      alertElement.textContent = "";
+      alertElement.textContent =
+        "No active weather alerts or upcoming events.";
+
+      alertElement.hidden = false;
       return;
     }
 
