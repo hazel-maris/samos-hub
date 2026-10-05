@@ -1,7 +1,30 @@
 // ============================================================
-// SAMOS HUB
+// SamOS Hub — external-display-first reset
 // ============================================================
 
+const CONFIG = window.SAMOS_CONFIG || {};
+const SPOTIFY_CLIENT_ID = CONFIG.spotifyClientId || "";
+const WEATHER = CONFIG.weather || {
+  latitude: 39.92,
+  longitude: -75.07,
+  timezone: "America/New_York"
+};
+
+const SPOTIFY_REDIRECT_URI =
+  window.location.origin + window.location.pathname;
+
+const SPOTIFY_SCOPES = [
+  "streaming",
+  "user-read-private",
+  "user-read-email",
+  "user-read-playback-state",
+  "user-modify-playback-state",
+  "playlist-read-private"
+];
+
+let spotifyPlayer = null;
+let spotifyDeviceId = null;
+let selectedPlaylistUri = null;
 
 // ============================================================
 // CLOCK
@@ -15,1629 +38,672 @@ function updateClock() {
     minute: "2-digit"
   });
 
-  const timeParts = time.split(" ");
+  const parts = time.split(" ");
 
-  const timeNumbers = timeParts[0];
-  const timePeriod = timeParts[1] || "";
+  document.getElementById("time-numbers").textContent = parts[0];
+  document.getElementById("time-period").textContent = parts[1] || "";
 
-  const isPortrait =
-    window.matchMedia("(orientation: portrait)").matches;
-
-  const date = now.toLocaleDateString([], {
-    weekday: isPortrait ? "short" : "long",
-    month: "long",
-    day: "numeric",
-    // year: "numeric"
-  });
-
-  document.getElementById("time-numbers").textContent = timeNumbers;
-  document.getElementById("time-period").textContent = timePeriod;
-  document.getElementById("date").textContent = date;
-
-  // Leaving this here in case I decide to
-  // revert time back to a single variable.
-
-  // document.getElementById("time").textContent = time;
+  document.getElementById("date").textContent =
+    now.toLocaleDateString([], {
+      weekday: "long",
+      month: "long",
+      day: "numeric"
+    });
 }
 
 updateClock();
 setInterval(updateClock, 1000);
 
+// ============================================================
+// QUOTE
+// ============================================================
+
+document.getElementById("quote").textContent =
+  CONFIG.quote || "Build for Future Sam.";
 
 // ============================================================
 // WEATHER
 // ============================================================
 
-async function updateWeather() {
-  try {
-    const latitude = 39.92;
-    const longitude = -75.07;
-
-    const url =
-      `https://api.open-meteo.com/v1/forecast` +
-      `?latitude=${latitude}` +
-      `&longitude=${longitude}` +
-      `&current=temperature_2m,weather_code` +
-      `&hourly=temperature_2m,precipitation_probability,weather_code` +
-      `&daily=temperature_2m_max,temperature_2m_min,weather_code,snowfall_sum,wind_gusts_10m_max` +
-      `&temperature_unit=fahrenheit` +
-      `&wind_speed_unit=mph` +
-      `&precipitation_unit=inch` +
-      `&timezone=America%2FNew_York`;
-
-  const response = await fetch(url);
-
-  if (!response.ok) {
-    throw new Error(`Open-Meteo is bwoken :( Error: ${response.status}`);
-  }
-
-  const data = await response.json();
-
-    const currentTemp =
-      Math.round(data.current.temperature_2m);
-
-    const tempIcon =
-      document.getElementById(
-        "temp-icon"
-      );
-
-    tempIcon.src =
-      getTemperatureIcon(
-        currentTemp
-      );
-
-    tempIcon.hidden = false;
-
-    const high =
-      Math.round(data.daily.temperature_2m_max[0]);
-
-    const low =
-      Math.round(data.daily.temperature_2m_min[0]);
-
-    const weatherText =
-      getWeatherDescription(
-        data.current.weather_code
-      );
-
-    const weatherIcon =
-      document.getElementById(
-        "weather-icon"
-      );
-
-    weatherIcon.src =
-      getWeatherIcon(
-        data.current.weather_code
-      );
-
-    weatherIcon.hidden = false;
-
-    document.getElementById(
-      "weather-temp"
-    ).textContent =
-      `${currentTemp}°`;
-
-    document.getElementById(
-      "weather-condition"
-    ).textContent =
-      weatherText;
-
-    /* document.getElementById(
-      "weather-range"
-    ).textContent =
-      `High ${high}° · Low ${low}°`; */
-
-    updateWeatherImpacts(data);
-    updateMajorWeatherEvent(data);
-
-  } catch (error) {
-    console.error(
-      "Weather error:",
-      error
-    );
-
-    document.getElementById(
-      "weather-current"
-    ).textContent =
-      "Weather unavailable";
-  }
-}
-
-function updateWeatherImpacts(data) {
-  const afternoonElement =
-    document.getElementById("weather-afternoon");
-
-  const overnightElement =
-    document.getElementById("weather-overnight");
-
-  const today =
-    data.daily.time[0];
-
-  const tomorrow =
-    data.daily.time[1];
-
-  const afternoonHours =
-    getWeatherHours(
-      data,
-      today,
-      12,
-      18
-    );
-
-  const overnightHours = [
-    ...getWeatherHours(
-      data,
-      today,
-      20,
-      23
-    ),
-
-    ...getWeatherHours(
-      data,
-      tomorrow,
-      0,
-      6
-    )
-  ];
-
-  const afternoonImpact =
-    getWeatherImpact(afternoonHours);
-
-  const overnightImpact =
-    getWeatherImpact(overnightHours);
-
-  if (afternoonImpact) {
-    const startTime =
-      formatWeatherTime(
-        afternoonImpact.time
-      );
-
-    afternoonElement.textContent =
-      `${afternoonImpact.text} likely after ${startTime}`;
-
-    afternoonElement.hidden = false;
-  } else {
-    afternoonElement.hidden = true;
-  }
-
-  const overnightLow =
-    Math.round(
-      Math.min(
-        ...overnightHours.map(
-          hour => hour.temperature
-        )
-      )
-    );
-
-  const currentHour = new Date().getHours();
-
-  if (overnightImpact) {
-    overnightElement.textContent =
-      `${overnightImpact.text} overnight · Low ${overnightLow}°`;
-
-    overnightElement.hidden = false;
-
-  } else if (overnightLow <= 32) {
-    overnightElement.textContent =
-      `Freezing overnight · Low ${overnightLow}°`;
-
-    overnightElement.hidden = false;
-
-  } else if (currentHour >= 18) {
-    overnightElement.textContent =
-      `Overnight · Low ${overnightLow}°`;
-
-    overnightElement.hidden = false;
-
-  } else {
-    overnightElement.hidden = true;
-  }
-}
-
-function getWeatherHours(
-  data,
-  date,
-  startHour,
-  endHour
-) {
-  return data.hourly.time
-    .map((time, index) => ({
-      time: time,
-      hour: Number(
-        time.slice(11, 13)
-      ),
-      temperature:
-        data.hourly.temperature_2m[index],
-      precipitation:
-        data.hourly.precipitation_probability[index],
-      weatherCode:
-        data.hourly.weather_code[index]
-    }))
-    .filter(hour =>
-      hour.time.startsWith(date) &&
-      hour.hour >= startHour &&
-      hour.hour <= endHour
-    );
-}
-
-function getWeatherImpact(hours) {
-  for (const hour of hours) {
-    const code = hour.weatherCode;
-
-    if ([95, 96, 99].includes(code)) {
-      return {
-        text: "Thunderstorms",
-        time: hour.time
-      };
-    }
-
-    if ([71, 73, 75, 77, 85, 86].includes(code)) {
-      return {
-        text: "Snow",
-        time: hour.time
-      };
-    }
-
-    if (
-      [
-        51, 53, 55,
-        56, 57,
-        61, 63, 65,
-        66, 67,
-        80, 81, 82
-      ].includes(code)
-    ) {
-      return {
-        text: "Rain",
-        time: hour.time
-      };
-    }
-  }
-
-  return null;
-}
-
-function formatWeatherTime(time) {
-  const hour =
-    Number(
-      time.slice(11, 13)
-    );
-
-  const period =
-    hour >= 12 ? "PM" : "AM";
-
-  const displayHour =
-    hour % 12 || 12;
-
-  return `${displayHour} ${period}`;
-}
-
-function getWeatherDescription(code) {
-  const weatherCodes = {
+function weatherDescription(code) {
+  const codes = {
     0: "Clear",
     1: "Mostly clear",
     2: "Partly cloudy",
     3: "Cloudy",
-
     45: "Foggy",
     48: "Foggy",
-
     51: "Light drizzle",
     53: "Drizzle",
     55: "Heavy drizzle",
-
     61: "Light rain",
     63: "Rain",
     65: "Heavy rain",
-
     71: "Light snow",
     73: "Snow",
     75: "Heavy snow",
-
     80: "Light showers",
     81: "Showers",
     82: "Heavy showers",
-
-    95: "Thunderstorms"
+    95: "Thunderstorms",
+    96: "Thunderstorms",
+    99: "Thunderstorms"
   };
 
-  return weatherCodes[code] || "Weather";
+  return codes[code] || "Weather";
 }
 
-function getWeatherIcon(code) {
-  if (code === 0) {
-    return "icons/weather-sunny.png";
-  }
-
-  if ([1, 2, 3, 45, 48].includes(code)) {
-    return "icons/weather-cloudy.png";
-  }
-
-  if (
-    [
-      51, 53, 55,
-      56, 57,
-      61, 63, 65,
-      66, 67,
-      80, 81, 82
-    ].includes(code)
-  ) {
-    return "icons/weather-rainy.png";
-  }
-
-  if (
-    [71, 73, 75, 77, 85, 86]
-      .includes(code)
-  ) {
-    return "icons/weather-snowy.png";
-  }
-
-  if ([95, 96, 99].includes(code)) {
-    return "icons/weather-rainy.png";
-  }
-
-  return "icons/weather-cloudy.png";
-}
-
-function getTemperatureIcon(temperature) {
-  if (temperature < 60) {
-    return "icons/temp-cold.png";
-  }
-
-  if (temperature < 80) {
-    return "icons/temp-mild.png";
-  }
-
-  return "icons/temp-hot.png";
-}
-
-function getAlertIcon(eventName) {
-  if (eventName.includes("Warning")) {
-    return "icons/alert-warning.png";
-  }
-
-  if (eventName.includes("Watch")) {
-    return "icons/alert-watch.png";
-  }
-
-  if (eventName.includes("Advisory")) {
-    return "icons/alert-watch.png";
-  }
-
-  return "icons/alert-watch.png";
-}
-
-async function updateWeatherAlerts() {
-  // console.log("updateWeatherAlerts is running");
-
-  const latitude = 39.92;
-  const longitude = -75.07;
-
-  const alertElement =
-    document.getElementById("weather-alerts");
-
-  try {
-    const url =
-      `https://api.weather.gov/alerts/active` +
-      `?point=${latitude},${longitude}`;
-
-    const response = await fetch(url);
-    const data = await response.json();
-
-    console.log("NWS alerts:", data.features);
-
-    if (
-      !data.features ||
-      data.features.length === 0
-    ) {
-      alertElement.textContent =
-        "No active weather alerts or upcoming events.";
-
-      alertElement.hidden = false;
-      return;
-    }
-
-    const alerts =
-      data.features.map(
-        feature => feature.properties
-      );
-
-    const sortedAlerts =
-      getAlertsByPriority(alerts);
-
-    const alertLines =
-      sortedAlerts.map(alert => {
-        const endTime =
-          alert.ends ||
-          alert.expires;
-
-        const endText =
-          formatAlertTime(endTime);
-
-        const alertName =
-          getAlertDisplayName(alert);
-
-        const alertIcon =
-          getAlertIcon(alert.event);
-
-        return `
-          <div class="weather-alert-line">
-            <img
-              src="${alertIcon}"
-              class="weather-alert-icon"
-              alt=""
-            >
-            <span>
-              ${alertName} · until ${endText}
-            </span>
-          </div>
-        `;
-      });
-
-    alertElement.innerHTML =
-      alertLines.join("");
-
-    alertElement.hidden = false;
-      } catch (error) {
-    console.error(
-      "Weather alert error:",
-      error
-    );
-
-    alertElement.hidden = true;
-  }
-}
-
-function getAlertsByPriority(alerts) {
-  const priority = {
-    Warning: 3,
-    Watch: 2,
-    Advisory: 1
-  };
-
-  return alerts.sort((a, b) => {
-    const aPriority =
-      getAlertPriority(
-        a.event,
-        priority
-      );
-
-    const bPriority =
-      getAlertPriority(
-        b.event,
-        priority
-      );
-
-    return bPriority - aPriority;
+function formatWeatherTime(iso) {
+  if (!iso) return "";
+  const date = new Date(iso);
+  return date.toLocaleTimeString([], {
+    hour: "numeric",
+    minute: "2-digit"
   });
 }
 
-function getAlertPriority(
-  eventName,
-  priority
-) {
-  if (eventName.includes("Warning")) {
-    return priority.Warning;
-  }
-
-  if (eventName.includes("Watch")) {
-    return priority.Watch;
-  }
-
-  if (eventName.includes("Advisory")) {
-    return priority.Advisory;
-  }
-
-  return 0;
+function hoursFor(data, dateString, startHour, endHour) {
+  return data.hourly.time
+    .map((time, index) => ({
+      time,
+      hour: Number(time.slice(11, 13)),
+      temperature: data.hourly.temperature_2m[index],
+      precipitation: data.hourly.precipitation_probability[index],
+      weatherCode: data.hourly.weather_code[index]
+    }))
+    .filter(item =>
+      item.time.startsWith(dateString) &&
+      item.hour >= startHour &&
+      item.hour <= endHour
+    );
 }
 
-function getTropicalStormName(alert) {
-  const text =
-    `${alert.headline || ""} ${alert.description || ""}`;
+function firstWeatherImpact(hours) {
+  for (const hour of hours) {
+    const code = hour.weatherCode;
 
-  const hurricaneMatch =
-    text.match(
-      /\bHurricane\s+([A-Z][A-Za-z-]+)\b/i
-    );
-
-  if (
-    hurricaneMatch &&
-    !["warning", "watch"].includes(
-      hurricaneMatch[1].toLowerCase()
-    )
-  ) {
-    return hurricaneMatch[1];
-  }
-
-  const tropicalStormMatch =
-    text.match(
-      /\bTropical Storm\s+([A-Z][A-Za-z-]+)\b/i
-    );
-
-  if (
-    tropicalStormMatch &&
-    !["warning", "watch"].includes(
-      tropicalStormMatch[1].toLowerCase()
-    )
-  ) {
-    return tropicalStormMatch[1];
-  }
-
-  return null;
-}
-
-function getAlertDisplayName(alert) {
-  const stormName =
-    getTropicalStormName(alert);
-
-  if (!stormName) {
-    return alert.event;
-  }
-
-  if (
-    alert.event.startsWith("Hurricane ")
-  ) {
-    return alert.event.replace(
-      "Hurricane ",
-      `Hurricane ${stormName} `
-    );
-  }
-
-  if (
-    alert.event.startsWith("Tropical Storm ")
-  ) {
-    return alert.event.replace(
-      "Tropical Storm ",
-      `Tropical Storm ${stormName} `
-    );
-  }
-
-  return alert.event;
-}
-
-function formatAlertTime(time) {
-  if (!time) {
-    return "later";
-  }
-
-  const date =
-    new Date(time);
-
-  return date.toLocaleTimeString(
-    [],
-    {
-      hour: "numeric",
-      minute: "2-digit"
-    }
-  );
-}
-
-function getMajorWeatherEvent(data) {
-  for (
-    let i = 1;
-    i < data.daily.time.length;
-    i++
-  ) {
-    const date =
-      data.daily.time[i];
-
-    const dayName =
-      formatForecastDay(date);
-
-    const weatherCode =
-      data.daily.weather_code[i];
-
-    const snowfall =
-      data.daily.snowfall_sum[i];
-
-    const windGust =
-      data.daily.wind_gusts_10m_max[i];
-
-    if (snowfall >= 4) {
-      return `Heavy snow possible ${dayName}`;
+    if ([95, 96, 99].includes(code)) {
+      return { text: "Thunderstorms", time: hour.time };
     }
 
-    if (
-      [95, 96, 99].includes(weatherCode)
-    ) {
-      return `Strong storms possible ${dayName}`;
+    if ([71, 73, 75, 77, 85, 86].includes(code)) {
+      return { text: "Snow", time: hour.time };
     }
 
-    if (windGust >= 45) {
-      return `Strong winds possible ${dayName}`;
+    if ([51,53,55,56,57,61,63,65,66,67,80,81,82].includes(code)) {
+      return { text: "Rain", time: hour.time };
     }
   }
 
   return null;
 }
 
-function updateMajorWeatherEvent(data) {
-  const eventElement =
-    document.getElementById("weather-event");
+async function updateWeather() {
+  const currentEl = document.getElementById("weather-current");
+  const rangeEl = document.getElementById("weather-range");
+  const afternoonEl = document.getElementById("weather-afternoon");
+  const overnightEl = document.getElementById("weather-overnight");
 
-  const event =
-    getMajorWeatherEvent(data);
+  try {
+    const params = new URLSearchParams({
+      latitude: WEATHER.latitude,
+      longitude: WEATHER.longitude,
+      current: "temperature_2m,weather_code",
+      hourly: "temperature_2m,precipitation_probability,weather_code",
+      daily: "temperature_2m_max,temperature_2m_min,weather_code,snowfall_sum,wind_gusts_10m_max",
+      temperature_unit: "fahrenheit",
+      wind_speed_unit: "mph",
+      precipitation_unit: "inch",
+      timezone: WEATHER.timezone
+    });
 
-  if (!event) {
-    eventElement.hidden = true;
-    document.getElementById(
-      "weather-event-text"
-    ).textContent = "";
-    return;
-  }
-
-  const eventIcon =
-    document.getElementById(
-      "weather-event-icon"
+    const response = await fetch(
+      `https://api.open-meteo.com/v1/forecast?${params}`
     );
 
-  const eventText =
-    document.getElementById(
-      "weather-event-text"
-    );
-
-  eventIcon.src =
-    "icons/weather-major-event.png";
-
-  eventText.textContent =
-    event;
-
-  eventElement.hidden = false;
-}
-
-function formatForecastDay(dateString) {
-  const date =
-    new Date(
-      `${dateString}T12:00:00`
-    );
-
-  return date.toLocaleDateString(
-    [],
-    {
-      weekday: "long"
+    if (!response.ok) {
+      throw new Error(`Open-Meteo returned ${response.status}`);
     }
-  );
+
+    const data = await response.json();
+
+    const temp = Math.round(data.current.temperature_2m);
+    const high = Math.round(data.daily.temperature_2m_max[0]);
+    const low = Math.round(data.daily.temperature_2m_min[0]);
+
+    currentEl.textContent =
+      `${temp}° · ${weatherDescription(data.current.weather_code)}`;
+
+    rangeEl.textContent = `High ${high}° · Low ${low}°`;
+
+    const today = data.daily.time[0];
+    const tomorrow = data.daily.time[1];
+
+    const afternoonHours = hoursFor(data, today, 12, 18);
+    const overnightHours = [
+      ...hoursFor(data, today, 20, 23),
+      ...hoursFor(data, tomorrow, 0, 6)
+    ];
+
+    const afternoon = firstWeatherImpact(afternoonHours);
+    if (afternoon) {
+      afternoonEl.textContent =
+        `${afternoon.text} likely after ${formatWeatherTime(afternoon.time)}`;
+      afternoonEl.hidden = false;
+    } else {
+      afternoonEl.hidden = true;
+    }
+
+    const overnight = firstWeatherImpact(overnightHours);
+    const overnightLow = overnightHours.length
+      ? Math.round(Math.min(...overnightHours.map(h => h.temperature)))
+      : null;
+
+    if (overnight) {
+      overnightEl.textContent =
+        `${overnight.text} overnight${overnightLow !== null ? ` · Low ${overnightLow}°` : ""}`;
+      overnightEl.hidden = false;
+    } else if (overnightLow !== null && overnightLow <= 32) {
+      overnightEl.textContent = `Freezing overnight · Low ${overnightLow}°`;
+      overnightEl.hidden = false;
+    } else {
+      overnightEl.hidden = true;
+    }
+
+  } catch (error) {
+    console.error("Weather error:", error);
+    currentEl.textContent = "Weather unavailable";
+    rangeEl.textContent = "";
+    afternoonEl.hidden = true;
+    overnightEl.hidden = true;
+  }
 }
 
-function getTropicalClassification(code) {
-  const classifications = {
-    HU: "Hurricane",
-    TS: "Tropical Storm",
-    TD: "Tropical Depression"
-  };
+async function updateWeatherAlerts() {
+  const alertEl = document.getElementById("weather-alerts");
 
-  return classifications[code] || code;
+  try {
+    const response = await fetch(
+      `https://api.weather.gov/alerts/active?point=${WEATHER.latitude},${WEATHER.longitude}`
+    );
+
+    if (!response.ok) {
+      throw new Error(`NWS returned ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    if (!data.features?.length) {
+      alertEl.textContent = "";
+      alertEl.hidden = true;
+      return;
+    }
+
+    const alerts = data.features
+      .map(feature => feature.properties)
+      .filter(Boolean);
+
+    const rank = alert => {
+      const event = alert.event || "";
+      if (event.includes("Warning")) return 3;
+      if (event.includes("Watch")) return 2;
+      if (event.includes("Advisory")) return 1;
+      return 0;
+    };
+
+    alerts.sort((a, b) => rank(b) - rank(a));
+
+    const alert = alerts[0];
+    const end = alert.ends || alert.expires;
+
+    alertEl.textContent =
+      `${alert.event}${end ? ` · until ${formatWeatherTime(end)}` : ""}`;
+
+    alertEl.hidden = false;
+
+  } catch (error) {
+    console.error("Weather alert error:", error);
+    alertEl.hidden = true;
+  }
 }
 
 updateWeather();
 updateWeatherAlerts();
-
-
-setInterval(
-  updateWeather,
-  30 * 60 * 1000
-);
-
-setInterval(
-  updateWeatherAlerts,
-  15 * 60 * 1000
-);
+setInterval(updateWeather, 30 * 60 * 1000);
+setInterval(updateWeatherAlerts, 15 * 60 * 1000);
 
 // ============================================================
-// SPOTIFY SETTINGS
+// SPOTIFY PKCE AUTH
 // ============================================================
 
-const clientId =
-  "702e46e7746b4766a46edcfe13b01f50";
-
-const redirectUri =
-  window.location.origin +
-  window.location.pathname;
-
-
-const scopes = [
-  "streaming",
-  "user-read-private",
-  "user-read-email",
-  "user-read-playback-state",
-  "user-modify-playback-state",
-  "playlist-read-private",
-  "playlist-read-collaborative"
-];
-
-
-let spotifyPlayer = null;
-let spotifyDeviceId = null;
-let spotifyAccessToken = null;
-
-
-// ============================================================
-// SPOTIFY PKCE LOGIN
-// ============================================================
-
-function generateCodeVerifier(length = 64) {
-  const possible =
+function randomString(length = 64) {
+  const chars =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~";
 
-  let text = "";
+  const values = crypto.getRandomValues(new Uint8Array(length));
 
-  for (let i = 0; i < length; i++) {
-    text += possible.charAt(
-      Math.floor(
-        Math.random() * possible.length
-      )
-    );
-  }
-
-  return text;
+  return Array.from(values, value => chars[value % chars.length]).join("");
 }
 
+async function sha256(value) {
+  return crypto.subtle.digest(
+    "SHA-256",
+    new TextEncoder().encode(value)
+  );
+}
 
-async function generateCodeChallenge(
-  codeVerifier
-) {
-  const data =
-    new TextEncoder().encode(
-      codeVerifier
-    );
-
-  const digest =
-    await crypto.subtle.digest(
-      "SHA-256",
-      data
-    );
-
+function base64Url(buffer) {
   return btoa(
-    String.fromCharCode(
-      ...new Uint8Array(digest)
-    )
+    String.fromCharCode(...new Uint8Array(buffer))
   )
     .replace(/\+/g, "-")
     .replace(/\//g, "_")
     .replace(/=+$/, "");
 }
 
-
 async function loginToSpotify() {
-  const codeVerifier =
-    generateCodeVerifier();
+  if (!SPOTIFY_CLIENT_ID) {
+    setSpotifyStatus("Spotify client ID is missing");
+    return;
+  }
 
-  const codeChallenge =
-    await generateCodeChallenge(
-      codeVerifier
-    );
+  const verifier = randomString(64);
+  const challenge = base64Url(await sha256(verifier));
+  const state = randomString(24);
 
-  localStorage.setItem(
-    "spotify_code_verifier",
-    codeVerifier
-  );
+  sessionStorage.setItem("spotify_verifier", verifier);
+  sessionStorage.setItem("spotify_state", state);
 
-  const authUrl =
-    new URL(
-      "https://accounts.spotify.com/authorize"
-    );
-
-  const params = {
-    client_id: clientId,
-
+  const params = new URLSearchParams({
     response_type: "code",
-
-    redirect_uri: redirectUri,
-
-    scope: scopes.join(" "),
-
+    client_id: SPOTIFY_CLIENT_ID,
+    scope: SPOTIFY_SCOPES.join(" "),
+    redirect_uri: SPOTIFY_REDIRECT_URI,
+    state,
     code_challenge_method: "S256",
-
-    code_challenge: codeChallenge
-  };
-
-  authUrl.search =
-    new URLSearchParams(
-      params
-    ).toString();
+    code_challenge: challenge
+  });
 
   window.location.href =
-    authUrl.toString();
+    `https://accounts.spotify.com/authorize?${params}`;
 }
 
+async function handleSpotifyRedirect() {
+  const params = new URLSearchParams(window.location.search);
+  const code = params.get("code");
+  const returnedState = params.get("state");
 
-// ============================================================
-// SPOTIFY TOKENS
-// ============================================================
+  if (!code) {
+    if (localStorage.getItem("spotify_access_token")) {
+      startSpotify();
+    }
+    return;
+  }
 
-async function getAccessToken(code) {
-  const codeVerifier =
-    localStorage.getItem(
-      "spotify_code_verifier"
-    );
+  const expectedState = sessionStorage.getItem("spotify_state");
+  const verifier = sessionStorage.getItem("spotify_verifier");
 
-  const response =
-    await fetch(
-      "https://accounts.spotify.com/api/token",
-      {
-        method: "POST",
+  if (!verifier || !returnedState || returnedState !== expectedState) {
+    setSpotifyStatus("Spotify login could not be verified");
+    return;
+  }
 
-        headers: {
-          "Content-Type":
-            "application/x-www-form-urlencoded"
-        },
+  const body = new URLSearchParams({
+    client_id: SPOTIFY_CLIENT_ID,
+    grant_type: "authorization_code",
+    code,
+    redirect_uri: SPOTIFY_REDIRECT_URI,
+    code_verifier: verifier
+  });
 
-        body: new URLSearchParams({
-          client_id: clientId,
-
-          grant_type:
-            "authorization_code",
-
-          code: code,
-
-          redirect_uri:
-            redirectUri,
-
-          code_verifier:
-            codeVerifier
-        })
-      }
-    );
-
-  const data =
-    await response.json();
+  const response = await fetch(
+    "https://accounts.spotify.com/api/token",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      body
+    }
+  );
 
   if (!response.ok) {
-    console.error(
-      "Spotify token error:",
-      data
-    );
-
-    throw new Error(
-      "Could not get Spotify token."
-    );
+    setSpotifyStatus("Spotify login failed");
+    return;
   }
 
-  saveSpotifyTokens(data);
+  const token = await response.json();
+  saveSpotifyToken(token);
 
-  // Deleting the PKCE verifier because I don't need it anymore.
-  localStorage.removeItem(
-    "spotify_code_verifier"
-  );
+  sessionStorage.removeItem("spotify_state");
+  sessionStorage.removeItem("spotify_verifier");
 
-  return data.access_token;
+  history.replaceState({}, document.title, SPOTIFY_REDIRECT_URI);
+
+  startSpotify();
 }
 
-function saveSpotifyTokens(data) {
-  spotifyAccessToken =
-    data.access_token;
-
+function saveSpotifyToken(token) {
   localStorage.setItem(
     "spotify_access_token",
-    data.access_token
+    token.access_token || ""
   );
 
-  if (data.refresh_token) {
+  if (token.refresh_token) {
     localStorage.setItem(
       "spotify_refresh_token",
-      data.refresh_token
+      token.refresh_token
     );
   }
 
-  const expiresAt =
-    Date.now() +
-    data.expires_in * 1000;
+  const expiresIn = Number(token.expires_in || 3600);
 
   localStorage.setItem(
     "spotify_expires_at",
-    expiresAt
+    String(Date.now() + (expiresIn - 60) * 1000)
   );
 }
 
 async function refreshSpotifyToken() {
   const refreshToken =
-    localStorage.getItem(
-      "spotify_refresh_token"
-    );
+    localStorage.getItem("spotify_refresh_token");
 
-  if (!refreshToken) {
-    return null;
-  }
+  if (!refreshToken) return null;
 
-  const response =
-    await fetch(
-      "https://accounts.spotify.com/api/token",
-      {
-        method: "POST",
+  const body = new URLSearchParams({
+    client_id: SPOTIFY_CLIENT_ID,
+    grant_type: "refresh_token",
+    refresh_token: refreshToken
+  });
 
-        headers: {
-          "Content-Type":
-            "application/x-www-form-urlencoded"
-        },
+  const response = await fetch(
+    "https://accounts.spotify.com/api/token",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      body
+    }
+  );
 
-        body: new URLSearchParams({
-          client_id: clientId,
+  if (!response.ok) return null;
 
-          grant_type:
-            "refresh_token",
+  const token = await response.json();
+  saveSpotifyToken(token);
 
-          refresh_token:
-            refreshToken
-        })
-      }
-    );
-
-  const data =
-    await response.json();
-
-  if (!response.ok) {
-    console.error(
-      "Spotify refresh error:",
-      data
-    );
-
-    return null;
-  }
-
-  saveSpotifyTokens(data);
-
-  return data.access_token;
+  return token.access_token;
 }
 
 async function getValidSpotifyToken() {
-  const storedToken =
-    localStorage.getItem(
-      "spotify_access_token"
-    );
+  const token =
+    localStorage.getItem("spotify_access_token");
 
   const expiresAt =
-    Number(
-      localStorage.getItem(
-        "spotify_expires_at"
-      )
-    );
+    Number(localStorage.getItem("spotify_expires_at") || 0);
 
-  // Still valid
-  if (
-    storedToken &&
-    expiresAt &&
-    Date.now() < expiresAt - 60000
-  ) {
-    spotifyAccessToken =
-      storedToken;
-
-    return storedToken;
+  if (token && Date.now() < expiresAt) {
+    return token;
   }
 
-  // Try refreshing it
-  const refreshed =
-    await refreshSpotifyToken();
-
-  if (refreshed) {
-    return refreshed;
-  }
-
-  return null;
-}
-
-
-// ============================================================
-// HANDLE SPOTIFY REDIRECT
-// ============================================================
-
-function showSpotifyLogin() {
-  document.getElementById(
-    "spotify-login-message"
-  ).hidden = false;
-
-  document.getElementById(
-    "spotify-login"
-  ).hidden = false;
-}
-
-function hideSpotifyLogin() {
-  document.getElementById(
-    "spotify-login-message"
-  ).hidden = true;
-
-  document.getElementById(
-    "spotify-login"
-  ).hidden = true;
-}
-
-
-async function handleSpotifyRedirect() {
-  const params =
-    new URLSearchParams(
-      window.location.search
-    );
-
-  const code =
-    params.get("code");
-
-  if (code) {
-    try {
-      const accessToken =
-        await getAccessToken(code);
-
-      // Hide login button in the fresh OAuth callback path.  
-      hideSpotifyLogin();
-
-      // Remove ?code=blahblah from URL
-      window.history.replaceState(
-        {},
-        document.title,
-        window.location.pathname
-      );
-
-      initializeSpotifyPlayer(
-        accessToken
-      );
-
-      return;
-
-    } catch (error) {
-      console.error(error);
-    }
-  }
-
-
-  // If we've already connected before, try using the stored token.
-  // If no stored token, tell me to reconnect.
-  const storedToken =
-    await getValidSpotifyToken();
-
-  if (storedToken) {
-    hideSpotifyLogin();
-
-    initializeSpotifyPlayer(
-      storedToken
-    );
-
-    return;
-  }
-
-  showSpotifyLogin();
+  return refreshSpotifyToken();
 }
 
 // ============================================================
-// LOAD SPOTIFY WEB PLAYBACK SDK
+// SPOTIFY PLAYER
 // ============================================================
+
+function setSpotifyStatus(message) {
+  document.getElementById("spotify-status").textContent = message;
+}
 
 function loadSpotifySDK() {
-
-  // SDK already exists
   if (window.Spotify) {
-    window.onSpotifyWebPlaybackSDKReady();
+    createSpotifyPlayer();
     return;
   }
 
-  // Don't load it twice
-  if (
-    document.getElementById(
-      "spotify-sdk"
-    )
-  ) {
+  if (document.getElementById("spotify-sdk")) return;
+
+  const script = document.createElement("script");
+  script.id = "spotify-sdk";
+  script.src = "https://sdk.scdn.co/spotify-player.js";
+  document.body.appendChild(script);
+
+  window.onSpotifyWebPlaybackSDKReady = createSpotifyPlayer;
+}
+
+async function createSpotifyPlayer() {
+  if (spotifyPlayer || !window.Spotify) return;
+
+  const token = await getValidSpotifyToken();
+
+  if (!token) {
+    setSpotifyStatus("Connect Spotify to load your playlists");
     return;
   }
 
-  const script =
-    document.createElement(
-      "script"
-    );
+  spotifyPlayer = new Spotify.Player({
+    name: "SamOS Hub",
+    getOAuthToken: async callback => {
+      const freshToken = await getValidSpotifyToken();
+      callback(freshToken || "");
+    },
+    volume: 0.75
+  });
 
-  script.id =
-    "spotify-sdk";
+  spotifyPlayer.addListener("ready", async ({ device_id }) => {
+    spotifyDeviceId = device_id;
 
-  script.src =
-    "https://sdk.scdn.co/spotify-player.js";
+    setSpotifyStatus("SamOS Hub connected");
+    document.getElementById("spotify-login").hidden = true;
 
-  document.body.appendChild(
-    script
-  );
+    await transferPlaybackToSamOS();
+    await loadPlaylists();
+  });
+
+  spotifyPlayer.addListener("not_ready", () => {
+    setSpotifyStatus("Spotify disconnected");
+  });
+
+  spotifyPlayer.addListener("authentication_error", ({ message }) => {
+    console.error("Spotify authentication error:", message);
+    setSpotifyStatus("Reconnect Spotify");
+    document.getElementById("spotify-login").hidden = false;
+  });
+
+  spotifyPlayer.addListener("account_error", ({ message }) => {
+    console.error("Spotify account error:", message);
+    setSpotifyStatus("Spotify Premium is required");
+  });
+
+  spotifyPlayer.addListener("playback_error", ({ message }) => {
+    console.error("Spotify playback error:", message);
+  });
+
+  spotifyPlayer.addListener("player_state_changed", state => {
+    if (!state) return;
+
+    const track = state.track_window?.current_track;
+    if (!track) return;
+
+    document.getElementById("track-name").textContent =
+      track.name || "Nothing playing";
+
+    document.getElementById("track-artist").textContent =
+      (track.artists || []).map(artist => artist.name).join(", ");
+
+    const art = track.album?.images?.[0]?.url || "";
+    const artEl = document.getElementById("album-art");
+    const placeholderEl =
+      document.getElementById("album-placeholder");
+
+    if (art) {
+      artEl.src = art;
+      artEl.hidden = false;
+      placeholderEl.hidden = true;
+    } else {
+      artEl.hidden = true;
+      placeholderEl.hidden = false;
+    }
+
+    document.getElementById("play-pause").textContent =
+      state.paused ? "▶" : "⏸";
+  });
+
+  spotifyPlayer.connect();
 }
-
-
-// ============================================================
-// CREATE SAMOS HUB SPOTIFY PLAYER
-// ============================================================
-
-function initializeSpotifyPlayer(
-  accessToken
-) {
-  spotifyAccessToken =
-    accessToken;
-
-
-  window.onSpotifyWebPlaybackSDKReady =
-    () => {
-
-      // Don't accidentally create two players
-      if (spotifyPlayer) {
-        return;
-      }
-
-
-      spotifyPlayer =
-        new Spotify.Player({
-          name: "SamOS Hub",
-
-          getOAuthToken:
-            async callback => {
-
-              const token =
-                await getValidSpotifyToken();
-
-              callback(token);
-            },
-
-          volume: 0.5
-        });
-
-
-      // ------------------------------------------------------
-      // READY
-      // ------------------------------------------------------
-
-      spotifyPlayer.addListener(
-        "ready",
-
-        async ({ device_id }) => {
-
-          console.log(
-            "SamOS Hub ready:",
-            device_id
-          );
-
-          spotifyDeviceId =
-            device_id;
-
-
-          document.getElementById(
-            "spotify-status"
-          ).textContent =
-            "SamOS Hub connected";
-
-
-          document.getElementById(
-            "spotify-player"
-          ).hidden =
-            false;
-
-
-          hideSpotifyLogin();
-
-          await transferPlaybackToSamOS();
-
-          await loadPlaylists();
-        }
-      );
-
-
-      // ------------------------------------------------------
-      // NOT READY
-      // ------------------------------------------------------
-
-      spotifyPlayer.addListener(
-        "not_ready",
-
-        ({ device_id }) => {
-
-          console.log(
-            "Device offline:",
-            device_id
-          );
-
-          document.getElementById(
-            "spotify-status"
-          ).textContent =
-            "Spotify disconnected";
-        }
-      );
-
-
-      // ------------------------------------------------------
-      // AUTH ERROR
-      // ------------------------------------------------------
-
-      spotifyPlayer.addListener(
-        "authentication_error",
-
-        ({ message }) => {
-
-          console.error(
-            "Spotify auth error:",
-            message
-          );
-
-          document.getElementById(
-            "spotify-status"
-          ).textContent =
-            "Spotify authorization expired";
-        }
-      );
-
-
-      // ------------------------------------------------------
-      // PLAYBACK ERROR
-      // ------------------------------------------------------
-
-      spotifyPlayer.addListener(
-        "playback_error",
-
-        ({ message }) => {
-
-          console.error(
-            "Spotify playback error:",
-            message
-          );
-        }
-      );
-
-
-      // ------------------------------------------------------
-      // PLAYER STATE CHANGED
-      // ------------------------------------------------------
-
-      spotifyPlayer.addListener(
-        "player_state_changed",
-
-        state => {
-
-          if (!state) {
-            return;
-          }
-
-
-          const track =
-            state.track_window
-              .current_track;
-
-
-          if (!track) {
-            return;
-          }
-
-
-          const artists =
-            track.artists
-              .map(
-                artist =>
-                  artist.name
-              )
-              .join(", ");
-
-
-          document.getElementById(
-            "track-name"
-          ).textContent =
-            track.name;
-
-
-          document.getElementById(
-            "track-artist"
-          ).textContent =
-            artists;
-
-
-          const albumArt =
-            document.getElementById(
-              "album-art"
-            );
-
-
-            if (
-            track.album &&
-            track.album.images &&
-            track.album.images.length > 0
-            ) {
-            albumArt.src =
-                track.album.images[0].url;
-
-            albumArt.hidden =
-                false;
-
-            document.getElementById(
-                "album-placeholder"
-            ).hidden = true;
-            }
-
-
-          document.getElementById(
-            "play-pause"
-          ).textContent =
-            state.paused
-              ? "▶"
-              : "⏸";
-        }
-      );
-
-
-      spotifyPlayer.connect();
-    };
-
-
-  loadSpotifySDK();
-}
-
-
-// ============================================================
-// MAKE SAMOS HUB THE ACTIVE SPOTIFY DEVICE
-// ============================================================
 
 async function transferPlaybackToSamOS() {
-  if (!spotifyDeviceId) {
-    return;
-  }
+  if (!spotifyDeviceId) return;
 
-  const token =
-    await getValidSpotifyToken();
+  const token = await getValidSpotifyToken();
+  if (!token) return;
 
-  if (!token) {
-    return;
-  }
-
-
-  const response =
-    await fetch(
-      "https://api.spotify.com/v1/me/player",
-      {
-        method: "PUT",
-
-        headers: {
-          "Authorization":
-            `Bearer ${token}`,
-
-          "Content-Type":
-            "application/json"
-        },
-
-        body: JSON.stringify({
-          device_ids: [
-            spotifyDeviceId
-          ],
-
-          play: false
-        })
-      }
-    );
-
-
-  if (!response.ok) {
-    console.error(
-      "Could not transfer playback:",
-      response.status
-    );
-  }
+  await fetch("https://api.spotify.com/v1/me/player", {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      device_ids: [spotifyDeviceId],
+      play: false
+    })
+  });
 }
 
-
-// ============================================================
-// LOAD USER PLAYLISTS
-// ============================================================
-
 async function loadPlaylists() {
-  const token =
-    await getValidSpotifyToken();
+  const token = await getValidSpotifyToken();
+  if (!token) return;
 
-  if (!token) {
-    return;
-  }
-
-  const playlistMenu =
-    document.getElementById(
-      "playlist-menu"
-    );
-
-  playlistMenu.innerHTML = "";
+  const menu = document.getElementById("playlist-menu");
+  menu.innerHTML = "";
 
   let url =
     "https://api.spotify.com/v1/me/playlists?limit=50";
 
   while (url) {
-    const response =
-      await fetch(
-        url,
-        {
-          headers: {
-            "Authorization":
-              `Bearer ${token}`
-          }
-        }
-      );
+    const response = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
 
     if (!response.ok) {
-      console.error(
-        "Could not load playlists:",
-        response.status
-      );
-
+      setSpotifyStatus("Could not load Spotify playlists");
       return;
     }
 
-    const data =
-      await response.json();
+    const data = await response.json();
 
-    data.items.forEach(
-      playlist => {
+    for (const playlist of data.items || []) {
+      if (!playlist) continue;
 
-        if (!playlist) {
-          return;
-        }
+      const item = document.createElement("button");
+      item.type = "button";
+      item.className = "playlist-item";
+      item.textContent = playlist.name;
 
-        const item =
-          document.createElement(
-            "button"
-          );
+      item.addEventListener("click", async () => {
+        selectedPlaylistUri = playlist.uri;
 
-        item.className =
-          "playlist-item";
-
-        item.textContent =
+        document.getElementById("playlist-button").textContent =
           playlist.name;
 
-        item.dataset.uri =
-          playlist.uri;
+        menu.hidden = true;
 
-        item.addEventListener(
-          "click",
-          async () => {
+        await startPlaylist(playlist.uri);
+      });
 
-            document.getElementById(
-              "playlist-button"
-            ).textContent =
-              playlist.name;
-
-            playlistMenu.hidden =
-              true;
-
-            await startPlaylist(
-              playlist.uri
-            );
-          }
-        );
-
-        playlistMenu.appendChild(
-          item
-        );
-      }
-    );
+      menu.appendChild(item);
+    }
 
     url = data.next;
   }
 }
 
-
-// ============================================================
-// START SELECTED PLAYLIST
-// ============================================================
-
 async function startPlaylist(playlistUri) {
   if (!spotifyDeviceId) {
-
-    document.getElementById(
-      "spotify-status"
-    ).textContent =
-      "Spotify player not ready";
-
+    setSpotifyStatus("Spotify player is not ready yet");
     return;
   }
 
-
-  const token =
-    await getValidSpotifyToken();
-
+  const token = await getValidSpotifyToken();
   if (!token) {
-
-    document.getElementById(
-      "spotify-status"
-    ).textContent =
-      "Reconnect Spotify";
-
+    setSpotifyStatus("Reconnect Spotify");
     return;
   }
 
-
-  // Make sure SamOS Hub is active
   await transferPlaybackToSamOS();
 
-
-  // Turn shuffle ON
-  const shuffleResponse =
-    await fetch(
-      `https://api.spotify.com/v1/me/player/shuffle?state=true&device_id=${spotifyDeviceId}`,
-      {
-        method: "PUT",
-
-        headers: {
-          "Authorization":
-            `Bearer ${token}`
-        }
+  await fetch(
+    `https://api.spotify.com/v1/me/player/shuffle?state=true&device_id=${encodeURIComponent(spotifyDeviceId)}`,
+    {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${token}`
       }
-    );
+    }
+  );
 
+  const response = await fetch(
+    `https://api.spotify.com/v1/me/player/play?device_id=${encodeURIComponent(spotifyDeviceId)}`,
+    {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        context_uri: playlistUri
+      })
+    }
+  );
 
-  if (!shuffleResponse.ok) {
-    console.error(
-      "Could not enable shuffle:",
-      shuffleResponse.status
-    );
-  }
-
-
-  // Start selected playlist
-  const playResponse =
-    await fetch(
-      `https://api.spotify.com/v1/me/player/play?device_id=${spotifyDeviceId}`,
-      {
-        method: "PUT",
-
-        headers: {
-          "Authorization":
-            `Bearer ${token}`,
-
-          "Content-Type":
-            "application/json"
-        },
-
-        body: JSON.stringify({
-          context_uri:
-            playlistUri
-        })
-      }
-    );
-
-
-  if (!playResponse.ok) {
-
-    console.error(
-      "Could not start playlist:",
-      playResponse.status
-    );
-
-    document.getElementById(
-      "spotify-status"
-    ).textContent =
-      "Could not start playlist";
-
+  if (!response.ok) {
+    setSpotifyStatus("Could not start playlist");
     return;
   }
 
-  document.getElementById(
-    "spotify-status"
-  ).textContent =
-    "Shuffle on";
+  setSpotifyStatus("Shuffle on");
 }
 
-
 // ============================================================
-// SPOTIFY BUTTONS
+// CONTROLS
 // ============================================================
 
+document
+  .getElementById("spotify-login")
+  .addEventListener("click", loginToSpotify);
 
-// CONNECT SPOTIFY
+document
+  .getElementById("playlist-button")
+  .addEventListener("click", () => {
+    const menu = document.getElementById("playlist-menu");
+    menu.hidden = !menu.hidden;
+  });
 
-document.getElementById(
-  "spotify-login"
-).addEventListener(
-  "click",
-  loginToSpotify
-);
+document.addEventListener("click", event => {
+  const picker = document.querySelector(".playlist-picker");
+  const menu = document.getElementById("playlist-menu");
 
+  if (!picker.contains(event.target)) {
+    menu.hidden = true;
+  }
+});
 
-// PLAY / PAUSE
+document
+  .getElementById("play-pause")
+  .addEventListener("click", async () => {
+    if (!spotifyPlayer) return;
 
-document.getElementById(
-  "play-pause"
-).addEventListener(
-  "click",
-
-  async () => {
-
-    if (!spotifyPlayer) {
-      return;
-    }
-
-    const state =
-      await spotifyPlayer
-        .getCurrentState();
+    const state = await spotifyPlayer.getCurrentState();
 
     if (!state) {
-      await startSelectedPlaylist();
+      if (selectedPlaylistUri) {
+        await startPlaylist(selectedPlaylistUri);
+      }
       return;
     }
 
@@ -1646,93 +712,26 @@ document.getElementById(
     } else {
       await spotifyPlayer.pause();
     }
-  }
-);
+  });
 
-// NEXT TRACK
+document
+  .getElementById("next-track")
+  .addEventListener("click", async () => {
+    if (spotifyPlayer) await spotifyPlayer.nextTrack();
+  });
 
-document.getElementById(
-  "next-track"
-).addEventListener(
-  "click",
+document
+  .getElementById("previous-track")
+  .addEventListener("click", async () => {
+    if (spotifyPlayer) await spotifyPlayer.previousTrack();
+  });
 
-  async () => {
+// ============================================================
+// START
+// ============================================================
 
-    if (!spotifyPlayer) {
-      return;
-    }
-
-    await spotifyPlayer.nextTrack();
-  }
-);
-
-
-// PREVIOUS TRACK
-
-document.getElementById(
-  "previous-track"
-).addEventListener(
-  "click",
-
-  async () => {
-
-    if (!spotifyPlayer) {
-      return;
-    }
-
-    await spotifyPlayer.previousTrack();
-  }
-);
-
-// PLAYLIST BUTTON
-
-document.getElementById(
-  "playlist-button"
-).addEventListener(
-  "click",
-  () => {
-
-    const menu =
-      document.getElementById(
-        "playlist-menu"
-      );
-
-    menu.hidden =
-      !menu.hidden;
-  }
-);
-
-// CLICK TO LEAVE PLAYLIST MENU
-
-document.addEventListener(
-  "click",
-  event => {
-
-    const picker =
-      document.querySelector(
-        ".playlist-picker"
-      );
-
-    const menu =
-      document.getElementById(
-        "playlist-menu"
-      );
-
-    if (
-      picker &&
-      !picker.contains(event.target)
-    ) {
-      menu.hidden = true;
-    }
-  }
-);
+handleSpotifyRedirect();
 
 if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("./service-worker.js");
 }
-
-// ============================================================
-// START SPOTIFY
-// ============================================================
-
-handleSpotifyRedirect();
