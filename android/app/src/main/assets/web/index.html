@@ -15,26 +15,20 @@
 
   <link rel="manifest" href="./manifest.webmanifest">
 
-  <link rel="stylesheet" href="./style.css?v=20261005-4">
+  <link rel="stylesheet" href="./styles/base.css">
+  <link rel="stylesheet" href="./styles/home.css">
+  <link rel="stylesheet" href="./styles/mobile.css">
+  <link rel="stylesheet" href="./styles/settings.css"> 
 </head>
 
-<body>
+<body data-root=".">
 
   <main class="home">
 
+
     <section class="journal-shell">
 
-      <nav class="journal-tabs" aria-label="SamOS sections">
-
-        <button
-          class="journal-tab active"
-          type="button"
-        >
-          Home
-        </button>
-
-      </nav>
-
+      <div id="nav-container"></div>
 
       <section class="journal">
 
@@ -121,24 +115,33 @@
 
               <section class="weather-alert-side">
 
-
-                <!-- AFTERNOON / OVERNIGHT -->
+                <!-- UPCOMING WEATHER -->
 
                 <div class="weather-upcoming">
+
+                  <div class="weather-alert-heading">
+                    OUTLOOK
+                  </div>
 
                   <div
                     id="weather-afternoon"
                     class="forecast-line"
+                    hidden
                   >
-                    Afternoon forecast loading...
-                  </div>
+                    <img
+                      class="weather-forecast-icon"
+                      src="./icons/afternoon-icon.png"
+                      alt=""
+                    >
 
+                    <span id="weather-afternoon-text"></span>
+                  </div>
 
                   <div
                     id="weather-overnight"
                     class="forecast-line"
+                    hidden
                   >
-
                     <img
                       class="weather-forecast-icon"
                       src="./icons/overnight-icon.png"
@@ -146,35 +149,24 @@
                     >
 
                     <span id="weather-overnight-text">
-                      Overnight forecast loading...
+                        No forecasted events or storms.
+                    </span>
+                  </div>
+
+                  <div id="weather-event">
+
+                    <img
+                      id="weather-event-icon"
+                      src="./icons/weather-major-event.png"
+                      alt=""
+                      hidden
+                    >
+
+                    <span id="weather-event-text" class="no-weather-events">
+                      No watches, warnings, or advisories.
                     </span>
 
                   </div>
-
-                </div>
-
-
-                <div class="weather-alert-divider"></div>
-
-
-                <!-- UPCOMING WEATHER EVENTS -->
-
-                <div class="weather-alert-heading">
-                  UPCOMING
-                </div>
-
-                <div id="weather-event">
-
-                  <img
-                    id="weather-event-icon"
-                    src="./icons/weather-major-event.png"
-                    alt=""
-                    hidden
-                  >
-
-                  <span id="weather-event-text">
-                    No upcoming events or storms.
-                  </span>
 
                 </div>
 
@@ -190,9 +182,7 @@
 
                 <div id="weather-alerts">
 
-                  <div class="no-weather-alerts">
-                    No watches, warnings, or advisories.
-                  </div>
+                  <div class="no-weather-alerts"></div>
 
                 </div>
 
@@ -405,10 +395,14 @@
   </main>
 
 
-  <script src="./config.js?v=20261005-4"></script>
+  <script src="./config.js"></script>
 
-  <script src="./script.js?v=20261005-4"></script>
-
+  <script src="./scripts/app.js"></script>
+  <script src="./scripts/nav.js"></script>
+  <script src="./scripts/weather.js"></script>
+  <script src="./scripts/spotify.js"></script>
+  <script src="./scripts/android.js"></script>
+  <script src="./scripts/home.js"></script>
 </body>
 
 </html>
