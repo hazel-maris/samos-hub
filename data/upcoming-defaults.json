@@ -1,0 +1,18 @@
+[
+  {
+    "id": "halloween",
+    "title": "Halloween",
+    "date": "2026-10-31",
+    "time": null,
+    "type": "event",
+    "recurrence": null
+  },
+  {
+    "id": "rent",
+    "title": "Rent",
+    "date": "2026-11-01",
+    "time": null,
+    "type": "task",
+    "recurrence": "monthly"
+  }
+]

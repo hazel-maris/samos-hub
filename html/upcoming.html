@@ -1,0 +1,600 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  >
+
+  <meta
+    name="theme-color"
+    content="#e4d4b8"
+  >
+
+  <title>
+    SamOS Hub · Upcoming
+  </title>
+
+  <link
+    rel="manifest"
+    href="../manifest.webmanifest"
+  >
+
+  <link
+    rel="stylesheet"
+    href="../styles/base.css"
+  >
+
+  <link
+    rel="stylesheet"
+    href="../styles/upcoming.css"
+  >
+
+  <link
+    rel="stylesheet"
+    href="../styles/mobile.css"
+  >
+</head>
+
+
+<body data-root="..">
+
+  <main class="home">
+
+
+    <!-- =====================================================
+         DELETE CONFIRMATION
+         ===================================================== -->
+
+    <div
+      id="delete-confirm-overlay"
+      class="delete-confirm-overlay"
+      hidden
+    >
+
+      <div class="delete-confirm-box">
+
+        <div class="delete-confirm-title">
+          Delete item?
+        </div>
+
+
+        <div
+          id="delete-confirm-name"
+          class="delete-confirm-name"
+        ></div>
+
+
+        <div class="delete-confirm-actions">
+
+          <button
+            id="delete-cancel"
+            type="button"
+          >
+            Cancel
+          </button>
+
+
+          <button
+            id="delete-confirm"
+            type="button"
+          >
+            Delete
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+<!-- =====================================================
+     TIME PICKER
+     ===================================================== -->
+
+<div
+  id="time-overlay"
+  class="time-overlay"
+  hidden
+>
+
+  <div
+    class="time-box"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Choose time"
+  >
+
+    <div class="time-picker-title">
+      Choose Time
+    </div>
+
+
+    <div class="time-picker-mode">
+
+      <button
+        id="time-mode-hour"
+        class="time-mode-button active"
+        type="button"
+      >
+        Hour
+      </button>
+
+      <button
+        id="time-mode-minute"
+        class="time-mode-button"
+        type="button"
+      >
+        Minute
+      </button>
+
+    </div>
+
+
+    <div
+      id="time-clock-face"
+      class="time-clock-face"
+    ></div>
+
+
+    <div
+      id="time-minute-adjust"
+      class="time-minute-adjust"
+      hidden
+    >
+
+      <button
+        id="time-minute-minus"
+        type="button"
+        aria-label="Previous minute"
+      >
+        −
+      </button>
+
+      <div
+        id="time-exact-minute"
+        class="time-exact-minute"
+      >
+        00
+      </div>
+
+      <button
+        id="time-minute-plus"
+        type="button"
+        aria-label="Next minute"
+      >
+        +
+      </button>
+
+    </div>
+
+
+    <div class="time-period-row">
+
+      <button
+        id="time-am"
+        class="time-period-button"
+        type="button"
+      >
+        AM
+      </button>
+
+      <button
+        id="time-pm"
+        class="time-period-button"
+        type="button"
+      >
+        PM
+      </button>
+
+    </div>
+
+
+    <div
+      id="time-preview"
+      class="time-preview"
+    >
+      12:00 PM
+    </div>
+
+
+    <div class="time-picker-actions">
+
+      <button
+        id="time-cancel"
+        type="button"
+      >
+        Cancel
+      </button>
+
+      <button
+        id="time-done"
+        type="button"
+      >
+        Done
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+    <!-- =====================================================
+         CALENDAR PICKER
+         ===================================================== -->
+
+    <div
+      id="calendar-overlay"
+      class="calendar-overlay"
+      hidden
+    >
+
+      <div
+        class="calendar-box"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Choose date"
+      >
+
+        <div class="calendar-top-row">
+
+          <button
+            id="calendar-prev"
+            class="calendar-nav-button"
+            type="button"
+            aria-label="Previous month"
+          >
+            &lt;
+          </button>
+
+
+          <div
+            id="calendar-heading"
+            class="calendar-heading"
+          >
+            October 2026
+          </div>
+
+
+          <button
+            id="calendar-next"
+            class="calendar-nav-button"
+            type="button"
+            aria-label="Next month"
+          >
+            &gt;
+          </button>
+
+        </div>
+
+
+        <div class="calendar-controls">
+
+          <label>
+
+            <span>
+              Month
+            </span>
+
+            <select
+              id="calendar-month"
+            ></select>
+
+          </label>
+
+
+          <label>
+
+            <span>
+              Year
+            </span>
+
+            <select
+            id="calendar-year"
+            ></select>
+
+          </label>
+
+
+          <button
+            id="calendar-today"
+            type="button"
+          >
+            Today
+          </button>
+
+        </div>
+
+
+        <div class="calendar-weekdays">
+
+          <span>Sun</span>
+          <span>Mon</span>
+          <span>Tue</span>
+          <span>Wed</span>
+          <span>Thu</span>
+          <span>Fri</span>
+          <span>Sat</span>
+
+        </div>
+
+
+        <div
+          id="calendar-grid"
+          class="calendar-grid"
+        ></div>
+
+
+        <div class="calendar-bottom-row">
+
+          <button
+            id="calendar-cancel"
+            type="button"
+          >
+            Cancel
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         MAIN JOURNAL
+         ===================================================== -->
+
+    <section class="journal-shell">
+
+      <div id="nav-container"></div>
+
+
+      <section class="journal upcoming-journal">
+
+        <section class="upcoming-area">
+
+          <div class="game-panel upcoming-page-panel">
+
+            <div class="upcoming-page-title">
+              Upcoming
+            </div>
+
+
+            <!-- =================================================
+                 ADD ITEM
+                 ================================================= -->
+
+            <div class="upcoming-add-section">
+
+              <div class="upcoming-section-title">
+                Add Item
+              </div>
+
+
+            <div class="upcoming-form">
+
+
+            <!-- TITLE -->
+
+            <label class="upcoming-field">
+
+                <span>
+                Title
+                </span>
+
+                <input
+                id="upcoming-title"
+                type="text"
+                placeholder="What’s coming up?"
+                autocomplete="off"
+                >
+
+            </label>
+
+
+            <!-- DATE -->
+
+            <label class="upcoming-field">
+
+                <span>
+                Date
+                </span>
+
+                <div class="date-input-wrap">
+
+                <input
+                    id="upcoming-date"
+                    type="text"
+                    inputmode="numeric"
+                    maxlength="10"
+                    placeholder="MM/DD/YYYY"
+                    autocomplete="off"
+                >
+
+                <button
+                    class="date-picker-button"
+                    type="button"
+                    data-date-target="upcoming-date"
+                    aria-label="Open calendar"
+                    title="Open calendar"
+                >
+                    ▦
+                </button>
+
+                </div>
+
+            </label>
+
+
+            <!-- TIME -->
+
+            <label class="upcoming-field">
+
+                <span>
+                Time
+                </span>
+
+                <div class="time-input-wrap">
+
+                <input
+                    id="upcoming-time"
+                    type="text"
+                    inputmode="text"
+                    placeholder="3:30 PM"
+                    autocomplete="off"
+                >
+
+                <button
+                    class="time-picker-button"
+                    type="button"
+                    data-time-target="upcoming-time"
+                    aria-label="Open time picker"
+                    title="Open time picker"
+                >
+                    ◷
+                </button>
+
+                </div>
+
+            </label>
+
+
+            <!-- TYPE -->
+
+            <label class="upcoming-field">
+
+                <span>
+                Type
+                </span>
+
+                <select id="upcoming-type">
+
+                <option value="task">
+                    Task
+                </option>
+
+                <option value="event">
+                    Event
+                </option>
+
+                <option value="appointment">
+                    Appointment
+                </option>
+
+                </select>
+
+            </label>
+
+
+            <!-- REPEATS -->
+
+            <label class="upcoming-field">
+
+                <span>
+                Repeats
+                </span>
+
+                <select id="upcoming-recurrence">
+
+                <option value="">
+                    Does not repeat
+                </option>
+
+                <option value="daily">
+                    Daily
+                </option>
+
+                <option value="weekly">
+                    Weekly
+                </option>
+
+                <option value="monthly">
+                    Monthly
+                </option>
+
+                <option value="yearly">
+                    Yearly
+                </option>
+
+                </select>
+
+            </label>
+
+
+            <!-- ADD -->
+
+            <button
+                id="upcoming-add"
+                type="button"
+            >
+                Add
+            </button>
+
+
+            <div
+                id="upcoming-form-status"
+                class="upcoming-form-status"
+            ></div>
+
+            </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 UPCOMING ITEMS
+                 ================================================= -->
+
+            <div class="upcoming-section-title">
+              Upcoming Items
+            </div>
+
+
+            <div id="upcoming-list">
+              Loading...
+            </div>
+
+          </div>
+
+        </section>
+
+      </section>
+
+    </section>
+
+  </main>
+
+
+  <!-- =========================================================
+       SCRIPTS
+       ========================================================= -->
+
+  <script
+    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+  ></script>
+
+  <script
+    src="../config.js"
+  ></script>
+
+  <script
+    src="../scripts/app.js"
+  ></script>
+
+  <script
+    src="../scripts/nav.js"
+  ></script>
+
+  <script
+    src="../scripts/upcoming.js"
+  ></script>
+
+</body>
+
+</html>

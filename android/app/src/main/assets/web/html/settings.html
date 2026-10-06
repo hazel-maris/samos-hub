@@ -13,12 +13,27 @@
 
   <title>SamOS Hub · Settings</title>
 
-  <link rel="manifest" href="./manifest.webmanifest">
+  <link
+    rel="manifest"
+    href="../manifest.webmanifest"
+  >
 
-  <link rel="stylesheet" href="../styles/base.css?v=20261006-1">
-  <link rel="stylesheet" href="../styles/settings.css?v=20261006-1">
-  <link rel="stylesheet" href="../styles/mobile.css?v=20261006-1">
+  <link
+    rel="stylesheet"
+    href="../styles/base.css?v=20261006-1"
+  >
+
+  <link
+    rel="stylesheet"
+    href="../styles/settings.css?v=20261006-1"
+  >
+
+  <link
+    rel="stylesheet"
+    href="../styles/mobile.css?v=20261006-1"
+  >
 </head>
+
 
 <body data-root="..">
 
@@ -27,6 +42,7 @@
     <section class="journal-shell">
 
       <div id="nav-container"></div>
+
 
       <section class="journal settings-journal">
 
@@ -38,6 +54,8 @@
               Settings
             </div>
 
+
+            <!-- WEATHER -->
 
             <div class="settings-section">
 
@@ -60,6 +78,118 @@
 
             </div>
 
+
+            <!-- ACCOUNT -->
+
+            <div class="settings-section">
+
+              <div class="settings-section-title">
+                Account
+              </div>
+
+              <div id="supabase-auth-status">
+                Not signed in
+              </div>
+
+              <div
+                id="supabase-login-form"
+                class="settings-login"
+              >
+
+                <input
+                  id="supabase-email"
+                  type="email"
+                  placeholder="Email"
+                >
+
+                <input
+                  id="supabase-password"
+                  type="password"
+                  placeholder="Password"
+                >
+
+                <button
+                  id="supabase-login"
+                  type="button"
+                >
+                  Sign in
+                </button>
+
+              </div>
+
+              <button
+                id="supabase-logout"
+                type="button"
+                hidden
+              >
+                Sign out
+              </button>
+
+            </div>
+
+
+            <!-- UPCOMING -->
+
+            <div class="settings-section">
+
+              <div class="settings-section-title">
+                Upcoming
+              </div>
+
+              <label class="settings-row">
+
+                <span>
+                  Show daily tasks
+                </span>
+
+                <input
+                  id="setting-daily-tasks"
+                  type="checkbox"
+                >
+
+              </label>
+
+              <label class="settings-row">
+
+                <span>
+                  Show weekly tasks
+                </span>
+
+                <input
+                  id="setting-weekly-tasks"
+                  type="checkbox"
+                >
+
+              </label>
+
+              <label class="settings-row">
+
+                <span>
+                  Show monthly tasks
+                </span>
+
+                <input
+                  id="setting-monthly-tasks"
+                  type="checkbox"
+                >
+
+              </label>
+
+              <label class="settings-row">
+
+                <span>
+                  Show yearly tasks
+                </span>
+
+                <input
+                  id="setting-yearly-tasks"
+                  type="checkbox"
+                >
+
+              </label>
+
+            </div>
+
           </div>
 
         </section>
@@ -71,11 +201,14 @@
   </main>
 
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
   <script src="../config.js"></script>
 
   <script src="../scripts/app.js"></script>
   <script src="../scripts/nav.js"></script>
   <script src="../scripts/settings.js"></script>
+
 </body>
 
 </html>

@@ -12,5 +12,11 @@ window.SAMOS_CONFIG = {
     timezone: "America/New_York"
   },
 
-  quote: "Build for Future Sam."
+  quote: "Build for Future Sam.",
+
+  supabaseUrl:
+    "https://yeszbhvgwelxyoqsxpvp.supabase.co",
+
+  supabaseKey:
+    "sb_publishable_rEgo_bAsRnytGsBws-Ebvg_9t_M7O9J"
 };

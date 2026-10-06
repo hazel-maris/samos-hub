@@ -9,28 +9,46 @@
     content="width=device-width, initial-scale=1, viewport-fit=cover"
   >
 
-  <meta name="theme-color" content="#e4d4b8">
+  <meta
+    name="theme-color"
+    content="#e4d4b8"
+  >
 
   <title>SamOS Hub</title>
 
-  <link rel="manifest" href="./manifest.webmanifest">
+  <link
+    rel="manifest"
+    href="./manifest.webmanifest"
+  >
 
-  <link rel="stylesheet" href="./styles/base.css">
-  <link rel="stylesheet" href="./styles/home.css">
-  <link rel="stylesheet" href="./styles/mobile.css">
-  <link rel="stylesheet" href="./styles/settings.css"> 
+  <link
+    rel="stylesheet"
+    href="./styles/base.css"
+  >
+
+  <link
+    rel="stylesheet"
+    href="./styles/home.css"
+  >
+
+  <link
+    rel="stylesheet"
+    href="./styles/mobile.css"
+  >
 </head>
+
 
 <body data-root=".">
 
   <main class="home">
 
-
     <section class="journal-shell">
 
       <div id="nav-container"></div>
 
+
       <section class="journal">
+
 
         <!-- =====================================================
              LEFT COLUMN
@@ -39,13 +57,16 @@
         <section class="orientation">
 
 
-          <!-- DATE / TIME -->
+          <!-- ===================================================
+               DATE / TIME
+               =================================================== -->
 
           <div class="game-panel date-panel">
 
             <div id="date">
               Loading...
             </div>
+
 
             <div id="time">
 
@@ -58,7 +79,9 @@
           </div>
 
 
-          <!-- WEATHER -->
+          <!-- ===================================================
+               WEATHER
+               =================================================== -->
 
           <div class="game-panel weather-panel">
 
@@ -68,41 +91,58 @@
               <!-- LEFT: CURRENT WEATHER -->
 
               <section class="weather-forecast-side">
-
+                <div class ="weather-current-heading">
+                  CURRENT WEATHER
+                </div>
+                      
                 <div class="weather-current-row">
 
-                  <div id="weather-current">
+                  <div id="weather-current">            
 
-                    <img
-                      id="temp-icon"
-                      src=""
-                      alt=""
-                      hidden
-                    >
+                    <div class="weather-temp-row">
 
-                    <span id="weather-temp">
-                      --
-                    </span>
+                      <img
+                        id="temp-icon"
+                        src=""
+                        alt=""
+                        hidden
+                      >
 
-                    <img
-                      id="weather-icon"
-                      src=""
-                      alt=""
-                      hidden
-                    >
+                      <span id="weather-temp">
+                        --
+                      </span>
 
-                    <span id="weather-condition">
-                      Weather loading...
-                    </span>
+                    </div>
+
+
+                    <div class="weather-condition-row">
+
+                      <img
+                        id="weather-icon"
+                        src=""
+                        alt=""
+                        hidden
+                      >
+
+                      <span id="weather-condition">
+                        Weather loading...
+                      </span>
+
+                    </div>
 
                   </div>
 
                 </div>
 
 
+                <!-- HIGH / LOW -->
+
                 <div id="weather-range">
                   High --° · Low --°
                 </div>
+
+
+                <!-- SUNRISE / SUNSET -->
 
                 <div id="sun-times">
                   Sunrise -- · Sunset --
@@ -111,11 +151,13 @@
               </section>
 
 
-              <!-- RIGHT: FORECAST + EVENTS + ALERTS -->
+              <!-- =================================================
+                   RIGHT: OUTLOOK + ALERTS
+                   ================================================= -->
 
               <section class="weather-alert-side">
 
-                <!-- UPCOMING WEATHER -->
+                <!-- OUTLOOK -->
 
                 <div class="weather-upcoming">
 
@@ -123,35 +165,50 @@
                     OUTLOOK
                   </div>
 
+
+                  <!-- AFTERNOON WEATHER -->
+
                   <div
                     id="weather-afternoon"
                     class="forecast-line"
                     hidden
                   >
+
                     <img
                       class="weather-forecast-icon"
                       src="./icons/afternoon-icon.png"
                       alt=""
                     >
 
-                    <span id="weather-afternoon-text"></span>
+                    <span
+                      id="weather-afternoon-text"
+                    ></span>
+
                   </div>
+
+
+                  <!-- OVERNIGHT WEATHER -->
 
                   <div
                     id="weather-overnight"
                     class="forecast-line"
                     hidden
                   >
+
                     <img
                       class="weather-forecast-icon"
                       src="./icons/overnight-icon.png"
                       alt=""
                     >
 
-                    <span id="weather-overnight-text">
-                        No forecasted events or storms.
-                    </span>
+                    <span
+                      id="weather-overnight-text"
+                    ></span>
+
                   </div>
+
+
+                  <!-- MAJOR UPCOMING WEATHER -->
 
                   <div id="weather-event">
 
@@ -162,8 +219,11 @@
                       hidden
                     >
 
-                    <span id="weather-event-text" class="no-weather-events">
-                      No watches, warnings, or advisories.
+                    <span
+                      id="weather-event-text"
+                      class="no-weather-events"
+                    >
+                      No forecasted events or storms.
                     </span>
 
                   </div>
@@ -171,7 +231,11 @@
                 </div>
 
 
-                <div class="weather-alert-divider"></div>
+                <!-- DIVIDER -->
+
+                <div
+                  class="weather-alert-divider"
+                ></div>
 
 
                 <!-- OFFICIAL ALERTS -->
@@ -180,9 +244,12 @@
                   ALERTS
                 </div>
 
+
                 <div id="weather-alerts">
 
-                  <div class="no-weather-alerts"></div>
+                  <div class="no-weather-alerts">
+                    No watches, warnings, or advisories.
+                  </div>
 
                 </div>
 
@@ -193,28 +260,29 @@
           </div>
 
 
-          <!-- UPCOMING DATES -->
+          <!-- ===================================================
+               UPCOMING DATES
+               =================================================== -->
 
           <div class="game-panel upcoming-panel">
 
             <div class="upcoming-title">
-              Upcoming This Month...
+              THIS WEEK
             </div>
 
-            <div class="upcoming-dates">
-
-              <div>
-                Oct 31, 2026 · Halloween
-              </div>
-
+            <div
+              id="home-upcoming-list"
+              class="upcoming-dates"
+            >
+              Loading...
             </div>
 
-            <button
+            <a
               class="upcoming-see-all"
-              type="button"
+              href="./html/upcoming.html"
             >
               See all
-            </button>
+            </a>
 
           </div>
 
@@ -230,14 +298,16 @@
           <div class="game-panel spotify-panel">
 
 
-            <!-- SPOTIFY HEADER -->
+            <!-- =================================================
+                 SPOTIFY HEADER
+                 ================================================= -->
 
             <div class="spotify-heading-row">
 
               <div class="spotify-heading-copy">
 
                 <div class="spotify-title">
-                  Spotify
+                  SPOTIFY
                 </div>
 
                 <div id="spotify-status">
@@ -258,7 +328,9 @@
             </div>
 
 
-            <!-- PLAYER -->
+            <!-- =================================================
+                 PLAYER
+                 ================================================= -->
 
             <div
               id="spotify-player"
@@ -277,6 +349,7 @@
                 >
                   Choose a playlist...
                 </button>
+
 
                 <div
                   id="playlist-menu"
@@ -297,6 +370,7 @@
                   alt="Album artwork"
                   hidden
                 >
+
 
                 <div
                   id="album-placeholder"
@@ -329,6 +403,9 @@
 
               <div class="player-controls">
 
+
+                <!-- PREVIOUS -->
+
                 <button
                   id="previous-track"
                   type="button"
@@ -342,6 +419,8 @@
 
                 </button>
 
+
+                <!-- PLAY / PAUSE -->
 
                 <button
                   id="play-pause"
@@ -357,6 +436,8 @@
 
                 </button>
 
+
+                <!-- NEXT -->
 
                 <button
                   id="next-track"
@@ -388,12 +469,21 @@
           Build for Future Sam.
         </blockquote>
 
+
       </section>
 
     </section>
 
   </main>
 
+
+  <!-- =========================================================
+       SCRIPTS
+       ========================================================= -->
+
+  <script
+    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
+  ></script>
 
   <script src="./config.js"></script>
 
@@ -402,7 +492,9 @@
   <script src="./scripts/weather.js"></script>
   <script src="./scripts/spotify.js"></script>
   <script src="./scripts/android.js"></script>
+  <script src="./scripts/home-upcoming.js"></script>
   <script src="./scripts/home.js"></script>
+
 </body>
 
 </html>

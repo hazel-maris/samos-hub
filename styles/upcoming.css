@@ -1,0 +1,1999 @@
+/* =========================================================
+   UPCOMING PAGE
+   ========================================================= */
+
+.upcoming-journal {
+  display: block;
+
+  padding:
+    clamp(26px, 3vw, 44px);
+
+  overflow: hidden;
+}
+
+
+.upcoming-area {
+  width: 100%;
+  height: 100%;
+
+  min-width: 0;
+  min-height: 0;
+}
+
+
+.upcoming-page-panel {
+  width: 100%;
+  height: 100%;
+
+  padding:
+    clamp(24px, 2.5vw, 38px);
+
+  overflow-y: auto;
+}
+
+
+/* =========================================================
+   PAGE TITLE
+   ========================================================= */
+
+.upcoming-page-title {
+  margin-bottom: 26px;
+
+  font-family: "VT323", sans-serif;
+  font-size:
+    clamp(2.4rem, 3vw, 3.5rem);
+
+  line-height: 1;
+
+  color: var(--text);
+}
+
+
+/* =========================================================
+   SECTION TITLES
+   ========================================================= */
+
+.upcoming-section-title {
+  margin-bottom: 14px;
+
+  padding-bottom: 8px;
+
+  border-bottom:
+    1px solid
+    rgba(122, 90, 58, 0.35);
+
+  font-family: "VT323", sans-serif;
+  font-size:
+    clamp(1.6rem, 1.9vw, 2.1rem);
+
+  line-height: 1;
+
+  color: var(--text);
+}
+
+
+/* =========================================================
+   ADD ITEM SECTION
+   ========================================================= */
+
+.upcoming-add-section {
+  margin-bottom: 34px;
+}
+
+
+.upcoming-form {
+  display: grid;
+
+  grid-template-columns:
+    minmax(220px, 2fr)
+    minmax(150px, 1fr)
+    minmax(120px, 0.8fr)
+    minmax(140px, 1fr)
+    minmax(170px, 1fr)
+    auto;
+
+  gap:
+    14px
+    16px;
+
+  align-items: end;
+}
+
+
+/* =========================================================
+   FORM FIELDS
+   ========================================================= */
+
+.upcoming-field {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 6px;
+
+  font-family: "VT323", sans-serif;
+  font-size:
+    clamp(1.15rem, 1.3vw, 1.45rem);
+
+  color: var(--text);
+}
+
+
+.upcoming-field span {
+  line-height: 1;
+}
+
+
+.upcoming-field input,
+.upcoming-field select {
+  width: 100%;
+  min-width: 0;
+  height: 44px;
+
+  box-sizing: border-box;
+
+  padding:
+    7px
+    10px;
+
+  font-family: "VT323", sans-serif;
+  font-size:
+    clamp(1.1rem, 1.25vw, 1.4rem);
+
+  color: var(--text);
+
+  background:
+    rgba(255, 252, 241, 0.75);
+
+  border:
+    2px solid
+    rgba(122, 90, 58, 0.72);
+
+  border-radius: 0;
+
+  outline: none;
+}
+
+
+.upcoming-field input:focus,
+.upcoming-field select:focus {
+  border-color:
+    var(--border);
+
+  box-shadow:
+    2px 2px 0
+    rgba(79, 57, 38, 0.22);
+}
+
+
+.upcoming-field input::placeholder {
+  color:
+    rgba(79, 57, 38, 0.55);
+}
+
+
+/* =========================================================
+   ADD BUTTON
+   ========================================================= */
+
+#upcoming-add {
+  min-width: 84px;
+  height: 44px;
+
+  padding:
+    7px
+    18px;
+
+  font-family: "VT323", sans-serif;
+  font-size:
+    clamp(1.2rem, 1.35vw, 1.5rem);
+
+  color: var(--text);
+
+  background:
+    var(--tab);
+
+  border:
+    2px solid
+    var(--border);
+
+  box-shadow:
+    2px 2px 0
+    rgba(79, 57, 38, 0.3);
+
+  cursor: pointer;
+}
+
+
+#upcoming-add:hover {
+  transform:
+    translateY(-1px);
+}
+
+
+#upcoming-add:active {
+  transform:
+    translate(1px, 1px);
+
+  box-shadow:
+    1px 1px 0
+    rgba(79, 57, 38, 0.3);
+}
+
+
+#upcoming-add:disabled {
+  opacity: 0.55;
+  cursor: default;
+  transform: none;
+}
+
+
+/* =========================================================
+   FORM STATUS
+   ========================================================= */
+
+.upcoming-form-status {
+  grid-column:
+    1 / -1;
+
+  min-height: 22px;
+
+  margin-top: -2px;
+
+  font-family: "VT323", sans-serif;
+  font-size:
+    clamp(1.05rem, 1.2vw, 1.35rem);
+
+  color:
+    rgba(79, 57, 38, 0.7);
+}
+
+
+/* =========================================================
+   UPCOMING LIST
+   ========================================================= */
+
+#upcoming-list {
+  display: flex;
+  flex-direction: column;
+
+  gap: 10px;
+
+  font-family: "VT323", sans-serif;
+}
+
+
+.upcoming-item {
+  display: grid;
+
+  grid-template-columns:
+    minmax(90px, 120px)
+    minmax(0, 1fr);
+
+  gap: 18px;
+
+  align-items: center;
+
+  padding:
+    14px
+    16px;
+
+  background:
+    rgba(255, 252, 241, 0.34);
+
+  border:
+    1px solid
+    rgba(122, 90, 58, 0.34);
+}
+
+
+.upcoming-item-date {
+  font-family: "VT323", sans-serif;
+  font-size:
+    clamp(1.35rem, 1.55vw, 1.75rem);
+
+  line-height: 1;
+
+  color: var(--text);
+}
+
+
+.upcoming-item-main {
+  min-width: 0;
+}
+
+
+.upcoming-item-title {
+  margin-bottom: 5px;
+
+  font-family: "VT323", sans-serif;
+  font-size:
+    clamp(1.4rem, 1.65vw, 1.9rem);
+
+  line-height: 1;
+
+  color: var(--text);
+}
+
+
+.upcoming-item-meta {
+  display: flex;
+  flex-wrap: wrap;
+
+  gap:
+    4px
+    12px;
+
+  font-family: "VT323", sans-serif;
+  font-size:
+    clamp(1.05rem, 1.2vw, 1.35rem);
+
+  line-height: 1.1;
+
+  color:
+    rgba(79, 57, 38, 0.67);
+}
+
+
+.upcoming-item-meta span:not(:last-child)::after {
+  content: " · ";
+
+  margin-left: 10px;
+}
+
+
+.upcoming-recurrence {
+  text-transform: capitalize;
+}
+
+
+/* =========================================================
+   EMPTY STATE
+   ========================================================= */
+
+.upcoming-empty {
+  padding:
+    18px
+    4px;
+
+  font-family: "VT323", sans-serif;
+  font-size:
+    clamp(1.2rem, 1.4vw, 1.55rem);
+
+  color:
+    rgba(79, 57, 38, 0.6);
+}
+
+
+/* =========================================================
+   SMALL / PORTRAIT SCREENS
+   ========================================================= */
+
+@media (
+  max-width: 900px
+) {
+
+  .upcoming-journal {
+    padding: 18px;
+  }
+
+
+  .upcoming-page-panel {
+    padding: 20px;
+  }
+
+
+  .upcoming-form {
+    grid-template-columns:
+      1fr
+      1fr;
+  }
+
+
+  .upcoming-field:first-child {
+    grid-column:
+      1 / -1;
+  }
+
+
+  #upcoming-add {
+    width: 100%;
+  }
+
+
+  .upcoming-item {
+    grid-template-columns:
+      82px
+      minmax(0, 1fr);
+
+    gap: 12px;
+
+    padding:
+      12px;
+  }
+
+}
+
+/* =========================================================
+   UPCOMING ITEM ACTIONS
+   ========================================================= */
+
+.upcoming-item {
+  grid-template-columns:
+    minmax(90px, 120px)
+    minmax(0, 1fr)
+    auto;
+}
+
+
+.upcoming-item-actions {
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+}
+
+
+.upcoming-icon-button {
+  width: 42px;
+  height: 42px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  padding: 5px;
+
+  background:
+    rgba(255, 252, 241, 0.55);
+
+  border:
+    1px solid
+    rgba(122, 90, 58, 0.45);
+
+  cursor: pointer;
+}
+
+
+.upcoming-icon-button:hover {
+  background:
+    rgba(255, 252, 241, 0.85);
+
+  transform:
+    translateY(-1px);
+}
+
+
+.upcoming-icon-button:active {
+  transform:
+    translate(1px, 1px);
+}
+
+
+.upcoming-icon-button img {
+  width: 30px;
+  height: 30px;
+
+  object-fit: contain;
+
+  image-rendering: pixelated;
+
+  pointer-events: none;
+}
+
+
+/* =========================================================
+   EDIT MODE
+   ========================================================= */
+
+.upcoming-item-editing {
+  grid-template-columns:
+    minmax(0, 1fr)
+    auto;
+}
+
+
+.upcoming-edit-fields {
+  display: grid;
+
+  grid-template-columns:
+    minmax(200px, 2fr)
+    minmax(140px, 1fr)
+    minmax(110px, 0.8fr)
+    minmax(130px, 1fr)
+    minmax(160px, 1fr);
+
+  gap: 10px;
+}
+
+
+.upcoming-edit-fields input,
+.upcoming-edit-fields select {
+  width: 100%;
+  min-width: 0;
+
+  height: 40px;
+
+  box-sizing: border-box;
+
+  padding:
+    6px
+    8px;
+
+  font-family:
+    "VT323",
+    sans-serif;
+
+  font-size:
+    clamp(
+      1.05rem,
+      1.2vw,
+      1.35rem
+    );
+
+  color:
+    var(--text);
+
+  background:
+    rgba(255, 252, 241, 0.8);
+
+  border:
+    1px solid
+    rgba(122, 90, 58, 0.55);
+}
+
+
+/* =========================================================
+   MOBILE ITEM ACTIONS
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+  .upcoming-item {
+    grid-template-columns:
+      76px
+      minmax(0, 1fr)
+      auto;
+  }
+
+
+  .upcoming-item-actions {
+    flex-direction: column;
+  }
+
+
+  .upcoming-icon-button {
+    width: 38px;
+    height: 38px;
+  }
+
+
+  .upcoming-icon-button img {
+    width: 27px;
+    height: 27px;
+  }
+
+
+  .upcoming-item-editing {
+    grid-template-columns:
+      minmax(0, 1fr)
+      auto;
+  }
+
+
+  .upcoming-edit-fields {
+    grid-template-columns:
+      1fr
+      1fr;
+  }
+
+
+  .upcoming-edit-title {
+    grid-column:
+      1 / -1;
+  }
+
+}
+
+/* =========================================================
+   DELETE CONFIRMATION
+   ========================================================= */
+
+.delete-confirm-overlay {
+  position: fixed;
+
+  inset: 0;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+
+  background:
+    rgba(79, 57, 38, 0.28);
+
+  z-index: 9999;
+}
+
+
+.delete-confirm-overlay[hidden] {
+  display: none;
+}
+
+
+.delete-confirm-box {
+  width:
+    min(
+      90vw,
+      420px
+    );
+
+  padding:
+    24px;
+
+  background:
+    var(--paper);
+
+  border:
+    3px solid
+    var(--border);
+
+  box-shadow:
+    6px 6px 0
+    rgba(79, 57, 38, 0.3);
+}
+
+
+.delete-confirm-title {
+  margin-bottom: 12px;
+
+  font-family:
+    "VT323",
+    sans-serif;
+
+  font-size:
+    2rem;
+
+  color:
+    var(--text);
+}
+
+
+.delete-confirm-name {
+  margin-bottom: 22px;
+
+  font-family:
+    "VT323",
+    sans-serif;
+
+  font-size:
+    1.4rem;
+
+  color:
+    rgba(79, 57, 38, 0.75);
+}
+
+
+.delete-confirm-actions {
+  display: flex;
+
+  justify-content: flex-end;
+
+  gap: 12px;
+}
+
+
+.delete-confirm-actions button {
+  padding:
+    8px
+    16px;
+
+  font-family:
+    "VT323",
+    sans-serif;
+
+  font-size:
+    1.25rem;
+
+  color:
+    var(--text);
+
+  background:
+    var(--tab);
+
+  border:
+    2px solid
+    var(--border);
+
+  cursor: pointer;
+}
+
+/* =========================================================
+   DATE INPUT
+   ========================================================= */
+
+.date-input-wrap {
+  display: flex;
+  align-items: stretch;
+
+  gap: 6px;
+
+  min-width: 0;
+}
+
+
+.date-input-wrap input {
+  min-width: 0;
+
+  flex: 1;
+}
+
+
+.date-picker-button {
+  width: 42px;
+
+  flex: 0 0 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  font-family:
+    "VT323",
+    sans-serif;
+
+  font-size: 1.8rem;
+
+  line-height: 1;
+
+  color:
+    var(--text);
+
+  background:
+    rgba(255, 252, 241, 0.7);
+
+  border:
+    2px solid
+    var(--border);
+
+  cursor: pointer;
+}
+
+
+.date-picker-button:hover {
+  background:
+    rgba(255, 252, 241, 1);
+}
+
+
+/* =========================================================
+   CUSTOM CALENDAR
+   ========================================================= */
+
+.calendar-overlay {
+  position: fixed;
+
+  inset: 0;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+
+  background:
+    rgba(79, 57, 38, 0.28);
+
+  z-index: 10000;
+}
+
+
+.calendar-overlay[hidden] {
+  display: none;
+}
+
+
+.calendar-box {
+  width:
+    min(
+      94vw,
+      560px
+    );
+
+  padding:
+    24px;
+
+  background:
+    var(--paper);
+
+  border:
+    3px solid
+    var(--border);
+
+  box-shadow:
+    6px 6px 0
+    rgba(79, 57, 38, 0.3);
+
+  font-family:
+    "VT323",
+    sans-serif;
+}
+
+
+/* =========================================================
+   CALENDAR HEADER
+   ========================================================= */
+
+.calendar-top-row {
+  display: grid;
+
+  grid-template-columns:
+    48px
+    1fr
+    48px;
+
+  align-items: center;
+
+  gap: 12px;
+
+  margin-bottom: 18px;
+}
+
+
+.calendar-heading {
+  text-align: center;
+
+  font-size:
+    clamp(
+      1.8rem,
+      5vw,
+      2.4rem
+    );
+
+  line-height: 1;
+}
+
+
+.calendar-nav-button {
+  height: 42px;
+
+  font-family:
+    "VT323",
+    sans-serif;
+
+  font-size: 1.8rem;
+
+  color:
+    var(--text);
+
+  background:
+    var(--tab);
+
+  border:
+    2px solid
+    var(--border);
+
+  cursor: pointer;
+}
+
+
+/* =========================================================
+   MONTH / YEAR CONTROLS
+   ========================================================= */
+
+.calendar-controls {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1.5fr)
+    minmax(100px, 1fr)
+    auto;
+
+  gap: 10px;
+
+  align-items: end;
+
+  margin-bottom: 18px;
+}
+
+
+.calendar-controls label {
+  display: flex;
+  flex-direction: column;
+
+  gap: 4px;
+
+  font-size: 1.15rem;
+}
+
+
+.calendar-controls select,
+.calendar-controls input {
+  width: 100%;
+  height: 40px;
+
+  box-sizing: border-box;
+
+  padding:
+    5px
+    8px;
+
+  font-family:
+    "VT323",
+    sans-serif;
+
+  font-size: 1.3rem;
+
+  color:
+    var(--text);
+
+  background:
+    rgba(255, 252, 241, 0.85);
+
+  border:
+    2px solid
+    rgba(122, 90, 58, 0.55);
+}
+
+
+#calendar-today,
+#calendar-cancel {
+  height: 40px;
+
+  padding:
+    5px
+    14px;
+
+  font-family:
+    "VT323",
+    sans-serif;
+
+  font-size: 1.25rem;
+
+  color:
+    var(--text);
+
+  background:
+    var(--tab);
+
+  border:
+    2px solid
+    var(--border);
+
+  cursor: pointer;
+}
+
+
+/* =========================================================
+   WEEKDAYS
+   ========================================================= */
+
+.calendar-weekdays {
+  display: grid;
+
+  grid-template-columns:
+    repeat(7, 1fr);
+
+  gap: 4px;
+
+  margin-bottom: 5px;
+
+  text-align: center;
+
+  font-size:
+    clamp(
+      1rem,
+      3vw,
+      1.25rem
+    );
+
+  opacity: 0.7;
+}
+
+
+/* =========================================================
+   DAYS
+   ========================================================= */
+
+.calendar-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(7, 1fr);
+
+  gap: 5px;
+}
+
+
+.calendar-day,
+.calendar-empty-day {
+  aspect-ratio: 1;
+
+  min-width: 0;
+}
+
+
+.calendar-day {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  font-family:
+    "VT323",
+    sans-serif;
+
+  font-size:
+    clamp(
+      1.25rem,
+      4vw,
+      1.6rem
+    );
+
+  color:
+    var(--text);
+
+  background:
+    rgba(255, 252, 241, 0.55);
+
+  border:
+    1px solid
+    rgba(122, 90, 58, 0.35);
+
+  cursor: pointer;
+}
+
+
+.calendar-day:hover {
+  border:
+    2px solid
+    var(--border);
+
+  background:
+    rgba(255, 252, 241, 0.95);
+}
+
+
+.calendar-day.today {
+  outline:
+    2px dashed
+    rgba(122, 90, 58, 0.7);
+
+  outline-offset: -4px;
+}
+
+
+.calendar-day.selected {
+  background:
+    var(--tab);
+
+  border:
+    3px solid
+    var(--border);
+}
+
+
+/* =========================================================
+   CALENDAR FOOTER
+   ========================================================= */
+
+.calendar-bottom-row {
+  display: flex;
+
+  justify-content: flex-end;
+
+  margin-top: 18px;
+}
+
+
+/* =========================================================
+   DATE INPUT
+   ========================================================= */
+
+.date-input-wrap {
+  display: flex;
+  align-items: stretch;
+
+  gap: 6px;
+
+  min-width: 0;
+}
+
+
+.date-input-wrap input {
+  min-width: 0;
+
+  flex: 1;
+}
+
+
+.date-picker-button {
+  width: 42px;
+
+  flex: 0 0 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  font-family:
+    "VT323",
+    sans-serif;
+
+  font-size: 1.8rem;
+
+  line-height: 1;
+
+  color:
+    var(--text);
+
+  background:
+    rgba(255, 252, 241, 0.7);
+
+  border:
+    2px solid
+    var(--border);
+
+  cursor: pointer;
+}
+
+
+.date-picker-button:hover {
+  background:
+    rgba(255, 252, 241, 1);
+}
+
+
+/* =========================================================
+   CUSTOM CALENDAR
+   ========================================================= */
+
+.calendar-overlay {
+  position: fixed;
+
+  inset: 0;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+
+  background:
+    rgba(79, 57, 38, 0.28);
+
+  z-index: 10000;
+}
+
+
+.calendar-overlay[hidden] {
+  display: none;
+}
+
+
+.calendar-box {
+  width:
+    min(
+      94vw,
+      560px
+    );
+
+  padding:
+    24px;
+
+  background:
+    var(--paper);
+
+  border:
+    3px solid
+    var(--border);
+
+  box-shadow:
+    6px 6px 0
+    rgba(79, 57, 38, 0.3);
+
+  font-family:
+    "VT323",
+    sans-serif;
+}
+
+
+/* =========================================================
+   CALENDAR HEADER
+   ========================================================= */
+
+.calendar-top-row {
+  display: grid;
+
+  grid-template-columns:
+    48px
+    1fr
+    48px;
+
+  align-items: center;
+
+  gap: 12px;
+
+  margin-bottom: 18px;
+}
+
+
+.calendar-heading {
+  text-align: center;
+
+  font-size:
+    clamp(
+      1.8rem,
+      5vw,
+      2.4rem
+    );
+
+  line-height: 1;
+}
+
+
+.calendar-nav-button {
+  height: 42px;
+
+  font-family:
+    "VT323",
+    sans-serif;
+
+  font-size: 1.8rem;
+
+  color:
+    var(--text);
+
+  background:
+    var(--tab);
+
+  border:
+    2px solid
+    var(--border);
+
+  cursor: pointer;
+}
+
+
+/* =========================================================
+   MONTH / YEAR CONTROLS
+   ========================================================= */
+
+.calendar-controls {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1.5fr)
+    minmax(100px, 1fr)
+    auto;
+
+  gap: 10px;
+
+  align-items: end;
+
+  margin-bottom: 18px;
+}
+
+
+.calendar-controls label {
+  display: flex;
+  flex-direction: column;
+
+  gap: 4px;
+
+  font-size: 1.15rem;
+}
+
+
+.calendar-controls select,
+.calendar-controls input {
+  width: 100%;
+  height: 40px;
+
+  box-sizing: border-box;
+
+  padding:
+    5px
+    8px;
+
+  font-family:
+    "VT323",
+    sans-serif;
+
+  font-size: 1.3rem;
+
+  color:
+    var(--text);
+
+  background:
+    rgba(255, 252, 241, 0.85);
+
+  border:
+    2px solid
+    rgba(122, 90, 58, 0.55);
+}
+
+
+#calendar-today,
+#calendar-cancel {
+  height: 40px;
+
+  padding:
+    5px
+    14px;
+
+  font-family:
+    "VT323",
+    sans-serif;
+
+  font-size: 1.25rem;
+
+  color:
+    var(--text);
+
+  background:
+    var(--tab);
+
+  border:
+    2px solid
+    var(--border);
+
+  cursor: pointer;
+}
+
+
+/* =========================================================
+   WEEKDAYS
+   ========================================================= */
+
+.calendar-weekdays {
+  display: grid;
+
+  grid-template-columns:
+    repeat(7, 1fr);
+
+  gap: 4px;
+
+  margin-bottom: 5px;
+
+  text-align: center;
+
+  font-size:
+    clamp(
+      1rem,
+      3vw,
+      1.25rem
+    );
+
+  opacity: 0.7;
+}
+
+
+/* =========================================================
+   DAYS
+   ========================================================= */
+
+.calendar-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(7, 1fr);
+
+  gap: 5px;
+}
+
+
+.calendar-day,
+.calendar-empty-day {
+  aspect-ratio: 1;
+
+  min-width: 0;
+}
+
+
+.calendar-day {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  font-family:
+    "VT323",
+    sans-serif;
+
+  font-size:
+    clamp(
+      1.25rem,
+      4vw,
+      1.6rem
+    );
+
+  color:
+    var(--text);
+
+  background:
+    rgba(255, 252, 241, 0.55);
+
+  border:
+    1px solid
+    rgba(122, 90, 58, 0.35);
+
+  cursor: pointer;
+}
+
+
+.calendar-day:hover {
+  border:
+    2px solid
+    var(--border);
+
+  background:
+    rgba(255, 252, 241, 0.95);
+}
+
+
+.calendar-day.today {
+  outline:
+    2px dashed
+    rgba(122, 90, 58, 0.7);
+
+  outline-offset: -4px;
+}
+
+
+.calendar-day.selected {
+  background:
+    var(--tab);
+
+  border:
+    3px solid
+    var(--border);
+}
+
+
+/* =========================================================
+   CALENDAR FOOTER
+   ========================================================= */
+
+.calendar-bottom-row {
+  display: flex;
+
+  justify-content: flex-end;
+
+  margin-top: 18px;
+}
+
+
+/* =========================================================
+   CALENDAR MOBILE
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+  .calendar-box {
+    padding: 18px 14px;
+  }
+
+
+  .calendar-controls {
+    grid-template-columns:
+      1fr
+      1fr;
+  }
+
+
+  #calendar-today {
+    grid-column:
+      1 / -1;
+  }
+
+
+  .calendar-grid {
+    gap: 3px;
+  }
+
+}
+
+/* =========================================================
+   TIME INPUT
+   ========================================================= */
+
+.time-input-wrap {
+  display: flex;
+  align-items: stretch;
+
+  gap: 6px;
+
+  min-width: 0;
+}
+
+
+.time-input-wrap input {
+  min-width: 0;
+  flex: 1;
+}
+
+
+.time-picker-button {
+  width: 42px;
+
+  flex: 0 0 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0;
+
+  font-family:
+    "VT323",
+    sans-serif;
+
+  font-size: 1.8rem;
+
+  color:
+    var(--text);
+
+  background:
+    rgba(255, 252, 241, 0.7);
+
+  border:
+    2px solid
+    var(--border);
+
+  cursor: pointer;
+}
+
+
+/* =========================================================
+   TIME PICKER OVERLAY
+   ========================================================= */
+
+.time-overlay {
+  position: fixed;
+
+  inset: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+
+  background:
+    rgba(79, 57, 38, 0.28);
+
+  z-index: 10000;
+}
+
+
+.time-overlay[hidden] {
+  display: none;
+}
+
+
+.time-box {
+  width:
+    min(
+      94vw,
+      430px
+    );
+
+  padding: 24px;
+
+  background:
+    var(--paper);
+
+  border:
+    3px solid
+    var(--border);
+
+  box-shadow:
+    6px 6px 0
+    rgba(79, 57, 38, 0.3);
+
+  font-family:
+    "VT323",
+    sans-serif;
+}
+
+
+.time-picker-title {
+  margin-bottom: 14px;
+
+  text-align: center;
+
+  font-size: 2.2rem;
+}
+
+
+/* =========================================================
+   HOUR / MINUTE MODE
+   ========================================================= */
+
+.time-picker-mode {
+  display: flex;
+
+  justify-content: center;
+
+  gap: 10px;
+
+  margin-bottom: 18px;
+}
+
+.time-mode-button,
+.time-period-button {
+  background:
+    var(--tab);
+}
+
+
+.time-mode-button,
+.time-period-button,
+.time-picker-actions button,
+.time-minute-adjust button {
+  font-family:
+    "VT323",
+    sans-serif;
+
+  color:
+    var(--text);
+
+  background:
+    var(--tab);
+
+  border:
+    2px solid
+    var(--border);
+
+  cursor: pointer;
+}
+
+
+.time-mode-button {
+  min-width: 90px;
+
+  padding:
+    6px
+    14px;
+
+  font-size: 1.3rem;
+}
+
+
+.time-mode-button.active,
+.time-period-button.active {
+  background:
+    rgba(255, 252, 241, 0.95);
+
+  border:
+    3px solid
+    var(--border);
+
+  box-shadow:
+    inset 0 0 0 2px
+    rgba(122, 90, 58, 0.15);
+}
+
+
+/* =========================================================
+   CLOCK FACE
+   ========================================================= */
+
+   .time-clock-face {
+  position: relative;
+}
+
+.time-clock-hand {
+  position: absolute;
+
+  left: 50%;
+  top: 50%;
+
+  width: 34%;
+  height: 4px;
+
+  background: var(--border);
+
+  transform-origin: 0 50%;
+  transform: translateY(-50%) rotate(-90deg);
+
+  border-radius: 999px;
+
+  pointer-events: none;
+  z-index: 1;
+}
+
+.time-clock-hand::after {
+  content: "";
+
+  position: absolute;
+  right: -2px;
+  top: 50%;
+
+  transform: translateY(-50%);
+
+  width: 0;
+  height: 0;
+
+  border-top: 6px solid transparent;
+  border-bottom: 6px solid transparent;
+  border-left: 10px solid var(--border);
+}
+
+.time-clock-center {
+  position: absolute;
+
+  left: 50%;
+  top: 50%;
+
+  width: 12px;
+  height: 12px;
+
+  background: var(--border);
+  border-radius: 50%;
+
+  transform: translate(-50%, -50%);
+
+  z-index: 2;
+  pointer-events: none;
+}
+
+.time-clock-option {
+  position: absolute;
+
+  width: 46px;
+  height: 46px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transform:
+    translate(-50%, -50%);
+
+  padding: 0;
+
+  font-family:
+    "VT323",
+    sans-serif;
+
+  font-size: 1.7rem;
+
+  line-height: 1;
+
+  color:
+    var(--text);
+
+  background:
+    transparent;
+
+  border:
+    2px solid transparent;
+
+  border-radius: 50%;
+
+  cursor: pointer;
+
+  z-index: 3;
+}
+
+.time-clock-face {
+  position: relative;
+
+  width:
+    min(
+      58vw,
+      225px
+    );
+
+  aspect-ratio: 1;
+
+  margin:
+    0 auto
+    18px;
+
+  border:
+    2px solid
+    rgba(122, 90, 58, 0.55);
+
+  border-radius: 50%;
+
+  background:
+    rgba(255, 252, 241, 0.45);
+}
+
+
+.time-clock-center {
+  position: absolute;
+
+  left: 50%;
+  top: 50%;
+
+  width: 8px;
+  height: 8px;
+
+  transform:
+    translate(-50%, -50%);
+
+  border-radius: 50%;
+
+  background:
+    var(--border);
+}
+
+
+.time-clock-option {
+  position: absolute;
+
+  width: 42px;
+  height: 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transform:
+    translate(-50%, -50%);
+
+  padding: 0;
+
+  font-family:
+    "VT323",
+    sans-serif;
+
+  font-size: 1.35rem;
+
+  color:
+    var(--text);
+
+  background:
+    transparent;
+
+  border:
+    2px solid
+    transparent;
+
+  border-radius: 50%;
+
+  cursor: pointer;
+}
+
+
+.time-clock-option:hover {
+  border-color:
+    rgba(122, 90, 58, 0.55);
+}
+
+
+.time-clock-option.selected {
+  background:
+    rgba(255, 252, 241, 1);
+
+  border:
+    3px solid
+    var(--border);
+
+  box-shadow:
+    0 0 0 2px
+    rgba(122, 90, 58, 0.18);
+
+  font-size: 1.9rem;
+
+  font-weight: bold;
+}
+
+
+/* =========================================================
+   EXACT MINUTE + / -
+   ========================================================= */
+
+.time-minute-adjust {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 16px;
+
+  margin:
+    0 auto
+    18px;
+}
+
+
+.time-minute-adjust[hidden] {
+  display: none;
+}
+
+
+.time-minute-adjust button {
+  width: 48px;
+  height: 42px;
+
+  font-size: 1.8rem;
+}
+
+
+.time-exact-minute {
+  min-width: 54px;
+
+  text-align: center;
+
+  font-size: 2rem;
+}
+
+
+/* =========================================================
+   AM / PM
+   ========================================================= */
+
+.time-period-row {
+  display: flex;
+
+  justify-content: center;
+
+  gap: 12px;
+
+  margin-bottom: 16px;
+}
+
+
+.time-period-button {
+  min-width: 84px;
+
+  padding:
+    7px
+    14px;
+
+  font-size: 1.4rem;
+}
+
+
+/* =========================================================
+   TIME PREVIEW
+   ========================================================= */
+
+.time-preview {
+  margin-bottom: 18px;
+
+  text-align: center;
+
+  font-size: 2.2rem;
+}
+
+
+/* =========================================================
+   TIME ACTIONS
+   ========================================================= */
+
+.time-picker-actions {
+  display: flex;
+
+  justify-content: flex-end;
+
+  gap: 12px;
+}
+
+
+.time-picker-actions button {
+  padding:
+    7px
+    16px;
+
+  font-size: 1.3rem;
+}

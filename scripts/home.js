@@ -8,40 +8,65 @@
 // ============================================================
 
 function updateClock() {
-  const now = new Date();
+  const now =
+    new Date();
 
 
   const time =
-    now.toLocaleTimeString([], {
-      hour: "numeric",
-      minute: "2-digit"
-    });
+    now.toLocaleTimeString(
+      [],
+      {
+        hour: "numeric",
+        minute: "2-digit"
+      }
+    );
 
 
   const parts =
     time.split(" ");
 
 
-  document.getElementById(
-    "time-numbers"
-  ).textContent =
-    parts[0];
+  const timeNumbers =
+    document.getElementById(
+      "time-numbers"
+    );
 
 
-  document.getElementById(
-    "time-period"
-  ).textContent =
-    parts[1] || "";
+  const timePeriod =
+    document.getElementById(
+      "time-period"
+    );
 
 
-  document.getElementById(
-    "date"
-  ).textContent =
-    now.toLocaleDateString([], {
-      weekday: "long",
-      month: "long",
-      day: "numeric"
-    });
+  const date =
+    document.getElementById(
+      "date"
+    );
+
+
+  if (timeNumbers) {
+    timeNumbers.textContent =
+      parts[0];
+  }
+
+
+  if (timePeriod) {
+    timePeriod.textContent =
+      parts[1] || "";
+  }
+
+
+  if (date) {
+    date.textContent =
+      now.toLocaleDateString(
+        [],
+        {
+          weekday: "long",
+          month: "long",
+          day: "numeric"
+        }
+      );
+  }
 }
 
 
@@ -58,8 +83,14 @@ setInterval(
 // QUOTE
 // ============================================================
 
-document.getElementById(
-  "quote"
-).textContent =
-  CONFIG.quote ||
-  "Build for Future Sam.";
+const quote =
+  document.getElementById(
+    "quote"
+  );
+
+
+if (quote) {
+  quote.textContent =
+    CONFIG.quote ||
+    "Build for Future Sam.";
+}

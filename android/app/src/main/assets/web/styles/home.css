@@ -103,15 +103,35 @@
    WEATHER — LEFT
    ========================================================= */
 
+.weather-current-heading {
+  margin: 0 0 18px;
+
+  font-family: "VT323", sans-serif;
+  font-size: clamp(1.65rem, 1.9vw, 2rem);
+
+  line-height: 1;
+}
+
 .weather-forecast-side {
   min-width: 0;
 
   display: flex;
   flex-direction: column;
 
-  justify-content: center;
+  align-items: flex-start;
+  justify-content: flex-start;
 
-  padding-right: 24px;
+  padding:
+    10px
+    24px
+    10px
+    0;
+}
+
+.weather-text-stack {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .weather-current-row {
@@ -123,33 +143,45 @@
 
 #weather-current {
   display: flex;
-
   align-items: center;
+  gap: 18px;
 
-  gap: 8px;
+  min-width: 0;
 
+  margin-top: 4px;
+}
+
+#weather-temp,
+#weather-condition {
+  font-size: clamp(1.55rem, 1.8vw, 1.9rem);
   font-family: "VT323", sans-serif;
-  font-size: clamp(2rem, 2.35vw, 2.8rem);
+}
 
+.weather-temp-row,
+.weather-condition-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  min-width: 0;
+}
+
+
+.weather-temp-row img,
+.weather-condition-row img {
+  flex: 0 0 auto;
+}
+
+
+#weather-temp,
+#weather-condition {
   line-height: 1;
 }
 
-#weather-temp {
-  font-family: "VT323", sans-serif;
-}
-
-#temp-icon {
-  width: clamp(36px, 2.6vw, 44px);
-  height: clamp(36px, 2.6vw, 44px);
-
-  object-fit: contain;
-
-  image-rendering: pixelated;
-}
-
+#temp-icon,
 #weather-icon {
-  width: clamp(44px, 3.2vw, 56px);
-  height: clamp(44px, 3.2vw, 56px);
+  width: 42px;
+  height: 42px;
 
   object-fit: contain;
 
@@ -157,12 +189,16 @@
 }
 
 #weather-range {
-  margin-top: 12px;
+  margin-top: 24px;
 
-  font-family: "VT323", sans-serif;
-  font-size: clamp(1.35rem, 1.5vw, 1.75rem);
+  font-size:
+    clamp(
+      1.35rem,
+      1.55vw,
+      1.6rem
+    );
 
-  line-height: 1.05;
+  letter-spacing: 0.03em;
 }
 
 
@@ -179,9 +215,11 @@
 
   justify-content: flex-start;
 
-  padding-left: 24px;
-  padding-top: 4px;
-  padding-bottom: 4px;
+  padding:
+    10px
+    0
+    10px
+    30px;
 
   border-left:
     2px solid
@@ -328,6 +366,9 @@
   min-width: 0;
   min-height: 0;
 
+  width: 100%;
+  max-width: none;
+
   padding: 18px 24px 54px;
 
   overflow: hidden;
@@ -342,6 +383,7 @@
 
 .upcoming-dates {
   min-width: 0;
+  width: 100%;
 
   column-count: 2;
   column-gap: 34px;
@@ -790,4 +832,61 @@
   font-size: clamp(1.45rem, 1.7vw, 2rem);
 
   font-style: italic;
+}
+
+/* =========================================================
+   HOME UPCOMING
+   ========================================================= */
+
+.home-upcoming-item {
+  margin-bottom: 6px;
+
+  line-height: 1.15;
+
+  display: flex;
+  align-items: baseline;
+  flex-wrap: nowrap;
+  gap: 4px;
+
+  white-space: nowrap;
+}
+
+
+.home-upcoming-item:last-child {
+  margin-bottom: 0;
+}
+
+
+.home-upcoming-date,
+.home-upcoming-time {
+  white-space: nowrap;
+}
+
+
+.home-upcoming-separator {
+  margin:
+    0
+    4px;
+
+  opacity: 0.7;
+}
+
+
+.home-upcoming-title {
+  font-weight: normal;
+}
+
+
+.home-upcoming-empty {
+  opacity: 0.65;
+}
+
+
+.upcoming-see-all {
+  text-decoration: none;
+
+  color:
+    var(--text);
+
+  cursor: pointer;
 }

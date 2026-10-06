@@ -6,9 +6,25 @@
 const CONFIG =
   window.SAMOS_CONFIG || {};
 
+const SUPABASE_URL =
+  CONFIG.supabaseUrl || "";
+
+const SUPABASE_KEY =
+  CONFIG.supabaseKey || "";
+
+const supabaseClient =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
 
 const DEFAULT_SETTINGS = {
-  showSunTimes: false
+  showSunTimes: false,
+
+  showDailyTasks: false,
+  showWeeklyTasks: true,
+  showMonthlyTasks: true,
+  showYearlyTasks: false
 };
 
 
@@ -114,3 +130,42 @@ if (
       );
   }
 }
+
+// ============================================================
+// SUPABASE
+// ============================================================
+
+// TESTING SUPABASE
+
+async function testSupabaseConnection() {
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from(
+        "upcoming_items"
+      )
+      .select(
+        "id"
+      )
+      .limit(1);
+
+  if (error) {
+    console.error(
+      "Supabase test failed:",
+      error
+    );
+
+    return;
+  }
+
+  console.log(
+    "Supabase connection works:",
+    data
+  );
+}
+
+testSupabaseConnection();
+
+//

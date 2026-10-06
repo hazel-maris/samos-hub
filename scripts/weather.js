@@ -542,7 +542,7 @@ async function updateWeather() {
 
 
     rangeEl.textContent =
-      `High ${high}° · Low ${low}°`;
+      `High ${high}° / Low ${low}°`;
 
 
     const sunrise =
@@ -649,7 +649,6 @@ async function updateWeather() {
       afternoonEl.hidden =
         true;
     }
-
 
     // --------------------------------------------------------
     // OVERNIGHT WEATHER IMPACT
