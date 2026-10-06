@@ -2,13 +2,18 @@ package dev.samos.hub;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.InputDevice;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowInsets;
 import android.view.WindowInsetsController;
 import android.view.WindowManager;
+import android.webkit.CookieManager;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
@@ -65,6 +70,25 @@ public class MainActivity extends Activity {
         settings.setDomStorageEnabled(true);
         settings.setDatabaseEnabled(true);
         settings.setMediaPlaybackRequiresUserGesture(false);
+        settings.setJavaScriptCanOpenWindowsAutomatically(true);
+
+        settings.setUserAgentString(
+                "Mozilla/5.0 (X11; Linux x86_64) "
+                        + "AppleWebKit/537.36 (KHTML, like Gecko) "
+                        + "Chrome/124.0.0.0 Safari/537.36"
+        );
+
+        CookieManager cookieManager =
+                CookieManager.getInstance();
+
+        cookieManager.setAcceptCookie(true);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            cookieManager.setAcceptThirdPartyCookies(
+                    webView,
+                    true
+            );
+        }
 
         webView.setWebChromeClient(
                 new WebChromeClient()
@@ -96,16 +120,41 @@ public class MainActivity extends Activity {
                             WebView view,
                             WebResourceRequest request
                     ) {
-                        String url = request.getUrl().toString();
+                        String url =
+                                request.getUrl().toString();
 
-                        if (url.startsWith("https://hazel-maris.github.io/samos-hub/")) {
-                            String query = request.getUrl().getEncodedQuery();
+                        if (
+                                url.startsWith(
+                                        "https://accounts.spotify.com/authorize"
+                                )
+                        ) {
+                            Intent browserIntent =
+                                    new Intent(
+                                            Intent.ACTION_VIEW,
+                                            request.getUrl()
+                                    );
+
+                            startActivity(browserIntent);
+                            return true;
+                        }
+
+                        if (
+                                url.startsWith(
+                                        "https://hazel-maris.github.io/samos-hub/"
+                                )
+                        ) {
+                            String query =
+                                    request.getUrl().getEncodedQuery();
 
                             String localUrl =
                                     "https://appassets.androidplatform.net/assets/web/index.html";
 
-                            if (query != null && !query.isEmpty()) {
-                                localUrl += "?" + query;
+                            if (
+                                    query != null
+                                            && !query.isEmpty()
+                            ) {
+                                localUrl +=
+                                        "?" + query;
                             }
 
                             view.loadUrl(localUrl);
@@ -119,7 +168,61 @@ public class MainActivity extends Activity {
 
         fullscreen();
 
-        webView.loadUrl(HOME_URL);
+        webView.loadUrl(
+                homeUrlForIntent(
+                        getIntent()
+                )
+        );
+    }
+
+    private String homeUrlForIntent(
+            Intent intent
+    ) {
+        if (intent == null) {
+            return HOME_URL;
+        }
+
+        Uri callback =
+                intent.getData();
+
+        if (
+                callback == null
+                        || !"samoshub".equals(
+                                callback.getScheme()
+                        )
+                        || !"spotify-callback".equals(
+                                callback.getHost()
+                        )
+        ) {
+            return HOME_URL;
+        }
+
+        String query =
+                callback.getEncodedQuery();
+
+        if (
+                query == null
+                        || query.isEmpty()
+        ) {
+            return HOME_URL;
+        }
+
+        return HOME_URL + "?" + query;
+    }
+
+    @Override
+    protected void onNewIntent(
+            Intent intent
+    ) {
+        super.onNewIntent(intent);
+
+        setIntent(intent);
+
+        if (webView != null) {
+            webView.loadUrl(
+                    homeUrlForIntent(intent)
+            );
+        }
     }
 
     private void fullscreen() {
@@ -164,7 +267,40 @@ public class MainActivity extends Activity {
     }
 
     @Override
-    public void onWindowFocusChanged(boolean focused) {
+    public boolean dispatchGenericMotionEvent(
+            MotionEvent event
+    ) {
+        if (
+                webView != null
+                        && (event.getSource() & InputDevice.SOURCE_MOUSE)
+                        == InputDevice.SOURCE_MOUSE
+                        && event.getActionMasked()
+                        == MotionEvent.ACTION_BUTTON_RELEASE
+                        && event.getActionButton()
+                        == MotionEvent.BUTTON_PRIMARY
+        ) {
+            String javascript =
+                    "window.samosHandleExternalMouse && "
+                            + "window.samosHandleExternalMouse("
+                            + Float.toString(event.getX()) + ","
+                            + Float.toString(event.getY()) + ","
+                            + webView.getWidth() + ","
+                            + webView.getHeight()
+                            + ");";
+
+            webView.evaluateJavascript(
+                    javascript,
+                    null
+            );
+        }
+
+        return super.dispatchGenericMotionEvent(event);
+    }
+
+    @Override
+    public void onWindowFocusChanged(
+            boolean focused
+    ) {
         super.onWindowFocusChanged(focused);
 
         if (focused) {
@@ -195,8 +331,8 @@ public class MainActivity extends Activity {
     @Override
     public void onBackPressed() {
         if (
-                webView != null &&
-                        webView.canGoBack()
+                webView != null
+                        && webView.canGoBack()
         ) {
             webView.goBack();
         } else {

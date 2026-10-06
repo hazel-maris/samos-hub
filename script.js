@@ -14,8 +14,14 @@ const WEATHER =
     timezone: "America/New_York"
   };
 
+const IS_ANDROID_APP =
+  window.location.hostname ===
+    "appassets.androidplatform.net";
+
 const SPOTIFY_REDIRECT_URI =
-  "https://hazel-maris.github.io/samos-hub/";
+  IS_ANDROID_APP
+    ? "samoshub://spotify-callback"
+    : "https://hazel-maris.github.io/samos-hub/";
 
 const SPOTIFY_SCOPES = [
   "streaming",
@@ -26,9 +32,8 @@ const SPOTIFY_SCOPES = [
   "playlist-read-private"
 ];
 
-let spotifyPlayer = null;
-let spotifyDeviceId = null;
 let selectedPlaylistUri = null;
+let spotifyPlaybackPoll = null;
 
 
 // ============================================================
@@ -393,27 +398,27 @@ function updateMajorWeatherEvent(data) {
     getMajorWeatherEvent(data);
 
 
-if (!event) {
-  icon.hidden = true;
+  if (!event) {
+    icon.hidden = true;
+
+    text.textContent =
+      "No upcoming events or storms.";
+
+    container.hidden = false;
+
+    return;
+  }
+
+
+  icon.src =
+    "./icons/weather-major-event.png";
+
+  icon.hidden = false;
 
   text.textContent =
-    "No upcoming events or storms.";
+    event;
 
   container.hidden = false;
-
-  return;
-}
-
-
-icon.src =
-  "./icons/weather-major-event.png";
-
-icon.hidden = false;
-
-text.textContent =
-  event;
-
-container.hidden = false;
 }
 
 
@@ -479,7 +484,7 @@ async function updateWeather() {
 
         daily:
           "temperature_2m_max,temperature_2m_min,weather_code,snowfall_sum,wind_gusts_10m_max,sunrise,sunset",
-        
+
         temperature_unit:
           "fahrenheit",
 
@@ -560,26 +565,27 @@ async function updateWeather() {
     rangeEl.textContent =
       `High ${high}° · Low ${low}°`;
 
-      const sunrise =
-  new Date(
-    data.daily.sunrise[0]
-  ).toLocaleTimeString([], {
-    hour: "numeric",
-    minute: "2-digit"
-  });
 
-const sunset =
-  new Date(
-    data.daily.sunset[0]
-  ).toLocaleTimeString([], {
-    hour: "numeric",
-    minute: "2-digit"
-  });
+    const sunrise =
+      new Date(
+        data.daily.sunrise[0]
+      ).toLocaleTimeString([], {
+        hour: "numeric",
+        minute: "2-digit"
+      });
 
-document.getElementById(
-  "sun-times"
-).textContent =
-  `Sunrise ${sunrise} · Sunset ${sunset}`;
+    const sunset =
+      new Date(
+        data.daily.sunset[0]
+      ).toLocaleTimeString([], {
+        hour: "numeric",
+        minute: "2-digit"
+      });
+
+    document.getElementById(
+      "sun-times"
+    ).textContent =
+      `Sunrise ${sunrise} · Sunset ${sunset}`;
 
 
     const today =
@@ -660,10 +666,7 @@ document.getElementById(
         : null;
 
 
-    // BEFORE 6 PM: AFTERNOON ONLY
-
     if (currentHour < 18) {
-
       if (afternoonImpact) {
         afternoonEl.textContent =
           `Afternoon · ${afternoonImpact.text} after ${formatWeatherTime(afternoonImpact.time)}`;
@@ -693,11 +696,7 @@ document.getElementById(
         true;
     }
 
-
-    // 6 PM AND LATER: EVENING ONLY
-
     else {
-
       if (overnightImpact) {
         overnightText.textContent =
           `Evening · ${overnightImpact.text}${
@@ -733,8 +732,6 @@ document.getElementById(
         false;
     }
 
-
-    // Keep separate major-weather message updated.
 
     updateMajorWeatherEvent(
       data
@@ -1087,12 +1084,12 @@ async function loginToSpotify() {
     randomString(24);
 
 
-  sessionStorage.setItem(
+  localStorage.setItem(
     "spotify_verifier",
     verifier
   );
 
-  sessionStorage.setItem(
+  localStorage.setItem(
     "spotify_state",
     state
   );
@@ -1121,6 +1118,15 @@ async function loginToSpotify() {
         challenge
     });
 
+
+  localStorage.setItem(
+    "spotify_login_pending",
+    "true"
+  );
+
+  setSpotifyStatus(
+    "Waiting for Spotify sign-in..."
+  );
 
   window.location.href =
     `https://accounts.spotify.com/authorize?${params}`;
@@ -1217,11 +1223,9 @@ async function refreshSpotifyToken() {
   const token =
     await response.json();
 
-
   saveSpotifyToken(
     token
   );
-
 
   return token.access_token;
 }
@@ -1283,7 +1287,7 @@ async function handleSpotifyRedirect() {
     history.replaceState(
       {},
       document.title,
-      SPOTIFY_REDIRECT_URI
+      window.location.pathname
     );
 
     return;
@@ -1312,13 +1316,13 @@ async function handleSpotifyRedirect() {
 
 
   const expectedState =
-    sessionStorage.getItem(
+    localStorage.getItem(
       "spotify_state"
     );
 
 
   const verifier =
-    sessionStorage.getItem(
+    localStorage.getItem(
       "spotify_verifier"
     );
 
@@ -1419,12 +1423,15 @@ async function handleSpotifyRedirect() {
     token
   );
 
+  localStorage.removeItem(
+    "spotify_login_pending"
+  );
 
-  sessionStorage.removeItem(
+  localStorage.removeItem(
     "spotify_state"
   );
 
-  sessionStorage.removeItem(
+  localStorage.removeItem(
     "spotify_verifier"
   );
 
@@ -1432,7 +1439,7 @@ async function handleSpotifyRedirect() {
   history.replaceState(
     {},
     document.title,
-    SPOTIFY_REDIRECT_URI
+    window.location.pathname
   );
 
 
@@ -1441,388 +1448,166 @@ async function handleSpotifyRedirect() {
 
 
 // ============================================================
-// SPOTIFY SDK
+// SPOTIFY PLAYBACK STATE
 // ============================================================
 
-function loadSpotifySDK() {
-  if (window.Spotify) {
-    createSpotifyPlayer();
-
-    return;
-  }
-
-
-  if (
-    document.getElementById(
-      "spotify-sdk"
-    )
-  ) {
-    return;
-  }
-
-
-  const script =
-    document.createElement(
-      "script"
-    );
-
-
-  script.id =
-    "spotify-sdk";
-
-
-  script.src =
-    "https://sdk.scdn.co/spotify-player.js";
-
-
-  document.body.appendChild(
-    script
-  );
-
-
-  window.onSpotifyWebPlaybackSDKReady =
-    createSpotifyPlayer;
-}
-
-
-// ============================================================
-// SPOTIFY PLAYER
-// ============================================================
-
-async function createSpotifyPlayer() {
-  if (
-    spotifyPlayer ||
-    !window.Spotify
-  ) {
-    return;
-  }
-
-
-  const token =
-    await getValidSpotifyToken();
-
+async function updateSpotifyPlaybackState() {
+  const token = await getValidSpotifyToken();
 
   if (!token) {
-    setSpotifyStatus(
-      "Connect Spotify to load your playlists"
-    );
-
     return;
   }
 
-
-  spotifyPlayer =
-    new Spotify.Player({
-      name:
-        "SamOS Hub",
-
-      getOAuthToken:
-        async callback => {
-          const freshToken =
-            await getValidSpotifyToken();
-
-          callback(
-            freshToken || ""
-          );
-        },
-
-      volume:
-        0.75
-    });
-
-
-  spotifyPlayer.addListener(
-    "ready",
-
-    async (
-      { device_id }
-    ) => {
-      spotifyDeviceId =
-        device_id;
-
-
-      setSpotifyStatus(
-        "SamOS Hub connected"
-      );
-
-
-      document.getElementById(
-        "spotify-login"
-      ).hidden =
-        true;
-
-
-      await transferPlaybackToSamOS();
-
-      await loadPlaylists();
-    }
-  );
-
-
-  spotifyPlayer.addListener(
-    "not_ready",
-
-    () => {
-      setSpotifyStatus(
-        "Spotify disconnected"
-      );
-    }
-  );
-
-
-  spotifyPlayer.addListener(
-    "authentication_error",
-
-    ({ message }) => {
-      console.error(
-        "Spotify authentication error:",
-        message
-      );
-
-
-      setSpotifyStatus(
-        "Reconnect Spotify"
-      );
-
-
-      document.getElementById(
-        "spotify-login"
-      ).hidden =
-        false;
-    }
-  );
-
-
-  spotifyPlayer.addListener(
-    "account_error",
-
-    ({ message }) => {
-      console.error(
-        "Spotify account error:",
-        message
-      );
-
-
-      setSpotifyStatus(
-        "Spotify Premium is required"
-      );
-    }
-  );
-
-
-  spotifyPlayer.addListener(
-    "playback_error",
-
-    ({ message }) => {
-      console.error(
-        "Spotify playback error:",
-        message
-      );
-
-
-      setSpotifyStatus(
-        "Spotify playback error"
-      );
-    }
-  );
-
-
-  spotifyPlayer.addListener(
-    "player_state_changed",
-
-    state => {
-      if (!state) {
-        return;
+  try {
+    const response = await fetch(
+      "https://api.spotify.com/v1/me/player",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
       }
+    );
 
-
-      const track =
-        state.track_window
-          ?.current_track;
-
-
-      if (!track) {
-        return;
-      }
-
-
-      document.getElementById(
-        "track-name"
-      ).textContent =
-        track.name ||
+    if (response.status === 204) {
+      document.getElementById("track-name").textContent =
         "Nothing playing";
 
+      document.getElementById("track-artist").textContent =
+        "";
+
+      document.getElementById("album-art").hidden = true;
 
       document.getElementById(
-        "track-artist"
-      ).textContent =
-        (track.artists || [])
-
-          .map(
-            artist =>
-              artist.name
-          )
-
-          .join(", ");
-
-
-      const art =
-        track.album
-          ?.images
-          ?.[0]
-          ?.url || "";
-
-
-      const artEl =
-        document.getElementById(
-          "album-art"
-        );
-
-
-      const placeholderEl =
-        document.getElementById(
-          "album-placeholder"
-        );
-
-
-      if (art) {
-        artEl.src =
-          art;
-
-        artEl.hidden =
-          false;
-
-        placeholderEl.hidden =
-          true;
-      }
-
-      else {
-        artEl.removeAttribute(
-          "src"
-        );
-
-        artEl.hidden =
-          true;
-
-        placeholderEl.hidden =
-          false;
-      }
-
+        "album-placeholder"
+      ).hidden = false;
 
       document.getElementById(
         "play-pause-icon"
-      ).src =
-        state.paused
-          ? "./icons/player-play.png"
-          : "./icons/player-pause.png";
+      ).src = "./icons/player-play.png";
+
+      setSpotifyStatus(
+        "Open Spotify on a device to start listening"
+      );
+
+      return;
     }
-  );
 
+    if (!response.ok) {
+      console.error(
+        "Spotify playback state failed:",
+        response.status
+      );
 
-  const connected =
-    await spotifyPlayer.connect();
+      return;
+    }
 
+    const state = await response.json();
 
-  if (!connected) {
-    setSpotifyStatus(
-      "Spotify player could not connect"
-    );
+    const track = state.item;
 
+    if (!track) {
+      return;
+    }
+
+    document.getElementById(
+      "track-name"
+    ).textContent =
+      track.name || "Nothing playing";
+
+    document.getElementById(
+      "track-artist"
+    ).textContent =
+      (track.artists || [])
+        .map(artist => artist.name)
+        .join(", ");
+
+    const art =
+      track.album?.images?.[0]?.url || "";
+
+    const artEl =
+      document.getElementById(
+        "album-art"
+      );
+
+    const placeholderEl =
+      document.getElementById(
+        "album-placeholder"
+      );
+
+    if (art) {
+      artEl.src = art;
+      artEl.hidden = false;
+      placeholderEl.hidden = true;
+    }
+    else {
+      artEl.removeAttribute("src");
+      artEl.hidden = true;
+      placeholderEl.hidden = false;
+    }
+
+    document.getElementById(
+      "play-pause-icon"
+    ).src =
+      state.is_playing
+        ? "./icons/player-pause.png"
+        : "./icons/player-play.png";
+
+    if (state.device?.name) {
+      setSpotifyStatus(
+        `Playing on ${state.device.name}`
+      );
+    }
+  }
+  catch (error) {
     console.error(
-      "Spotify Web Playback SDK connect() returned false"
+      "Spotify playback state error:",
+      error
     );
   }
 }
-
 
 // ============================================================
 // START SPOTIFY
 // ============================================================
 
 async function startSpotify() {
-  const token =
-    await getValidSpotifyToken();
-
+  const token = await getValidSpotifyToken();
 
   if (!token) {
     setSpotifyStatus(
       "Connect Spotify to load your playlists"
     );
 
-
     document.getElementById(
       "spotify-login"
-    ).hidden =
-      false;
+    ).hidden = false;
 
     return;
   }
 
+  document.getElementById(
+    "spotify-login"
+  ).hidden = true;
 
   setSpotifyStatus(
-    "Connecting to Spotify..."
+    "Spotify connected"
   );
 
+  await loadPlaylists();
 
-  loadSpotifySDK();
+  await updateSpotifyPlaybackState();
+
+  clearInterval(
+    spotifyPlaybackPoll
+  );
+
+  spotifyPlaybackPoll =
+    setInterval(
+      updateSpotifyPlaybackState,
+      3000
+    );
 }
 
-
-// ============================================================
-// TRANSFER PLAYBACK
-// ============================================================
-
-async function transferPlaybackToSamOS() {
-  if (!spotifyDeviceId) {
-    return;
-  }
-
-
-  const token =
-    await getValidSpotifyToken();
-
-
-  if (!token) {
-    return;
-  }
-
-
-  const response =
-    await fetch(
-      "https://api.spotify.com/v1/me/player",
-      {
-        method: "PUT",
-
-        headers: {
-          Authorization:
-            `Bearer ${token}`,
-
-          "Content-Type":
-            "application/json"
-        },
-
-        body:
-          JSON.stringify({
-            device_ids: [
-              spotifyDeviceId
-            ],
-
-            play: false
-          })
-      }
-    );
-
-
-  if (
-    !response.ok &&
-    response.status !== 204
-  ) {
-    console.error(
-      "Spotify playback transfer failed:",
-      response.status
-    );
-  }
-}
 
 
 // ============================================================
@@ -1952,21 +1737,9 @@ async function loadPlaylists() {
 // START PLAYLIST
 // ============================================================
 
-async function startPlaylist(
-  playlistUri
-) {
-  if (!spotifyDeviceId) {
-    setSpotifyStatus(
-      "Spotify player is not ready yet"
-    );
-
-    return;
-  }
-
-
+async function startPlaylist(playlistUri) {
   const token =
     await getValidSpotifyToken();
-
 
   if (!token) {
     setSpotifyStatus(
@@ -1976,12 +1749,9 @@ async function startPlaylist(
     return;
   }
 
-
-  await transferPlaybackToSamOS();
-
-
+  // Turn shuffle on for the currently active Spotify device.
   await fetch(
-    `https://api.spotify.com/v1/me/player/shuffle?state=true&device_id=${encodeURIComponent(spotifyDeviceId)}`,
+    "https://api.spotify.com/v1/me/player/shuffle?state=true",
     {
       method: "PUT",
 
@@ -1992,10 +1762,9 @@ async function startPlaylist(
     }
   );
 
-
   const response =
     await fetch(
-      `https://api.spotify.com/v1/me/player/play?device_id=${encodeURIComponent(spotifyDeviceId)}`,
+      "https://api.spotify.com/v1/me/player/play",
       {
         method: "PUT",
 
@@ -2015,24 +1784,33 @@ async function startPlaylist(
       }
     );
 
-
   if (!response.ok) {
     console.error(
       "Could not start Spotify playlist:",
       response.status
     );
 
-
-    setSpotifyStatus(
-      `Could not start playlist (${response.status})`
-    );
+    if (response.status === 404) {
+      setSpotifyStatus(
+        "Open Spotify on a device first"
+      );
+    }
+    else {
+      setSpotifyStatus(
+        `Could not start playlist (${response.status})`
+      );
+    }
 
     return;
   }
 
-
   setSpotifyStatus(
     "Shuffle on"
+  );
+
+  setTimeout(
+    updateSpotifyPlaybackState,
+    500
   );
 }
 
@@ -2106,17 +1884,27 @@ document
     "click",
 
     async () => {
-      if (!spotifyPlayer) {
+      const token =
+        await getValidSpotifyToken();
+
+      if (!token) {
         return;
       }
 
+      const stateResponse =
+        await fetch(
+          "https://api.spotify.com/v1/me/player",
+          {
+            headers: {
+              Authorization:
+                `Bearer ${token}`
+            }
+          }
+        );
 
-      const state =
-        await spotifyPlayer
-          .getCurrentState();
-
-
-      if (!state) {
+      if (
+        stateResponse.status === 204
+      ) {
         if (
           selectedPlaylistUri
         ) {
@@ -2128,16 +1916,34 @@ document
         return;
       }
 
-
-      if (state.paused) {
-        await spotifyPlayer
-          .resume();
+      if (!stateResponse.ok) {
+        return;
       }
 
-      else {
-        await spotifyPlayer
-          .pause();
-      }
+      const state =
+        await stateResponse.json();
+
+      const endpoint =
+        state.is_playing
+          ? "pause"
+          : "play";
+
+      await fetch(
+        `https://api.spotify.com/v1/me/player/${endpoint}`,
+        {
+          method: "PUT",
+
+          headers: {
+            Authorization:
+              `Bearer ${token}`
+          }
+        }
+      );
+
+      setTimeout(
+        updateSpotifyPlaybackState,
+        300
+      );
     }
   );
 
@@ -2150,10 +1956,29 @@ document
     "click",
 
     async () => {
-      if (spotifyPlayer) {
-        await spotifyPlayer
-          .nextTrack();
+      const token =
+        await getValidSpotifyToken();
+
+      if (!token) {
+        return;
       }
+
+      await fetch(
+        "https://api.spotify.com/v1/me/player/next",
+        {
+          method: "POST",
+
+          headers: {
+            Authorization:
+              `Bearer ${token}`
+          }
+        }
+      );
+
+      setTimeout(
+        updateSpotifyPlaybackState,
+        300
+      );
     }
   );
 
@@ -2166,10 +1991,29 @@ document
     "click",
 
     async () => {
-      if (spotifyPlayer) {
-        await spotifyPlayer
-          .previousTrack();
+      const token =
+        await getValidSpotifyToken();
+
+      if (!token) {
+        return;
       }
+
+      await fetch(
+        "https://api.spotify.com/v1/me/player/previous",
+        {
+          method: "POST",
+
+          headers: {
+            Authorization:
+              `Bearer ${token}`
+          }
+        }
+      );
+
+      setTimeout(
+        updateSpotifyPlaybackState,
+        300
+      );
     }
   );
 
@@ -2251,3 +2095,114 @@ if (
       );
   }
 }
+
+
+let lastPlayerControlClick = 0;
+
+const playerControls =
+  document.querySelector(
+    ".player-controls"
+  );
+
+
+if (playerControls) {
+  playerControls.addEventListener(
+    "click",
+
+    event => {
+      if (
+        event.target.closest(
+          "button"
+        )
+      ) {
+        lastPlayerControlClick =
+          Date.now();
+      }
+    },
+
+    true
+  );
+}
+
+
+window.samosHandleExternalMouse = (
+  physicalX,
+  physicalY,
+  viewWidth,
+  viewHeight
+) => {
+  if (
+    !viewWidth ||
+    !viewHeight
+  ) {
+    return false;
+  }
+
+
+  const x =
+    physicalX *
+    window.innerWidth /
+    viewWidth;
+
+  const y =
+    physicalY *
+    window.innerHeight /
+    viewHeight;
+
+  const padding =
+    18;
+
+
+  const controls = [
+    document.getElementById(
+      "previous-track"
+    ),
+
+    document.getElementById(
+      "play-pause"
+    ),
+
+    document.getElementById(
+      "next-track"
+    )
+  ];
+
+
+  const control =
+    controls.find(
+      button => {
+        if (!button) {
+          return false;
+        }
+
+        const rect =
+          button.getBoundingClientRect();
+
+        return (
+          x >= rect.left - padding &&
+          x <= rect.right + padding &&
+          y >= rect.top - padding &&
+          y <= rect.bottom + padding
+        );
+      }
+    );
+
+
+  if (!control) {
+    return false;
+  }
+
+
+  if (
+    Date.now() -
+    lastPlayerControlClick <
+    400
+  ) {
+    return true;
+  }
+
+
+  control.click();
+
+  return true;
+};
