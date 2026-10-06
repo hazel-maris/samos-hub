@@ -8,7 +8,7 @@ const CONFIG =
 
 
 const DEFAULT_SETTINGS = {
-  showSunTimes: true
+  showSunTimes: false
 };
 
 
