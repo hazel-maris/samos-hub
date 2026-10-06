@@ -1087,12 +1087,12 @@ async function loginToSpotify() {
     randomString(24);
 
 
-  sessionStorage.setItem(
+  localStorage.setItem(
     "spotify_verifier",
     verifier
   );
 
-  sessionStorage.setItem(
+  localStorage.setItem(
     "spotify_state",
     state
   );
@@ -1283,7 +1283,7 @@ async function handleSpotifyRedirect() {
     history.replaceState(
       {},
       document.title,
-      SPOTIFY_REDIRECT_URI
+      window.location.pathname
     );
 
     return;
@@ -1312,13 +1312,13 @@ async function handleSpotifyRedirect() {
 
 
   const expectedState =
-    sessionStorage.getItem(
+    localStorage.getItem(
       "spotify_state"
     );
 
 
   const verifier =
-    sessionStorage.getItem(
+    localStorage.getItem(
       "spotify_verifier"
     );
 
@@ -1420,11 +1420,11 @@ async function handleSpotifyRedirect() {
   );
 
 
-  sessionStorage.removeItem(
+  localStorage.removeItem(
     "spotify_state"
   );
 
-  sessionStorage.removeItem(
+  localStorage.removeItem(
     "spotify_verifier"
   );
 
@@ -1432,7 +1432,7 @@ async function handleSpotifyRedirect() {
   history.replaceState(
     {},
     document.title,
-    SPOTIFY_REDIRECT_URI
+    window.location.pathname
   );
 
 

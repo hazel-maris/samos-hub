@@ -1,36 +1,34 @@
 package dev.samos.hub;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.ActivityNotFoundException;
-import android.content.Intent;
-import android.content.res.Configuration;
 import android.graphics.Color;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowInsets;
 import android.view.WindowInsetsController;
 import android.view.WindowManager;
-import android.webkit.CookieManager;
+import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.FrameLayout;
-import android.widget.Toast;
+
+import androidx.webkit.WebViewAssetLoader;
 
 public class MainActivity extends Activity {
 
-    // Change this only if the GitHub Pages address changes.
+    private WebView webView;
+
     private static final String HOME_URL =
-            "https://hazel-maris.github.io/samos-hub/";
+            "https://appassets.androidplatform.net/assets/web/index.html";
 
-    private WebView web;
-
+    @SuppressLint("SetJavaScriptEnabled")
     @Override
-    public void onCreate(Bundle state) {
-        super.onCreate(state);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
         getWindow().addFlags(
                 WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
@@ -57,76 +55,71 @@ public class MainActivity extends Activity {
             getWindow().setAttributes(attributes);
         }
 
-        FrameLayout root = new FrameLayout(this);
-        root.setBackgroundColor(0xffe4d4b8);
+        webView = new WebView(this);
+        webView.setBackgroundColor(0xffe4d4b8);
+        setContentView(webView);
 
-        web = new WebView(this);
-        web.setBackgroundColor(0xffe4d4b8);
+        WebSettings settings = webView.getSettings();
 
-        root.addView(
-                web,
-                new FrameLayout.LayoutParams(
-                        FrameLayout.LayoutParams.MATCH_PARENT,
-                        FrameLayout.LayoutParams.MATCH_PARENT
-                )
-        );
-
-        setContentView(root);
-
-        WebSettings settings = web.getSettings();
         settings.setJavaScriptEnabled(true);
         settings.setDomStorageEnabled(true);
-        settings.setUseWideViewPort(true);
-        settings.setLoadWithOverviewMode(true);
+        settings.setDatabaseEnabled(true);
         settings.setMediaPlaybackRequiresUserGesture(false);
 
-        CookieManager.getInstance().setAcceptCookie(true);
-        CookieManager.getInstance().setAcceptThirdPartyCookies(web, true);
+        webView.setWebChromeClient(
+                new WebChromeClient()
+        );
 
-        web.setWebViewClient(new WebViewClient() {
-            @Override
-            public boolean shouldOverrideUrlLoading(
-                    WebView view,
-                    WebResourceRequest request
-            ) {
-                Uri uri = request.getUrl();
+        WebViewAssetLoader assetLoader =
+                new WebViewAssetLoader.Builder()
+                        .addPathHandler(
+                                "/assets/",
+                                new WebViewAssetLoader.AssetsPathHandler(this)
+                        )
+                        .build();
 
-                String host = uri.getHost();
+        webView.setWebViewClient(
+                new WebViewClient() {
 
-                if (host != null && (
-                        host.equals("hazel-maris.github.io")
-                                || host.equals("accounts.spotify.com")
-                                || host.endsWith(".spotify.com")
-                )) {
-                    return false;
-                }
-
-                if ("https".equals(uri.getScheme())
-                        || "http".equals(uri.getScheme())) {
-                    try {
-                        startActivity(
-                                new Intent(Intent.ACTION_VIEW, uri)
+                    @Override
+                    public WebResourceResponse shouldInterceptRequest(
+                            WebView view,
+                            WebResourceRequest request
+                    ) {
+                        return assetLoader.shouldInterceptRequest(
+                                request.getUrl()
                         );
-                    } catch (ActivityNotFoundException error) {
-                        Toast.makeText(
-                                MainActivity.this,
-                                "No app can open this link",
-                                Toast.LENGTH_SHORT
-                        ).show();
                     }
 
-                    return true;
-                }
+                    @Override
+                    public boolean shouldOverrideUrlLoading(
+                            WebView view,
+                            WebResourceRequest request
+                    ) {
+                        String url = request.getUrl().toString();
 
-                return false;
-            }
-        });
+                        if (url.startsWith("https://hazel-maris.github.io/samos-hub/")) {
+                            String query = request.getUrl().getEncodedQuery();
+
+                            String localUrl =
+                                    "https://appassets.androidplatform.net/assets/web/index.html";
+
+                            if (query != null && !query.isEmpty()) {
+                                localUrl += "?" + query;
+                            }
+
+                            view.loadUrl(localUrl);
+                            return true;
+                        }
+
+                        return false;
+                    }
+                }
+        );
 
         fullscreen();
 
-        if (state == null || web.restoreState(state) == null) {
-            web.loadUrl(HOME_URL);
-        }
+        webView.loadUrl(HOME_URL);
     }
 
     private void fullscreen() {
@@ -156,7 +149,6 @@ public class MainActivity extends Activity {
                     );
                 }
             }
-
         } else {
             getWindow()
                     .getDecorView()
@@ -181,25 +173,11 @@ public class MainActivity extends Activity {
     }
 
     @Override
-    public void onConfigurationChanged(
-            Configuration newConfig
-    ) {
-        super.onConfigurationChanged(newConfig);
-        fullscreen();
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle state) {
-        web.saveState(state);
-        super.onSaveInstanceState(state);
-    }
-
-    @Override
     protected void onResume() {
         super.onResume();
 
-        if (web != null) {
-            web.onResume();
+        if (webView != null) {
+            webView.onResume();
         }
 
         fullscreen();
@@ -207,30 +185,22 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onPause() {
-        if (web != null) {
-            web.onPause();
+        if (webView != null) {
+            webView.onPause();
         }
-
-        CookieManager.getInstance().flush();
 
         super.onPause();
     }
 
     @Override
     public void onBackPressed() {
-        if (web != null && web.canGoBack()) {
-            web.goBack();
+        if (
+                webView != null &&
+                        webView.canGoBack()
+        ) {
+            webView.goBack();
         } else {
             super.onBackPressed();
         }
-    }
-
-    @Override
-    protected void onDestroy() {
-        if (web != null) {
-            web.destroy();
-        }
-
-        super.onDestroy();
     }
 }

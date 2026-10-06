@@ -1,0 +1,8 @@
+{
+  "name": "SamOS Hub",
+  "short_name": "SamOS",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#e4d4b8",
+  "theme_color": "#e4d4b8"
+}
