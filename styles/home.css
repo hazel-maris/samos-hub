@@ -765,11 +765,15 @@
    ========================================================= */
 
 .player-controls {
+  position: relative;
+
   display: flex;
-
+  align-items: center;
   justify-content: center;
-
   gap: 18px;
+
+  width: max-content;
+  margin-inline: auto;
 }
 
 .player-controls button {
@@ -889,4 +893,96 @@
     var(--text);
 
   cursor: pointer;
+}
+/* =========================================================
+   SHUFFLE SWITCH
+   ========================================================= */
+
+.player-controls #spotify-shuffle {
+  position: absolute;
+  left: calc(100% + 18px);
+  top: 50%;
+  transform: translateY(-50%);
+
+  width: 78px;
+  height: 72px;
+
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+
+  font-family: inherit;
+  font-size: 1.15rem;
+  color: var(--border, #7a5a3a);
+}
+#spotify-shuffle .shuffle-track {
+  display: block;
+  position: relative;
+  box-sizing: border-box;
+
+  width: 48px;
+  height: 26px;
+
+  border: 2px solid #7a5a3a;
+  border-radius: 15px;
+  background: #b9b3a7;
+
+  transition: background 0.15s;
+}
+
+#spotify-shuffle .shuffle-thumb {
+  display: block;
+  position: absolute;
+
+  left: 2px;
+  top: 2px;
+
+  width: 18px;
+  height: 18px;
+
+  border-radius: 50%;
+  background: #fff8ed;
+
+  transition: transform 0.15s;
+}
+
+#spotify-shuffle[aria-checked="true"] .shuffle-track {
+  background: #779454;
+}
+
+#spotify-shuffle[aria-checked="true"] .shuffle-thumb {
+  transform: translateX(22px);
+}
+
+#spotify-shuffle:disabled {
+  opacity: 0.55;
+}
+
+#play-pause:disabled,
+#previous-track:disabled,
+#next-track:disabled {
+  opacity: 0.4;
+  cursor: default;
+  transform: none;
+}
+
+/* Spotify connection button */
+
+#spotify-login[data-connected="true"],
+#spotify-login[data-connected="true"]:hover,
+#spotify-login[data-connected="true"]:active {
+  background: #dce4cf;
+  color: #586449;
+  border-color: #788367;
+
+  opacity: 1;
+  cursor: default;
+  transform: none;
 }

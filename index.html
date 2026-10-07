@@ -371,16 +371,17 @@
                   hidden
                 >
 
-
                 <div
                   id="album-placeholder"
-                  aria-hidden="true"
+                  role="status"
+                  aria-live="polite"
+                  style="
+                    font-size: clamp(1.25rem, 2vw, 2rem);
+                    line-height: 1.15;
+                    padding: 12px;
+                  "
                 >
-
-                  <div class="placeholder-icon">
-                    ♫
-                  </div>
-
+                  Select playlist
                 </div>
 
               </div>
@@ -389,20 +390,14 @@
               <!-- TRACK INFO -->
 
               <div class="track-info">
-
-                <div id="track-name">
-                  Nothing playing
-                </div>
-
+                <div id="track-name"></div>
                 <div id="track-artist"></div>
-
               </div>
 
 
               <!-- PLAYER CONTROLS -->
 
               <div class="player-controls">
-
 
                 <!-- PREVIOUS -->
 
@@ -411,14 +406,11 @@
                   type="button"
                   aria-label="Previous track"
                 >
-
                   <img
                     src="./icons/player-previous.png"
                     alt=""
                   >
-
                 </button>
-
 
                 <!-- PLAY / PAUSE -->
 
@@ -427,15 +419,12 @@
                   type="button"
                   aria-label="Play or pause"
                 >
-
                   <img
                     id="play-pause-icon"
                     src="./icons/player-play.png"
                     alt=""
                   >
-
                 </button>
-
 
                 <!-- NEXT -->
 
@@ -444,12 +433,29 @@
                   type="button"
                   aria-label="Next track"
                 >
-
                   <img
                     src="./icons/player-next.png"
                     alt=""
                   >
+                </button>
 
+                <!-- SHUFFLE -->
+
+                <button
+                  id="spotify-shuffle"
+                  type="button"
+                  role="switch"
+                  aria-label="Shuffle"
+                  aria-checked="true"
+                >
+                  <span>Shuffle</span>
+
+                  <span
+                    class="shuffle-track"
+                    aria-hidden="true"
+                  >
+                    <span class="shuffle-thumb"></span>
+                  </span>
                 </button>
 
               </div>

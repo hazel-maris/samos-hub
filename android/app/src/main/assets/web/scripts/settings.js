@@ -148,47 +148,75 @@ async function updateAuthUI() {
 }
 
 
-loginButton.addEventListener(
-  "click",
+let supabaseLoginBusy = false;
 
-  async () => {
+function showSupabaseLoginError(error) {
+  const invalidLogin =
+    error.code === "invalid_credentials" ||
+    error.status === 400;
+
+  authStatus.textContent = invalidLogin
+    ? "Login failed — wrong email or password"
+    : `Login failed: ${error.message}`;
+
+  console.error("Supabase sign-in failed:", error);
+}
+
+async function signInToSupabase() {
+  if (supabaseLoginBusy) return;
+
+  const email = emailInput.value.trim();
+  const password = passwordInput.value;
+
+  if (!email || !password) {
     authStatus.textContent =
-      "Signing in...";
+      "Enter your email and password.";
+    return;
+  }
 
+  supabaseLoginBusy = true;
+  loginButton.disabled = true;
+  authStatus.textContent = "Signing in...";
 
-    const {
-      error
-    } =
-      await supabaseClient.auth
-        .signInWithPassword({
-          email:
-            emailInput.value,
-
-          password:
-            passwordInput.value
-        });
-
+  try {
+    const { error } =
+      await supabaseClient.auth.signInWithPassword({
+        email,
+        password
+      });
 
     if (error) {
-      authStatus.textContent =
-        "Sign in failed";
-
-      console.error(
-        "Supabase sign-in failed:",
-        error
-      );
-
+      showSupabaseLoginError(error);
       return;
     }
 
-
-    passwordInput.value =
-      "";
-
-
-    updateAuthUI();
+    passwordInput.value = "";
+    await updateAuthUI();
+  } catch (error) {
+    showSupabaseLoginError(error);
+  } finally {
+    supabaseLoginBusy = false;
+    loginButton.disabled = false;
   }
+}
+
+loginButton.addEventListener(
+  "click",
+  signInToSupabase
 );
+
+for (const input of [emailInput, passwordInput]) {
+  input.addEventListener("keydown", event => {
+    if (
+      event.key === "Enter" &&
+      !event.isComposing &&
+      !event.repeat
+    ) {
+      event.preventDefault();
+      loginButton.click();
+    }
+  });
+}
 
 
 logoutButton.addEventListener(

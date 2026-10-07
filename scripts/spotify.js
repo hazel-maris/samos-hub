@@ -2,180 +2,492 @@
 // SamOS Hub — Spotify
 // ============================================================
 
-
 const SPOTIFY_CLIENT_ID =
   CONFIG.spotifyClientId || "";
 
-
 const IS_ANDROID_APP =
   window.location.hostname ===
-    "appassets.androidplatform.net";
-
+  "appassets.androidplatform.net";
 
 const SPOTIFY_REDIRECT_URI =
   IS_ANDROID_APP
     ? "samoshub://spotify-callback"
     : "https://hazel-maris.github.io/samos-hub/";
 
-
 const SPOTIFY_SCOPES = [
   "streaming",
   "user-read-private",
   "user-read-email",
   "user-read-playback-state",
+  "user-read-recently-played",
   "user-modify-playback-state",
   "playlist-read-private"
 ];
 
-
 let selectedPlaylistUri = null;
-
 let spotifyPlaybackPoll = null;
-
 let spotifyIsPlaying = false;
 
-
-
-// Local playback device. Commands always target this hub, never another phone.
 let spotifyPlayer = null;
 let spotifyDeviceId = null;
 let spotifyPlayerReady = null;
 let spotifySdkLoad = null;
 
+let hubControlBusy = false;
+
+let spotifyShuffleEnabled =
+  localStorage.getItem("samos_spotify_shuffle") !== "false";
+
+let spotifyConnected = false;
+
+function setSpotifyConnectionState(connected) {
+  spotifyConnected = connected;
+
+  const button = document.getElementById("spotify-login");
+
+  button.hidden = false;
+  button.textContent = connected ? "Connected" : "Connect";
+  button.disabled = connected;
+
+  button.setAttribute(
+    "data-connected",
+    String(connected)
+  );
+}
+
+
+// ============================================================
+// STATUS
+// ============================================================
+
+function setSpotifyStatus(message) {
+  document.getElementById(
+    "spotify-status"
+  ).textContent = message;
+}
+
+
+function showSelectPlaylist() {
+  const placeholder =
+    document.getElementById("album-placeholder");
+
+  document.getElementById(
+    "album-art"
+  ).hidden = true;
+
+  placeholder.hidden = false;
+  placeholder.textContent = "Select playlist";
+  placeholder.style.fontSize =
+    "clamp(1.25rem, 2vw, 2rem)";
+  placeholder.style.padding = "12px";
+  placeholder.style.lineHeight = "1.15";
+
+  placeholder.removeAttribute("aria-hidden");
+  placeholder.setAttribute("role", "status");
+
+  document.getElementById(
+    "playlist-menu"
+  ).hidden = true;
+
+  setSpotifyStatus("Select playlist");
+}
+
+
+// ============================================================
+// LOCAL PLAYBACK DEVICE
+// ============================================================
+
+let spotifyHasPlaybackSession = false;
+
+function updateSpotifyControlAvailability() {
+  const disabled =
+    !spotifyHasPlaybackSession || hubControlBusy;
+
+  for (const id of [
+    "play-pause",
+    "previous-track",
+    "next-track"
+  ]) {
+    document.getElementById(id).disabled = disabled;
+  }
+}
+
 function loadSpotifyPlaybackSdk() {
-  if (window.Spotify?.Player) return Promise.resolve();
-  if (spotifySdkLoad) return spotifySdkLoad;
+  if (window.Spotify?.Player) {
+    return Promise.resolve();
+  }
+
+  if (spotifySdkLoad) {
+    return spotifySdkLoad;
+  }
+
   spotifySdkLoad = new Promise((resolve, reject) => {
-    const timeout = setTimeout(() => reject(new Error("Spotify player timed out; reopen the hub")), 20000);
+    const timeout = setTimeout(
+      () => reject(
+        new Error("Spotify player timed out; reopen the hub")
+      ),
+      20000
+    );
+
     window.onSpotifyWebPlaybackSDKReady = () => {
       clearTimeout(timeout);
       resolve();
     };
+
     const script = document.createElement("script");
-    script.src = "https://sdk.scdn.co/spotify-player.js";
+
+    script.src =
+      "https://sdk.scdn.co/spotify-player.js";
+
     script.onerror = () => {
       clearTimeout(timeout);
-      reject(new Error("Could not load Spotify player; check your connection"));
+
+      reject(
+        new Error(
+          "Could not load Spotify player; check your connection"
+        )
+      );
     };
+
     document.head.appendChild(script);
-  }).catch(error => { spotifySdkLoad = null; throw error; });
+  }).catch(error => {
+    spotifySdkLoad = null;
+    throw error;
+  });
+
   return spotifySdkLoad;
 }
 
+
 async function connectHubPlayer() {
-  if (spotifyDeviceId) return spotifyDeviceId;
-  if (spotifyPlayerReady) return spotifyPlayerReady;
+  if (spotifyDeviceId) {
+    return spotifyDeviceId;
+  }
+
+  if (spotifyPlayerReady) {
+    return spotifyPlayerReady;
+  }
+
   spotifyPlayerReady = (async () => {
     await loadSpotifyPlaybackSdk();
-    if (spotifyPlayer) spotifyPlayer.disconnect();
+
+    if (spotifyPlayer) {
+      spotifyPlayer.disconnect();
+    }
+
     return new Promise((resolve, reject) => {
-      const timeout = setTimeout(() => fail("Spotify player did not connect; reopen the hub"), 20000);
+      const timeout = setTimeout(
+        () => fail(
+          "Spotify player did not connect; reopen the hub"
+        ),
+        20000
+      );
+
       const fail = message => {
         clearTimeout(timeout);
         setSpotifyStatus(message);
         reject(new Error(message));
       };
+
       spotifyPlayer = new Spotify.Player({
         name: "SamOS Hub",
-        getOAuthToken: callback => getValidSpotifyToken().then(token => callback(token || "")),
+
+        getOAuthToken: callback =>
+          getValidSpotifyToken().then(
+            token => callback(token || "")
+          ),
+
         volume: 0.8
       });
-      spotifyPlayer.addListener("ready", ({ device_id }) => {
-        clearTimeout(timeout);
-        spotifyDeviceId = device_id;
-        setSpotifyStatus("SamOS Hub ready");
-        resolve(device_id);
-      });
-      spotifyPlayer.addListener("not_ready", () => {
-        spotifyDeviceId = null;
-        spotifyPlayerReady = null;
-        setSpotifyStatus("SamOS Hub disconnected; press play to reconnect");
-      });
-      for (const event of ["initialization_error", "authentication_error", "account_error"]) {
-        spotifyPlayer.addListener(event, ({ message }) => fail(message));
+
+      spotifyPlayer.addListener(
+        "ready",
+        ({ device_id }) => {
+          clearTimeout(timeout);
+          spotifyDeviceId = device_id;
+          setSpotifyStatus("SamOS Hub ready");
+          resolve(device_id);
+        }
+      );
+
+      spotifyPlayer.addListener(
+        "not_ready",
+        () => {
+          spotifyDeviceId = null;
+          spotifyPlayerReady = null;
+
+          setSpotifyStatus(
+            "SamOS Hub disconnected; press play to reconnect"
+          );
+        }
+      );
+
+      for (const event of [
+        "initialization_error",
+        "authentication_error",
+        "account_error"
+      ]) {
+        spotifyPlayer.addListener(
+          event,
+          ({ message }) => fail(message)
+        );
       }
-      spotifyPlayer.addListener("playback_error", ({ message }) => setSpotifyStatus(message));
-      spotifyPlayer.addListener("autoplay_failed", () => setSpotifyStatus("Press play on the hub to enable audio"));
-      spotifyPlayer.addListener("player_state_changed", () => updateSpotifyPlaybackState());
-      spotifyPlayer.connect().then(ok => {
-        if (!ok) fail("Spotify player could not connect");
-      }).catch(error => fail(error.message));
+
+      spotifyPlayer.addListener(
+        "playback_error",
+        ({ message }) => setSpotifyStatus(message)
+      );
+
+      spotifyPlayer.addListener(
+        "autoplay_failed",
+        () => setSpotifyStatus(
+          "Press play on the hub to enable audio"
+        )
+      );
+
+      spotifyPlayer.addListener(
+        "player_state_changed",
+        state => renderLocalPlayback(state)
+      );
+
+      spotifyPlayer.connect()
+        .then(ok => {
+          if (!ok) {
+            fail("Spotify player could not connect");
+          }
+        })
+        .catch(error => fail(error.message));
     });
   })().catch(error => {
     spotifyPlayerReady = null;
     spotifyDeviceId = null;
     throw error;
   });
+
   return spotifyPlayerReady;
 }
 
-async function hubSpotifyRequest(url, options) {
-  // Call while the user's click still counts as an audio activation gesture.
-  if (spotifyPlayer) spotifyPlayer.activateElement().catch(() => {});
-  try {
-    const deviceId = await connectHubPlayer();
-    const target = new URL(url);
-    target.searchParams.set("device_id", deviceId);
-    return await fetch(target.toString(), options);
-  } catch (error) {
-    setSpotifyStatus(error.message);
-    return { ok: false, status: 503 };
+
+function activateHubAudio() {
+  if (spotifyPlayer) {
+    spotifyPlayer.activateElement().catch(error => {
+      console.warn(
+        "Spotify audio activation failed:",
+        error
+      );
+    });
   }
 }
 
+
+document.addEventListener(
+  "click",
+  event => {
+    if (
+      event.target.closest?.(
+        "#play-pause, #next-track, #previous-track, #spotify-shuffle, .playlist-item"
+      )
+    ) {
+      activateHubAudio();
+    }
+  },
+  true
+);
+
+
+async function transferToHub(deviceId, options, play) {
+  return fetch(
+    "https://api.spotify.com/v1/me/player",
+    {
+      method: "PUT",
+
+      headers: {
+        ...options.headers,
+        "Content-Type": "application/json"
+      },
+
+      body: JSON.stringify({
+        device_ids: [deviceId],
+        play
+      })
+    }
+  );
+}
+
+
+async function hubSpotifyRequest(url, options) {
+  try {
+    const deviceId = await connectHubPlayer();
+    const target = new URL(url);
+
+    target.searchParams.set("device_id", deviceId);
+
+    const startingPlayback =
+      target.pathname.endsWith("/play");
+
+    if (startingPlayback && !options.body) {
+      const current = await fetch(
+        "https://api.spotify.com/v1/me/player",
+        { headers: options.headers }
+      );
+
+      if (current.status !== 204 && !current.ok) {
+        return current;
+      }
+
+      const state =
+        current.status === 204
+          ? null
+          : await current.json();
+
+      if (!state?.item) {
+        const recent = await fetch(
+          "https://api.spotify.com/v1/me/player/recently-played?limit=1",
+          { headers: options.headers }
+        );
+
+        if (recent.status === 403) {
+          document.getElementById(
+            "spotify-login"
+          ).hidden = false;
+
+          setSpotifyStatus(
+            "Reconnect Spotify to allow listening history"
+          );
+
+          return {
+            ok: false,
+            status: 403,
+            samosMessageShown: true
+          };
+        }
+
+        if (!recent.ok) {
+          return recent;
+        }
+
+        const history = await recent.json();
+        const lastPlayed = history.items?.[0];
+        const trackUri = lastPlayed?.track?.uri;
+
+        if (!trackUri) {
+          showSelectPlaylist();
+
+          return {
+            ok: false,
+            status: 409,
+            samosMessageShown: true
+          };
+        }
+
+        const contextUri = lastPlayed.context?.uri;
+
+        const playback =
+          contextUri &&
+          /^spotify:(playlist|album):/.test(contextUri)
+            ? {
+                context_uri: contextUri,
+                offset: { uri: trackUri }
+              }
+            : {
+                uris: [trackUri]
+              };
+
+        options = {
+          ...options,
+
+          headers: {
+            ...options.headers,
+            "Content-Type": "application/json"
+          },
+
+          body: JSON.stringify(playback)
+        };
+      } else if (state.device?.id !== deviceId) {
+        return transferToHub(
+          deviceId,
+          options,
+          true
+        );
+      }
+    }
+
+    let response =
+      await fetch(target.toString(), options);
+
+    if (startingPlayback && response.status === 404) {
+      const transfer =
+        await transferToHub(
+          deviceId,
+          options,
+          false
+        );
+
+      if (!transfer.ok) {
+        return transfer;
+      }
+
+      for (let attempt = 0; attempt < 3; attempt++) {
+        await new Promise(resolve =>
+          setTimeout(resolve, 300)
+        );
+
+        response =
+          await fetch(target.toString(), options);
+
+        if (response.status !== 404) {
+          break;
+        }
+      }
+    }
+
+    return response;
+  } catch (error) {
+    setSpotifyStatus(error.message);
+
+    return {
+      ok: false,
+      status: 503,
+      samosMessageShown: true
+    };
+  }
+}
+
+
 // ============================================================
-// SPOTIFY — PKCE HELPERS
+// PKCE HELPERS
 // ============================================================
 
-function randomString(
-  length = 64
-) {
+function randomString(length = 64) {
   const chars =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~";
-
 
   const values =
     crypto.getRandomValues(
       new Uint8Array(length)
     );
 
-
-  return Array
-    .from(
-      values,
-
-      value =>
-        chars[
-          value %
-          chars.length
-        ]
-    )
-
-    .join("");
+  return Array.from(
+    values,
+    value => chars[value % chars.length]
+  ).join("");
 }
 
 
-async function sha256(
-  value
-) {
+async function sha256(value) {
   return crypto.subtle.digest(
     "SHA-256",
-
-    new TextEncoder()
-      .encode(value)
+    new TextEncoder().encode(value)
   );
 }
 
 
-function base64Url(
-  buffer
-) {
+function base64Url(buffer) {
   return btoa(
     String.fromCharCode(
       ...new Uint8Array(buffer)
     )
   )
-
     .replace(/\+/g, "-")
     .replace(/\//g, "_")
     .replace(/=+$/, "");
@@ -183,114 +495,67 @@ function base64Url(
 
 
 // ============================================================
-// SPOTIFY STATUS
+// LOGIN
 // ============================================================
 
-function setSpotifyStatus(
-  message
-) {
-  document.getElementById(
-    "spotify-status"
-  ).textContent =
-    message;
-}
-
-
-// ============================================================
-// SPOTIFY LOGIN
-// ============================================================
+let spotifyLoginBusy = false;
 
 async function loginToSpotify() {
+  if (spotifyLoginBusy) return;
+
   if (!SPOTIFY_CLIENT_ID) {
-    setSpotifyStatus(
-      "Spotify client ID is missing"
-    );
-
-
+    setSpotifyStatus("Spotify client ID is missing");
     return;
   }
 
+  spotifyLoginBusy = true;
 
-  const verifier =
-    randomString(64);
+  const button = document.getElementById("spotify-login");
+  button.disabled = true;
 
+  try {
+    const verifier = randomString(64);
+    const challenge = base64Url(await sha256(verifier));
+    const state = randomString(24);
 
-  const challenge =
-    base64Url(
-      await sha256(
-        verifier
-      )
-    );
+    localStorage.setItem("spotify_verifier", verifier);
+    localStorage.setItem("spotify_state", state);
+    localStorage.setItem("spotify_login_pending", "true");
 
-
-  const state =
-    randomString(24);
-
-
-  localStorage.setItem(
-    "spotify_verifier",
-    verifier
-  );
-
-
-  localStorage.setItem(
-    "spotify_state",
-    state
-  );
-
-
-  const params =
-    new URLSearchParams({
-      response_type:
-        "code",
-
-      client_id:
-        SPOTIFY_CLIENT_ID,
-
-      scope:
-        SPOTIFY_SCOPES.join(" "),
-
-      redirect_uri:
-        SPOTIFY_REDIRECT_URI,
-
+    const params = new URLSearchParams({
+      response_type: "code",
+      client_id: SPOTIFY_CLIENT_ID,
+      scope: SPOTIFY_SCOPES.join(" "),
+      redirect_uri: SPOTIFY_REDIRECT_URI,
       state,
-
-      code_challenge_method:
-        "S256",
-
-      code_challenge:
-        challenge
+      code_challenge_method: "S256",
+      code_challenge: challenge
     });
 
+    setSpotifyStatus("Waiting for Spotify sign-in...");
 
-  localStorage.setItem(
-    "spotify_login_pending",
-    "true"
-  );
-
-
-  setSpotifyStatus(
-    "Waiting for Spotify sign-in..."
-  );
-
-
-  window.location.href =
-    `https://accounts.spotify.com/authorize?${params}`;
+    window.location.href =
+      `https://accounts.spotify.com/authorize?${params}`;
+  } catch (error) {
+    setSpotifyStatus(
+      `Could not start Spotify login: ${error.message}`
+    );
+  } finally {
+    spotifyLoginBusy = false;
+    setSpotifyConnectionState(spotifyConnected);
+  }
 }
 
 
 // ============================================================
-// SPOTIFY TOKEN STORAGE
+// TOKEN STORAGE
 // ============================================================
 
-function saveSpotifyToken(
-  token
-) {
+function saveSpotifyToken(token) {
   localStorage.setItem(
     "spotify_access_token",
     token.access_token || ""
   );
-
 
   if (token.refresh_token) {
     localStorage.setItem(
@@ -299,16 +564,11 @@ function saveSpotifyToken(
     );
   }
 
-
   const expiresIn =
-    Number(
-      token.expires_in || 3600
-    );
-
+    Number(token.expires_in || 3600);
 
   localStorage.setItem(
     "spotify_expires_at",
-
     String(
       Date.now() +
       (expiresIn - 60) * 1000
@@ -323,41 +583,29 @@ async function refreshSpotifyToken() {
       "spotify_refresh_token"
     );
 
-
   if (!refreshToken) {
     return null;
   }
 
+  const body = new URLSearchParams({
+    client_id: SPOTIFY_CLIENT_ID,
+    grant_type: "refresh_token",
+    refresh_token: refreshToken
+  });
 
-  const body =
-    new URLSearchParams({
-      client_id:
-        SPOTIFY_CLIENT_ID,
+  const response = await fetch(
+    "https://accounts.spotify.com/api/token",
+    {
+      method: "POST",
 
-      grant_type:
-        "refresh_token",
+      headers: {
+        "Content-Type":
+          "application/x-www-form-urlencoded"
+      },
 
-      refresh_token:
-        refreshToken
-    });
-
-
-  const response =
-    await fetch(
-      "https://accounts.spotify.com/api/token",
-
-      {
-        method: "POST",
-
-        headers: {
-          "Content-Type":
-            "application/x-www-form-urlencoded"
-        },
-
-        body
-      }
-    );
-
+      body
+    }
+  );
 
   if (!response.ok) {
     console.error(
@@ -365,19 +613,12 @@ async function refreshSpotifyToken() {
       response.status
     );
 
-
     return null;
   }
 
+  const token = await response.json();
 
-  const token =
-    await response.json();
-
-
-  saveSpotifyToken(
-    token
-  );
-
+  saveSpotifyToken(token);
 
   return token.access_token;
 }
@@ -385,410 +626,249 @@ async function refreshSpotifyToken() {
 
 async function getValidSpotifyToken() {
   const token =
-    localStorage.getItem(
-      "spotify_access_token"
-    );
+    localStorage.getItem("spotify_access_token");
 
+  const expiresAt = Number(
+    localStorage.getItem("spotify_expires_at") || 0
+  );
 
-  const expiresAt =
-    Number(
-      localStorage.getItem(
-        "spotify_expires_at"
-      ) || 0
-    );
-
-
-  if (
-    token &&
-    Date.now() <
-      expiresAt
-  ) {
+  if (token && Date.now() < expiresAt) {
     return token;
   }
 
+  try {
+    const refreshedToken = await refreshSpotifyToken();
 
-  return refreshSpotifyToken();
+    if (!refreshedToken) {
+      setSpotifyConnectionState(false);
+    }
+
+    return refreshedToken;
+  } catch (error) {
+    setSpotifyConnectionState(false);
+    throw error;
+  }
 }
 
 
 // ============================================================
-// SPOTIFY OAUTH RETURN
+// OAUTH RETURN
 // ============================================================
 
+let spotifyRedirectBusy = false;
+
 async function handleSpotifyRedirect() {
-  const params =
-    new URLSearchParams(
-      window.location.search
-    );
+  if (spotifyRedirectBusy) return;
 
+  const params = new URLSearchParams(window.location.search);
+  const code = params.get("code");
+  const oauthError = params.get("error");
 
-  const oauthError =
-    params.get("error");
-
-
-  if (oauthError) {
-    console.error(
-      "Spotify OAuth error:",
-      oauthError
-    );
-
-
-    setSpotifyStatus(
-      `Spotify login failed: ${oauthError}`
-    );
-
-
-    history.replaceState(
-      {},
-
-      document.title,
-
-      window.location.pathname
-    );
-
-
-    return;
-  }
-
-
-  const code =
-    params.get("code");
-
-
-  if (!code) {
+  if (!code && !oauthError) {
     if (
-      localStorage.getItem(
-        "spotify_access_token"
-      )
+      localStorage.getItem("spotify_access_token") ||
+      localStorage.getItem("spotify_refresh_token")
     ) {
-      startSpotify();
+      await startSpotify();
     }
 
-
     return;
   }
 
+  spotifyRedirectBusy = true;
 
-  const returnedState =
-    params.get("state");
+  // Remove callback parameters so refreshing cannot reuse the code.
+  const cleanUrl = new URL(window.location.href);
 
-
-  const expectedState =
-    localStorage.getItem(
-      "spotify_state"
-    );
-
-
-  const verifier =
-    localStorage.getItem(
-      "spotify_verifier"
-    );
-
-
-  if (
-    !verifier ||
-    !returnedState ||
-    returnedState !==
-      expectedState
-  ) {
-    setSpotifyStatus(
-      "Spotify login could not be verified"
-    );
-
-
-    console.error(
-      "Spotify OAuth state verification failed"
-    );
-
-
-    return;
+  for (const key of [
+    "code",
+    "state",
+    "error",
+    "error_description"
+  ]) {
+    cleanUrl.searchParams.delete(key);
   }
-
-
-  const body =
-    new URLSearchParams({
-      client_id:
-        SPOTIFY_CLIENT_ID,
-
-      grant_type:
-        "authorization_code",
-
-      code,
-
-      redirect_uri:
-        SPOTIFY_REDIRECT_URI,
-
-      code_verifier:
-        verifier
-    });
-
-
-  let response;
-
-
-  try {
-    response =
-      await fetch(
-        "https://accounts.spotify.com/api/token",
-
-        {
-          method: "POST",
-
-          headers: {
-            "Content-Type":
-              "application/x-www-form-urlencoded"
-          },
-
-          body
-        }
-      );
-  }
-
-
-  catch (error) {
-    console.error(
-      "Spotify token request failed:",
-      error
-    );
-
-
-    setSpotifyStatus(
-      "Spotify token request failed"
-    );
-
-
-    return;
-  }
-
-
-  if (!response.ok) {
-    const text =
-      await response.text();
-
-
-    console.error(
-      "Spotify token exchange failed:",
-      response.status,
-      text
-    );
-
-
-    setSpotifyStatus(
-      `Spotify login failed (${response.status})`
-    );
-
-
-    return;
-  }
-
-
-  const token =
-    await response.json();
-
-
-  saveSpotifyToken(
-    token
-  );
-
-
-  localStorage.removeItem(
-    "spotify_login_pending"
-  );
-
-
-  localStorage.removeItem(
-    "spotify_state"
-  );
-
-
-  localStorage.removeItem(
-    "spotify_verifier"
-  );
-
 
   history.replaceState(
     {},
-
     document.title,
-
-    window.location.pathname
+    cleanUrl.pathname + cleanUrl.search + cleanUrl.hash
   );
 
+  const button = document.getElementById("spotify-login");
+  button.disabled = true;
 
-  startSpotify();
+  try {
+    if (oauthError) {
+      button.hidden = false;
+      setSpotifyStatus(`Spotify login failed: ${oauthError}`);
+      return;
+    }
+
+    const returnedState = params.get("state");
+    const expectedState = localStorage.getItem("spotify_state");
+    const verifier = localStorage.getItem("spotify_verifier");
+
+    if (
+      !verifier ||
+      !returnedState ||
+      returnedState !== expectedState
+    ) {
+      button.hidden = false;
+
+      setSpotifyStatus(
+        "This sign-in link expired. Press Connect to try again."
+      );
+
+      return;
+    }
+
+    const response = await fetch(
+      "https://accounts.spotify.com/api/token",
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded"
+        },
+
+        body: new URLSearchParams({
+          client_id: SPOTIFY_CLIENT_ID,
+          grant_type: "authorization_code",
+          code,
+          redirect_uri: SPOTIFY_REDIRECT_URI,
+          code_verifier: verifier
+        })
+      }
+    );
+
+    if (!response.ok) {
+      button.hidden = false;
+
+      setSpotifyStatus(
+        `Spotify login failed (${response.status}). Press Connect to retry.`
+      );
+
+      return;
+    }
+
+    saveSpotifyToken(await response.json());
+
+    for (const key of [
+      "spotify_login_pending",
+      "spotify_state",
+      "spotify_verifier"
+    ]) {
+      localStorage.removeItem(key);
+    }
+
+    window.dispatchEvent(
+      new Event("samos-spotify-connected")
+    );
+
+    await startSpotify();
+  } catch (error) {
+    button.hidden = false;
+
+    setSpotifyStatus(
+      `Spotify connection failed: ${error.message}`
+    );
+  } finally {
+    spotifyRedirectBusy = false;
+    setSpotifyConnectionState(spotifyConnected);
+  }
 }
 
 
 // ============================================================
-// SPOTIFY PLAYBACK STATE
+// LOCAL PLAYBACK STATE
 // ============================================================
 
 async function updateSpotifyPlaybackState() {
-  const token =
-    await getValidSpotifyToken();
-
-
-  if (!token) {
+  if (!spotifyPlayer) {
     return;
   }
 
-
   try {
-    const response =
-      await fetch(
-        "https://api.spotify.com/v1/me/player",
-
-        {
-          headers: {
-            Authorization:
-              `Bearer ${token}`
-          }
-        }
-      );
-
-
-    if (response.status === 204) {
-      spotifyIsPlaying = false;
-
-
-      document.getElementById(
-        "play-pause-icon"
-      ).src =
-        "./icons/player-play.png";
-
-
-      setSpotifyStatus(
-        "Paused"
-      );
-
-
-      return;
-    }
-
-
-    if (!response.ok) {
-      console.error(
-        "Spotify playback state failed:",
-        response.status
-      );
-
-
-      return;
-    }
-
-
     const state =
-      await response.json();
+      await spotifyPlayer.getCurrentState();
 
-
-    spotifyIsPlaying =
-      Boolean(
-        state.is_playing
-      );
-
-
-    if (state.device?.id !== spotifyDeviceId) {
-      spotifyIsPlaying = false;
-      document.getElementById("play-pause-icon").src = "./icons/player-play.png";
-      document.getElementById("track-name").textContent = "Nothing playing on SamOS Hub";
-      document.getElementById("track-artist").textContent = "";
-      document.getElementById("album-art").hidden = true;
-      document.getElementById("album-placeholder").hidden = false;
-      setSpotifyStatus(spotifyDeviceId ? "SamOS Hub ready" : "Connecting SamOS Hub...");
-      return;
-    }
-
-    const track =
-      state.item;
-
-
-    if (!track) {
-      return;
-    }
-
-
-    document.getElementById(
-      "track-name"
-    ).textContent =
-      track.name ||
-      "Nothing playing";
-
-
-    document.getElementById(
-      "track-artist"
-    ).textContent =
-      (track.artists || [])
-        .map(
-          artist =>
-            artist.name
-        )
-        .join(", ");
-
-
-    const art =
-      track.album
-        ?.images?.[0]
-        ?.url || "";
-
-
-    const artEl =
-      document.getElementById(
-        "album-art"
-      );
-
-
-    const placeholderEl =
-      document.getElementById(
-        "album-placeholder"
-      );
-
-
-    if (art) {
-      artEl.src =
-        art;
-
-      artEl.hidden =
-        false;
-
-      placeholderEl.hidden =
-        true;
-    }
-
-    else {
-      artEl.removeAttribute(
-        "src"
-      );
-
-      artEl.hidden =
-        true;
-
-      placeholderEl.hidden =
-        false;
-    }
-
-
-    document.getElementById(
-      "play-pause-icon"
-    ).src =
-      state.is_playing
-        ? "./icons/player-pause.png"
-        : "./icons/player-play.png";
-
-
-    if (state.device?.name) {
-      setSpotifyStatus(
-        `${state.is_playing ? "Playing" : "Paused"} on ${state.device.name}`
-      );
-    }
-  }
-
-
-  catch (error) {
-    console.error(
-      "Spotify playback state error:",
+    renderLocalPlayback(state);
+  } catch (error) {
+    console.warn(
+      "Could not read hub playback:",
       error
     );
   }
+}
+
+
+function renderLocalPlayback(state) {
+  spotifyIsPlaying = Boolean(state && !state.paused);
+
+  const track = state?.track_window?.current_track;
+
+  spotifyHasPlaybackSession = Boolean(track);
+  updateSpotifyControlAvailability();
+
+  document.getElementById("play-pause-icon").src =
+    spotifyIsPlaying
+      ? "./icons/player-pause.png"
+      : "./icons/player-play.png";
+
+  document.getElementById("track-name").textContent =
+    track?.name || "";
+
+  document.getElementById("track-artist").textContent =
+    (track?.artists || [])
+      .map(artist => artist.name)
+      .join(", ");
+
+  const placeholder =
+    document.getElementById("album-placeholder");
+
+  if (track) {
+    setSpotifyConnectionState(true);
+
+    placeholder.textContent = "♫";
+    placeholder.style.fontSize = "clamp(4rem, 5vw, 6rem)";
+    placeholder.style.padding = "0";
+    placeholder.setAttribute("aria-hidden", "true");
+    placeholder.removeAttribute("role");
+  }
+
+  const art = track?.album?.images?.[0]?.url;
+  const artEl = document.getElementById("album-art");
+
+  artEl.hidden = !art;
+  placeholder.hidden = Boolean(art);
+
+  if (art) {
+    artEl.src = art;
+  } else {
+    artEl.removeAttribute("src");
+  }
+}
+
+
+async function waitForHubSession() {
+  for (let attempt = 0; attempt < 20; attempt++) {
+    const state =
+      await spotifyPlayer.getCurrentState();
+
+    if (state?.track_window?.current_track) {
+      renderLocalPlayback(state);
+      return state;
+    }
+
+    await new Promise(resolve =>
+      setTimeout(resolve, 250)
+    );
+  }
+
+  throw new Error(
+    "Spotify is still connecting playback; try Play again"
+  );
 }
 
 
@@ -798,12 +878,10 @@ function refreshSpotifyAfterControl() {
     150
   );
 
-
   setTimeout(
     updateSpotifyPlaybackState,
     500
   );
-
 
   setTimeout(
     updateSpotifyPlaybackState,
@@ -817,55 +895,32 @@ function refreshSpotifyAfterControl() {
 // ============================================================
 
 async function startSpotify() {
-  const token =
-    await getValidSpotifyToken();
+  const token = await getValidSpotifyToken();
 
+  setSpotifyConnectionState(Boolean(token));
 
   if (!token) {
     setSpotifyStatus(
       "Connect Spotify to load your playlists"
     );
-
-
-    document.getElementById(
-      "spotify-login"
-    ).hidden =
-      false;
-
-
     return;
   }
 
+  setSpotifyStatus("Spotify connected");
 
-  document.getElementById(
-    "spotify-login"
-  ).hidden =
-    true;
-
-
-  setSpotifyStatus(
-    "Spotify connected"
-  );
-
-
-  connectHubPlayer().catch(error => setSpotifyStatus(error.message));
+  connectHubPlayer().catch(error => {
+    setSpotifyStatus(error.message);
+  });
 
   await loadPlaylists();
-
-
   await updateSpotifyPlaybackState();
 
+  clearInterval(spotifyPlaybackPoll);
 
-  clearInterval(
-    spotifyPlaybackPoll
+  spotifyPlaybackPoll = setInterval(
+    updateSpotifyPlaybackState,
+    3000
   );
-
-
-  spotifyPlaybackPoll =
-    setInterval(
-      updateSpotifyPlaybackState,
-      3000
-    );
 }
 
 
@@ -877,104 +932,64 @@ async function loadPlaylists() {
   const token =
     await getValidSpotifyToken();
 
-
   if (!token) {
     return;
   }
-
 
   const menu =
     document.getElementById(
       "playlist-menu"
     );
 
-
-  menu.innerHTML =
-    "";
-
+  menu.innerHTML = "";
 
   let url =
     "https://api.spotify.com/v1/me/playlists?limit=50";
 
-
   while (url) {
-    const response =
-      await fetch(
-        url,
-
-        {
-          headers: {
-            Authorization:
-              `Bearer ${token}`
-          }
+    const response = await fetch(
+      url,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
         }
-      );
-
+      }
+    );
 
     if (!response.ok) {
-      console.error(
-        "Spotify playlist load failed:",
-        response.status
-      );
-
-
       setSpotifyStatus(
         `Could not load playlists (${response.status})`
       );
 
-
       return;
     }
 
+    const data = await response.json();
 
-    const data =
-      await response.json();
-
-
-    for (
-      const playlist
-      of data.items || []
-    ) {
+    for (const playlist of data.items || []) {
       if (!playlist) {
         continue;
       }
 
-
       const item =
-        document.createElement(
-          "button"
-        );
+        document.createElement("button");
 
-
-      item.type =
-        "button";
-
-
-      item.className =
-        "playlist-item";
-
-
-      item.textContent =
-        playlist.name;
-
+      item.type = "button";
+      item.className = "playlist-item";
+      item.textContent = playlist.name;
 
       item.addEventListener(
         "click",
-
         async () => {
           selectedPlaylistUri =
             playlist.uri;
-
 
           document.getElementById(
             "playlist-button"
           ).textContent =
             playlist.name;
 
-
-          menu.hidden =
-            true;
-
+          menu.hidden = true;
 
           await startPlaylist(
             playlist.uri
@@ -982,15 +997,10 @@ async function loadPlaylists() {
         }
       );
 
-
-      menu.appendChild(
-        item
-      );
+      menu.appendChild(item);
     }
 
-
-    url =
-      data.next;
+    url = data.next;
   }
 }
 
@@ -999,328 +1009,335 @@ async function loadPlaylists() {
 // START PLAYLIST
 // ============================================================
 
-async function startPlaylist(
-  playlistUri
-) {
-  const token =
-    await getValidSpotifyToken();
+async function startPlaylist(playlistUri) {
+  return runHubControl(async () => {
+    const token =
+      await getValidSpotifyToken();
 
-
-  if (!token) {
-    setSpotifyStatus(
-      "Reconnect Spotify"
-    );
-
-
-    return;
-  }
-
-
-  // Turn shuffle on for the currently active Spotify device.
-
-  await hubSpotifyRequest(
-    "https://api.spotify.com/v1/me/player/shuffle?state=true",
-
-    {
-      method: "PUT",
-
-      headers: {
-        Authorization:
-          `Bearer ${token}`
-      }
+    if (!token) {
+      throw new Error("Reconnect Spotify");
     }
-  );
 
+    const response =
+      await hubSpotifyRequest(
+        "https://api.spotify.com/v1/me/player/play",
+        {
+          method: "PUT",
 
-  const response =
-    await hubSpotifyRequest(
-      "https://api.spotify.com/v1/me/player/play",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json"
+          },
 
-      {
-        method: "PUT",
-
-        headers: {
-          Authorization:
-            `Bearer ${token}`,
-
-          "Content-Type":
-            "application/json"
-        },
-
-        body:
-          JSON.stringify({
-            context_uri:
-              playlistUri
+          body: JSON.stringify({
+            context_uri: playlistUri
           })
+        }
+      );
+
+    if (!response.ok) {
+      if (!response.samosMessageShown) {
+        throw new Error(
+          `Could not start playlist (${response.status})`
+        );
       }
-    );
 
-
-  if (!response.ok) {
-    console.error(
-      "Could not start Spotify playlist:",
-      response.status
-    );
-
-
-    if (
-      response.status === 404
-    ) {
-      setSpotifyStatus(
-        "Open Spotify on a device first"
-      );
+      return;
     }
 
-    else {
-      setSpotifyStatus(
-        `Could not start playlist (${response.status})`
-      );
-    }
+    await waitForHubSession();
 
+    await applyHubShuffle(
+      token,
+      spotifyShuffleEnabled
+    );
 
-    return;
-  }
-
-
-  setSpotifyStatus(
-    "Shuffle on"
-  );
-
-
-  setTimeout(
-    updateSpotifyPlaybackState,
-    500
-  );
+    setSpotifyStatus(
+      "Playing on SamOS Hub"
+    );
+  });
 }
 
 
 // ============================================================
-// SPOTIFY CONTROLS
+// CONTROLS
 // ============================================================
 
-document
-  .getElementById(
-    "spotify-login"
-  )
-
-  .addEventListener(
-    "click",
-    loginToSpotify
-  );
+document.getElementById(
+  "spotify-login"
+).addEventListener(
+  "click",
+  loginToSpotify
+);
 
 
-document
-  .getElementById(
-    "playlist-button"
-  )
+document.getElementById(
+  "playlist-button"
+).addEventListener(
+  "click",
+  () => {
+    const menu =
+      document.getElementById(
+        "playlist-menu"
+      );
 
-  .addEventListener(
-    "click",
-
-    () => {
-      const menu =
-        document.getElementById(
-          "playlist-menu"
-        );
-
-
-      menu.hidden =
-        !menu.hidden;
-    }
-  );
+    menu.hidden = !menu.hidden;
+  }
+);
 
 
 document.addEventListener(
   "click",
-
   event => {
     const picker =
       document.querySelector(
         ".playlist-picker"
       );
 
-
     const menu =
       document.getElementById(
         "playlist-menu"
       );
 
-
     if (
       picker &&
-      !picker.contains(
-        event.target
-      )
+      !picker.contains(event.target)
     ) {
-      menu.hidden =
-        true;
+      menu.hidden = true;
     }
   }
 );
 
 
-document
-  .getElementById(
-    "play-pause"
-  )
+async function runHubControl(action) {
+  if (hubControlBusy) return;
 
-  .addEventListener(
-    "click",
+  hubControlBusy = true;
 
-    async () => {
-      const token =
-        await getValidSpotifyToken();
+  const buttons = document.querySelectorAll(
+    "#play-pause, #next-track, #previous-track, #spotify-shuffle, .playlist-item"
+  );
+
+  buttons.forEach(button => {
+    button.disabled = true;
+  });
+
+  try {
+    await connectHubPlayer();
+    await action();
+    await updateSpotifyPlaybackState();
+  } catch (error) {
+    setSpotifyStatus(error.message);
+  } finally {
+    hubControlBusy = false;
+
+    buttons.forEach(button => {
+      button.disabled = false;
+    });
+
+    updateSpotifyControlAvailability();
+  }
+}
 
 
-      if (!token) {
+document.getElementById(
+  "play-pause"
+).addEventListener(
+  "click",
+  () => {
+    runHubControl(async () => {
+      const state =
+        await spotifyPlayer.getCurrentState();
+
+      if (state?.track_window?.current_track) {
+        if (state.paused) {
+          await spotifyPlayer.resume();
+        } else {
+          await spotifyPlayer.pause();
+        }
+
+        setSpotifyStatus(
+          state.paused
+            ? "Playing on SamOS Hub"
+            : "Paused on SamOS Hub"
+        );
+
         return;
       }
 
+      const token =
+        await getValidSpotifyToken();
 
-      const wasPlaying =
-        spotifyIsPlaying;
-
-
-      spotifyIsPlaying =
-        !spotifyIsPlaying;
-
-
-      document.getElementById(
-        "play-pause-icon"
-      ).src =
-        spotifyIsPlaying
-          ? "./icons/player-pause.png"
-          : "./icons/player-play.png";
-
-
-      const endpoint =
-        spotifyIsPlaying
-          ? "play"
-          : "pause";
-
+      if (!token) {
+        throw new Error("Reconnect Spotify");
+      }
 
       const response =
         await hubSpotifyRequest(
-          `https://api.spotify.com/v1/me/player/${endpoint}`,
-
+          "https://api.spotify.com/v1/me/player/play",
           {
             method: "PUT",
 
             headers: {
-              Authorization:
-                `Bearer ${token}`
+              Authorization: `Bearer ${token}`
             }
           }
         );
 
-
       if (!response.ok) {
-        spotifyIsPlaying =
-          wasPlaying;
+        if (!response.samosMessageShown) {
+          throw new Error(
+            `Could not start playback (${response.status})`
+          );
+        }
+
+        return;
+      }
+
+      await waitForHubSession();
+
+      await applyHubShuffle(
+        token,
+        spotifyShuffleEnabled
+      );
+
+      setSpotifyStatus(
+        "Playing on SamOS Hub"
+      );
+    });
+  }
+);
 
 
-        document.getElementById(
-          "play-pause-icon"
-        ).src =
-          spotifyIsPlaying
-            ? "./icons/player-pause.png"
-            : "./icons/player-play.png";
+document.getElementById(
+  "next-track"
+).addEventListener(
+  "click",
+  () => {
+    runHubControl(async () => {
+      await waitForHubSession();
+      await spotifyPlayer.nextTrack();
+      refreshSpotifyAfterControl();
+    });
+  }
+);
 
 
-        console.error(
-          "Spotify play/pause failed:",
-          response.status
+document.getElementById(
+  "previous-track"
+).addEventListener(
+  "click",
+  () => {
+    runHubControl(async () => {
+      await waitForHubSession();
+      await spotifyPlayer.previousTrack();
+      refreshSpotifyAfterControl();
+    });
+  }
+);
+
+
+// ============================================================
+// SHUFFLE SWITCH
+// ============================================================
+
+const shuffleButton =
+  document.getElementById("spotify-shuffle");
+
+function renderShuffleButton() {
+  shuffleButton.setAttribute(
+    "aria-checked",
+    String(spotifyShuffleEnabled)
+  );
+}
+
+async function applyHubShuffle(token, desired) {
+  const response = await hubSpotifyRequest(
+    `https://api.spotify.com/v1/me/player/shuffle?state=${desired}`,
+    {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error(
+      `Could not change shuffle (${response.status})`
+    );
+  }
+
+  // Confirm Spotify actually applied the change.
+  for (let attempt = 0; attempt < 6; attempt++) {
+    await new Promise(resolve =>
+      setTimeout(resolve, 350)
+    );
+
+    const current = await fetch(
+      "https://api.spotify.com/v1/me/player",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
+
+    if (current.status === 429) {
+      throw new Error(
+        "Spotify is busy; wait a moment and try shuffle again"
+      );
+    }
+
+    if (current.ok && current.status !== 204) {
+      const state = await current.json();
+
+      if (
+        state.device?.id === spotifyDeviceId &&
+        state.shuffle_state === desired
+      ) {
+        return;
+      }
+    }
+  }
+
+  throw new Error(
+    "Spotify has not confirmed the shuffle change; try again"
+  );
+}
+
+shuffleButton.addEventListener("click", () => {
+  runHubControl(async () => {
+    const desired = !spotifyShuffleEnabled;
+    const token = await getValidSpotifyToken();
+
+    if (!token) {
+      spotifyShuffleEnabled = desired;
+    } else {
+      const state = await spotifyPlayer.getCurrentState();
+
+      if (!state?.track_window?.current_track) {
+        spotifyShuffleEnabled = desired;
+
+        setSpotifyStatus(
+          "Shuffle preference saved for when music starts"
         );
-
-
-        await updateSpotifyPlaybackState();
-
-
-        return;
+      } else {
+        await applyHubShuffle(token, desired);
+        spotifyShuffleEnabled = desired;
       }
-
-
-      refreshSpotifyAfterControl();
     }
-  );
 
+    localStorage.setItem(
+      "samos_spotify_shuffle",
+      String(spotifyShuffleEnabled)
+    );
 
-document
-  .getElementById(
-    "next-track"
-  )
+    renderShuffleButton();
+  });
+});
 
-  .addEventListener(
-    "click",
-
-    async () => {
-      const token =
-        await getValidSpotifyToken();
-
-
-      if (!token) {
-        return;
-      }
-
-
-      await hubSpotifyRequest(
-        "https://api.spotify.com/v1/me/player/next",
-
-        {
-          method: "POST",
-
-          headers: {
-            Authorization:
-              `Bearer ${token}`
-          }
-        }
-      );
-
-
-      refreshSpotifyAfterControl();
-    }
-  );
-
-
-document
-  .getElementById(
-    "previous-track"
-  )
-
-  .addEventListener(
-    "click",
-
-    async () => {
-      const token =
-        await getValidSpotifyToken();
-
-
-      if (!token) {
-        return;
-      }
-
-
-      await hubSpotifyRequest(
-        "https://api.spotify.com/v1/me/player/previous",
-
-        {
-          method: "POST",
-
-          headers: {
-            Authorization:
-              `Bearer ${token}`
-          }
-        }
-      );
-
-
-      refreshSpotifyAfterControl();
-    }
-  );
-
-
-// ============================================================
-// START SPOTIFY
-// ============================================================
-
+renderShuffleButton();
+updateSpotifyControlAvailability();
+setSpotifyConnectionState(false);
 handleSpotifyRedirect();

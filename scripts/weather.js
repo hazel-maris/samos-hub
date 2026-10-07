@@ -383,7 +383,24 @@ function updateMajorWeatherEvent(
 // CURRENT + UPCOMING WEATHER
 // ============================================================
 
-async function updateWeather() {
+let weatherRetryTimer = null;
+let weatherRetryCount = 0;
+let weatherRequestInFlight = null;
+
+function updateWeather() {
+  if (weatherRequestInFlight) {
+    return weatherRequestInFlight;
+  }
+
+  weatherRequestInFlight =
+    renderWeather().finally(() => {
+      weatherRequestInFlight = null;
+    });
+
+  return weatherRequestInFlight;
+}
+
+async function renderWeather() {
   const tempEl =
     document.getElementById(
       "weather-temp"
@@ -472,10 +489,11 @@ async function updateWeather() {
 
     const response =
       await fetch(
-        `https://api.open-meteo.com/v1/forecast?${params}`
+        `https://api.open-meteo.com/v1/forecast?${params}`,
+        { signal: AbortSignal.timeout(15000) }
       );
 
-
+      
     if (!response.ok) {
       throw new Error(
         `Open-Meteo returned ${response.status}`
@@ -674,6 +692,9 @@ async function updateWeather() {
     updateMajorWeatherEvent(
       data
     );
+
+    clearTimeout(weatherRetryTimer);
+    weatherRetryCount = 0;
   }
 
 
@@ -683,6 +704,16 @@ async function updateWeather() {
       error
     );
 
+    clearTimeout(weatherRetryTimer);
+
+    if (weatherRetryCount < 3) {
+      weatherRetryCount++;
+
+      weatherRetryTimer = setTimeout(
+        updateWeather,
+        weatherRetryCount * 5000
+      );
+    }
 
     tempIcon.hidden =
       true;
@@ -917,18 +948,35 @@ async function updateWeatherAlerts() {
 // START WEATHER
 // ============================================================
 
+function refreshHomeWeather() {
+  updateWeather();
+  updateWeatherAlerts();
+}
+
+// Start immediately instead of waiting for Spotify's SDK.
+refreshHomeWeather();
+
 window.addEventListener(
-  "load",
+  "online",
+  refreshHomeWeather
+);
 
+window.addEventListener(
+  "focus",
+  refreshHomeWeather
+);
+
+window.addEventListener(
+  "samos-spotify-connected",
+  refreshHomeWeather
+);
+
+document.addEventListener(
+  "visibilitychange",
   () => {
-    setTimeout(
-      () => {
-        updateWeather();
-        updateWeatherAlerts();
-      },
-
-      0
-    );
+    if (!document.hidden) {
+      refreshHomeWeather();
+    }
   }
 );
 
