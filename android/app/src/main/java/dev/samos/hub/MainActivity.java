@@ -14,7 +14,6 @@ import android.view.WindowInsets;
 import android.view.WindowInsetsController;
 import android.view.WindowManager;
 import android.webkit.CookieManager;
-import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
@@ -91,7 +90,7 @@ public class MainActivity extends Activity {
         }
 
         webView.setWebChromeClient(
-                new WebChromeClient()
+                new PlaybackChromeClient()
         );
 
         WebViewAssetLoader assetLoader =
