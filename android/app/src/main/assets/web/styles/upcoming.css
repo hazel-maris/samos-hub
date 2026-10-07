@@ -650,8 +650,13 @@
 
 .time-clock-face {
   position: relative;
-  width: min(58vw, 225px);
-  aspect-ratio: 1;
+  --time-clock-size: min(58vmin, 225px);
+  width: var(--time-clock-size);
+  height: var(--time-clock-size);
+  min-width: var(--time-clock-size);
+  min-height: var(--time-clock-size);
+  flex: 0 0 auto;
+  box-sizing: border-box;
   margin: 0 auto 18px;
   border: 2px solid rgba(122, 90, 58, 0.55);
   border-radius: 50%;

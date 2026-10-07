@@ -35,6 +35,94 @@ let spotifyPlaybackPoll = null;
 let spotifyIsPlaying = false;
 
 
+
+// Local playback device. Commands always target this hub, never another phone.
+let spotifyPlayer = null;
+let spotifyDeviceId = null;
+let spotifyPlayerReady = null;
+let spotifySdkLoad = null;
+
+function loadSpotifyPlaybackSdk() {
+  if (window.Spotify?.Player) return Promise.resolve();
+  if (spotifySdkLoad) return spotifySdkLoad;
+  spotifySdkLoad = new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => reject(new Error("Spotify player timed out; reopen the hub")), 20000);
+    window.onSpotifyWebPlaybackSDKReady = () => {
+      clearTimeout(timeout);
+      resolve();
+    };
+    const script = document.createElement("script");
+    script.src = "https://sdk.scdn.co/spotify-player.js";
+    script.onerror = () => {
+      clearTimeout(timeout);
+      reject(new Error("Could not load Spotify player; check your connection"));
+    };
+    document.head.appendChild(script);
+  }).catch(error => { spotifySdkLoad = null; throw error; });
+  return spotifySdkLoad;
+}
+
+async function connectHubPlayer() {
+  if (spotifyDeviceId) return spotifyDeviceId;
+  if (spotifyPlayerReady) return spotifyPlayerReady;
+  spotifyPlayerReady = (async () => {
+    await loadSpotifyPlaybackSdk();
+    if (spotifyPlayer) spotifyPlayer.disconnect();
+    return new Promise((resolve, reject) => {
+      const timeout = setTimeout(() => fail("Spotify player did not connect; reopen the hub"), 20000);
+      const fail = message => {
+        clearTimeout(timeout);
+        setSpotifyStatus(message);
+        reject(new Error(message));
+      };
+      spotifyPlayer = new Spotify.Player({
+        name: "SamOS Hub",
+        getOAuthToken: callback => getValidSpotifyToken().then(token => callback(token || "")),
+        volume: 0.8
+      });
+      spotifyPlayer.addListener("ready", ({ device_id }) => {
+        clearTimeout(timeout);
+        spotifyDeviceId = device_id;
+        setSpotifyStatus("SamOS Hub ready");
+        resolve(device_id);
+      });
+      spotifyPlayer.addListener("not_ready", () => {
+        spotifyDeviceId = null;
+        spotifyPlayerReady = null;
+        setSpotifyStatus("SamOS Hub disconnected; press play to reconnect");
+      });
+      for (const event of ["initialization_error", "authentication_error", "account_error"]) {
+        spotifyPlayer.addListener(event, ({ message }) => fail(message));
+      }
+      spotifyPlayer.addListener("playback_error", ({ message }) => setSpotifyStatus(message));
+      spotifyPlayer.addListener("autoplay_failed", () => setSpotifyStatus("Press play on the hub to enable audio"));
+      spotifyPlayer.addListener("player_state_changed", () => updateSpotifyPlaybackState());
+      spotifyPlayer.connect().then(ok => {
+        if (!ok) fail("Spotify player could not connect");
+      }).catch(error => fail(error.message));
+    });
+  })().catch(error => {
+    spotifyPlayerReady = null;
+    spotifyDeviceId = null;
+    throw error;
+  });
+  return spotifyPlayerReady;
+}
+
+async function hubSpotifyRequest(url, options) {
+  // Call while the user's click still counts as an audio activation gesture.
+  if (spotifyPlayer) spotifyPlayer.activateElement().catch(() => {});
+  try {
+    const deviceId = await connectHubPlayer();
+    const target = new URL(url);
+    target.searchParams.set("device_id", deviceId);
+    return await fetch(target.toString(), options);
+  } catch (error) {
+    setSpotifyStatus(error.message);
+    return { ok: false, status: 503 };
+  }
+}
+
 // ============================================================
 // SPOTIFY — PKCE HELPERS
 // ============================================================
@@ -599,6 +687,17 @@ async function updateSpotifyPlaybackState() {
       );
 
 
+    if (state.device?.id !== spotifyDeviceId) {
+      spotifyIsPlaying = false;
+      document.getElementById("play-pause-icon").src = "./icons/player-play.png";
+      document.getElementById("track-name").textContent = "Nothing playing on SamOS Hub";
+      document.getElementById("track-artist").textContent = "";
+      document.getElementById("album-art").hidden = true;
+      document.getElementById("album-placeholder").hidden = false;
+      setSpotifyStatus(spotifyDeviceId ? "SamOS Hub ready" : "Connecting SamOS Hub...");
+      return;
+    }
+
     const track =
       state.item;
 
@@ -678,7 +777,7 @@ async function updateSpotifyPlaybackState() {
 
     if (state.device?.name) {
       setSpotifyStatus(
-        `Playing on ${state.device.name}`
+        `${state.is_playing ? "Playing" : "Paused"} on ${state.device.name}`
       );
     }
   }
@@ -748,6 +847,8 @@ async function startSpotify() {
     "Spotify connected"
   );
 
+
+  connectHubPlayer().catch(error => setSpotifyStatus(error.message));
 
   await loadPlaylists();
 
@@ -917,7 +1018,7 @@ async function startPlaylist(
 
   // Turn shuffle on for the currently active Spotify device.
 
-  await fetch(
+  await hubSpotifyRequest(
     "https://api.spotify.com/v1/me/player/shuffle?state=true",
 
     {
@@ -932,7 +1033,7 @@ async function startPlaylist(
 
 
   const response =
-    await fetch(
+    await hubSpotifyRequest(
       "https://api.spotify.com/v1/me/player/play",
 
       {
@@ -1099,7 +1200,7 @@ document
 
 
       const response =
-        await fetch(
+        await hubSpotifyRequest(
           `https://api.spotify.com/v1/me/player/${endpoint}`,
 
           {
@@ -1162,7 +1263,7 @@ document
       }
 
 
-      await fetch(
+      await hubSpotifyRequest(
         "https://api.spotify.com/v1/me/player/next",
 
         {
@@ -1199,7 +1300,7 @@ document
       }
 
 
-      await fetch(
+      await hubSpotifyRequest(
         "https://api.spotify.com/v1/me/player/previous",
 
         {

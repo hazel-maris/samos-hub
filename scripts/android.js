@@ -43,6 +43,26 @@ window.samosHandleExternalMouse = (
   viewWidth,
   viewHeight
 ) => {
+  const pageFrame =
+    document.getElementById(
+      "samos-page-frame"
+    );
+
+  if (
+    pageFrame &&
+    !pageFrame.hidden &&
+    pageFrame.contentWindow
+      ?.samosHandleExternalMouse
+  ) {
+    return pageFrame.contentWindow
+      .samosHandleExternalMouse(
+        physicalX,
+        physicalY,
+        viewWidth,
+        viewHeight
+      );
+  }
+
   if (
     !viewWidth ||
     !viewHeight

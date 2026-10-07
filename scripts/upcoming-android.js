@@ -6,6 +6,182 @@
 let lastExternalBridgeClick = 0;
 let lastExternalBridgeTarget = null;
 
+
+// Android's native select popup is unreliable on the external display.
+// Replace each select with a normal button menu that the mouse bridge can use.
+function samosUpgradeSelect(select) {
+  if (
+    !select ||
+    select.classList.contains(
+      "samos-native-select"
+    )
+  ) {
+    return;
+  }
+
+  const wrapper =
+    document.createElement(
+      "div"
+    );
+
+  wrapper.className =
+    "samos-select";
+
+  const button =
+    document.createElement(
+      "button"
+    );
+
+  button.type =
+    "button";
+
+  button.className =
+    "samos-select-button";
+
+  const menu =
+    document.createElement(
+      "div"
+    );
+
+  menu.className =
+    "samos-select-menu";
+
+  menu.hidden =
+    true;
+
+  function syncLabel() {
+    button.textContent =
+      select.options[
+        select.selectedIndex
+      ]?.textContent?.trim() ||
+      "Choose";
+  }
+
+  Array.from(
+    select.options
+  ).forEach(option => {
+    const item =
+      document.createElement(
+        "button"
+      );
+
+    item.type =
+      "button";
+
+    item.className =
+      "samos-select-option";
+
+    item.textContent =
+      option.textContent.trim();
+
+    item.addEventListener(
+      "click",
+      () => {
+        select.value =
+          option.value;
+
+        select.dispatchEvent(
+          new Event(
+            "change",
+            { bubbles: true }
+          )
+        );
+
+        syncLabel();
+
+        menu.hidden =
+          true;
+
+        wrapper.classList.remove(
+          "open"
+        );
+      }
+    );
+
+    menu.appendChild(
+      item
+    );
+  });
+
+  button.addEventListener(
+    "click",
+    () => {
+      menu.hidden =
+        !menu.hidden;
+
+      wrapper.classList.toggle(
+        "open",
+        !menu.hidden
+      );
+    }
+  );
+
+  select.addEventListener(
+    "change",
+    syncLabel
+  );
+
+  select.parentNode.insertBefore(
+    wrapper,
+    select
+  );
+
+  wrapper.appendChild(
+    select
+  );
+
+  wrapper.appendChild(
+    button
+  );
+
+  wrapper.appendChild(
+    menu
+  );
+
+  select.classList.add(
+    "samos-native-select"
+  );
+
+  syncLabel();
+}
+
+
+function samosUpgradeAllSelects(root = document) {
+  root.querySelectorAll?.(
+    "select"
+  ).forEach(
+    samosUpgradeSelect
+  );
+}
+
+
+samosUpgradeAllSelects();
+
+
+new MutationObserver(
+  mutations => {
+    mutations.forEach(mutation => {
+      mutation.addedNodes.forEach(node => {
+        if (!(node instanceof Element)) {
+          return;
+        }
+
+        if (node.matches("select")) {
+          samosUpgradeSelect(node);
+        }
+
+        samosUpgradeAllSelects(node);
+      });
+    });
+  }
+).observe(
+  document.body,
+  {
+    childList: true,
+    subtree: true
+  }
+);
+
 const SAMOS_INTERACTIVE_SELECTOR = [
   ".samos-select-option",
   ".samos-select-button",

@@ -3288,3 +3288,126 @@ setupCalendarYears();
 // ============================================================
 
 loadUpcomingItems();
+
+// ============================================================
+// EXTERNAL DISPLAY INPUT FIXES
+// ============================================================
+
+function samosSetExternalKeyboardMode(root = document) {
+  root.querySelectorAll?.(
+    "#upcoming-title, #upcoming-date, #upcoming-time, .upcoming-edit-title, .upcoming-edit-date, .upcoming-edit-time"
+  ).forEach(input => {
+    input.setAttribute("inputmode", "none");
+    input.setAttribute("autocomplete", "off");
+  });
+}
+
+function samosCloseSelectMenus(except = null) {
+  document.querySelectorAll(".samos-select.open").forEach(wrapper => {
+    if (wrapper !== except) {
+      wrapper.classList.remove("open");
+      const menu = wrapper.querySelector(".samos-select-menu");
+      const button = wrapper.querySelector(".samos-select-button");
+      if (menu) menu.hidden = true;
+      if (button) button.setAttribute("aria-expanded", "false");
+    }
+  });
+}
+
+function samosUpgradeSelect(select) {
+  if (!select || select.dataset.samosUpgraded === "true") {
+    return;
+  }
+
+  select.dataset.samosUpgraded = "true";
+
+  const wrapper = document.createElement("div");
+  wrapper.className = "samos-select";
+
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "samos-select-button";
+  button.setAttribute("aria-haspopup", "listbox");
+  button.setAttribute("aria-expanded", "false");
+
+  const menu = document.createElement("div");
+  menu.className = "samos-select-menu";
+  menu.setAttribute("role", "listbox");
+  menu.hidden = true;
+
+  const updateButton = () => {
+    const selected = select.options[select.selectedIndex];
+    button.textContent = selected ? selected.textContent.trim() : "Choose";
+  };
+
+  Array.from(select.options).forEach(option => {
+    const optionButton = document.createElement("button");
+    optionButton.type = "button";
+    optionButton.className = "samos-select-option";
+    optionButton.dataset.value = option.value;
+    optionButton.textContent = option.textContent.trim();
+    optionButton.setAttribute("role", "option");
+
+    optionButton.addEventListener("click", event => {
+      event.preventDefault();
+      event.stopPropagation();
+
+      select.value = option.value;
+      select.dispatchEvent(new Event("change", { bubbles: true }));
+      updateButton();
+      samosCloseSelectMenus();
+    });
+
+    menu.appendChild(optionButton);
+  });
+
+  button.addEventListener("click", event => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const opening = menu.hidden;
+    samosCloseSelectMenus(wrapper);
+    menu.hidden = !opening;
+    wrapper.classList.toggle("open", opening);
+    button.setAttribute("aria-expanded", String(opening));
+  });
+
+  select.parentNode.insertBefore(wrapper, select);
+  wrapper.appendChild(select);
+  wrapper.appendChild(button);
+  wrapper.appendChild(menu);
+
+  select.classList.add("samos-native-select");
+  updateButton();
+}
+
+function samosUpgradeUpcomingControls(root = document) {
+  samosSetExternalKeyboardMode(root);
+
+  root.querySelectorAll?.(
+    "#upcoming-type, #upcoming-recurrence, .upcoming-edit-type, .upcoming-edit-recurrence"
+  ).forEach(samosUpgradeSelect);
+}
+
+samosUpgradeUpcomingControls();
+
+const samosUpcomingObserver = new MutationObserver(mutations => {
+  for (const mutation of mutations) {
+    for (const node of mutation.addedNodes) {
+      if (node.nodeType === Node.ELEMENT_NODE) {
+        samosUpgradeUpcomingControls(node);
+      }
+    }
+  }
+});
+
+samosUpcomingObserver.observe(document.body, {
+  childList: true,
+  subtree: true
+});
+
+document.addEventListener("click", event => {
+  if (!event.target.closest(".samos-select")) {
+    samosCloseSelectMenus();
+  }
+});
