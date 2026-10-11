@@ -1,506 +1,429 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1, viewport-fit=cover" name="viewport"/>
+    <meta content="#e4d4b8" name="theme-color"/>
+    <title>
+      SamOS Hub
+    </title>
+    <link href="./manifest.webmanifest" rel="manifest"/>
+    <link href="./styles/base.css" rel="stylesheet"/>
+    <link href="./styles/home.css" rel="stylesheet"/>
+    <link href="./styles/mobile.css" rel="stylesheet"/>
+  </head>
+  <body data-root=".">
+    <main class="home">
+      <section class="journal-shell">
+        <div id="nav-container">
+        </div>
+        <section class="journal">
+          
+          <!-- =====================================================
 
-<head>
-  <meta charset="utf-8">
+                          LEFT COLUMN
 
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1, viewport-fit=cover"
-  >
+          ===================================================== -->
+          
+          <section class="orientation">
+            
+            <!-- ===================================================
 
-  <meta
-    name="theme-color"
-    content="#e4d4b8"
-  >
+                              DATE / TIME
 
-  <title>SamOS Hub</title>
-
-  <link
-    rel="manifest"
-    href="./manifest.webmanifest"
-  >
-
-  <link
-    rel="stylesheet"
-    href="./styles/base.css"
-  >
-
-  <link
-    rel="stylesheet"
-    href="./styles/home.css"
-  >
-
-  <link
-    rel="stylesheet"
-    href="./styles/mobile.css"
-  >
-</head>
-
-
-<body data-root=".">
-
-  <main class="home">
-
-    <section class="journal-shell">
-
-      <div id="nav-container"></div>
-
-
-      <section class="journal">
-
-
-        <!-- =====================================================
-             LEFT COLUMN
-             ===================================================== -->
-
-        <section class="orientation">
-
-
-          <!-- ===================================================
-               DATE / TIME
-               =================================================== -->
-
-          <div class="game-panel date-panel">
-
-            <div id="date">
-              Loading...
+            =================================================== -->
+            
+            <div class="game-panel date-panel">
+              <div id="date">
+                Loading...
+              </div>
+              <div id="time">
+                <span id="time-numbers">
+                </span>
+                <span id="time-period">
+                </span>
+              </div>
             </div>
 
+            <!-- ===================================================
 
-            <div id="time">
+                              WEATHER
 
-              <span id="time-numbers"></span>
-
-              <span id="time-period"></span>
-
-            </div>
-
-          </div>
-
-
-          <!-- ===================================================
-               WEATHER
-               =================================================== -->
-
-          <div class="game-panel weather-panel">
-
-            <div class="weather">
-
-
-              <!-- LEFT: CURRENT WEATHER -->
-
-              <section class="weather-forecast-side">
-                <div class ="weather-current-heading">
-                  CURRENT WEATHER
-                </div>
-                      
-                <div class="weather-current-row">
-
-                  <div id="weather-current">            
-
-                    <div class="weather-temp-row">
-
-                      <img
-                        id="temp-icon"
-                        src=""
-                        alt=""
-                        hidden
-                      >
-
-                      <span id="weather-temp">
-                        --
-                      </span>
-
-                    </div>
-
-
-                    <div class="weather-condition-row">
-
-                      <img
-                        id="weather-icon"
-                        src=""
-                        alt=""
-                        hidden
-                      >
-
-                      <span id="weather-condition">
-                        Weather loading...
-                      </span>
-
-                    </div>
-
+            =================================================== -->
+            
+            <div class="game-panel weather-panel">
+              <div class="weather">
+                <!-- LEFT: CURRENT WEATHER -->
+                <section class="weather-forecast-side">
+                  <div class="weather-current-heading">
+                    CURRENT WEATHER
                   </div>
+                  <div class="weather-current-row">
+                    <div id="weather-current">
+                      <div class="weather-temp-row">
+                        <img alt="" hidden="" id="temp-icon" src=""/>
+                        <span id="weather-temp">
+                          --
+                        </span>
+                      </div>
+                      <div class="weather-condition-row">
+                        <img alt="" hidden="" id="weather-icon" src=""/>
+                        <span id="weather-condition">
+                          Weather loading...
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- HIGH / LOW -->
+                  <div id="weather-range">
+                    High --° · Low --°
+                  </div>
+                  <!-- SUNRISE / SUNSET -->
+                  <div id="sun-times">
+                    Sunrise -- · Sunset --
+                  </div>
+                </section>
 
+                <!-- =================================================
+
+                                      RIGHT: OUTLOOK + ALERTS
+
+                ================================================= -->
+                
+                <section class="weather-alert-side">
+                  <!-- OUTLOOK -->
+                  <div class="weather-upcoming">
+                    <div class="weather-alert-heading">
+                      OUTLOOK
+                    </div>
+                    <!-- AFTERNOON WEATHER -->
+                    <div class="forecast-line" hidden="" id="weather-afternoon">
+                      <img alt="" class="weather-forecast-icon" src="./icons/afternoon-icon.png"/>
+                      <span id="weather-afternoon-text">
+                      </span>
+                    </div>
+                    <!-- OVERNIGHT WEATHER -->
+                    <div class="forecast-line" hidden="" id="weather-overnight">
+                      <img alt="" class="weather-forecast-icon" src="./icons/overnight-icon.png"/>
+                      <span id="weather-overnight-text">
+                      </span>
+                    </div>
+                    <!-- MAJOR UPCOMING WEATHER -->
+                    <div id="weather-event">
+                      <img alt="" hidden="" id="weather-event-icon" src="./icons/weather-major-event.png"/>
+                      <span class="no-weather-events" id="weather-event-text">
+                        No forecasted events or storms.
+                      </span>
+                    </div>
+                  </div>
+                  <!-- DIVIDER -->
+                  <div class="weather-alert-divider">
+                  </div>
+                  <!-- OFFICIAL ALERTS -->
+                  <div class="weather-alert-heading">
+                    ALERTS
+                  </div>
+                  <div id="weather-alerts">
+                    <div class="no-weather-alerts">
+                      No watches, warnings, or advisories.
+                    </div>
+                  </div>
+                </section>
+              </div>
+            </div>
+
+            <!-- ===================================================
+
+                              UPCOMING DATES
+
+            =================================================== -->
+            <div class="game-panel upcoming-panel">
+              <div class="upcoming-title">
+                THIS WEEK
+              </div>
+              <div class="upcoming-dates" id="home-upcoming-list">
+                Loading...
+              </div>
+              <a class="upcoming-see-all" href="./html/upcoming.html">
+                See all
+              </a>
+            </div>
+
+            <!-- ===================================================
+
+                            MORNING ROUTINE
+
+            =================================================== -->
+            
+            <div class="game-panel morning-panel">
+              <div class="morning-title">
+                MORNING ROUTINE
+              </div>
+              <ul class="morning-list">
+                <li>
+                  Get dressed + hygiene
+                </li>
+                <li>
+                  Start coffee
+                </li>
+                <li>
+                  Take Bean + Fern outside
+                </li>
+                <li>
+                  Breakfast + coffee
+                </li>
+                <li>
+                  Pack lunch + work bag
+                </li>
+                <li>
+                  Shoes, keys, lights — leave!
+                </li>
+              </ul>
+            </div>
+          </section>
+
+          <!-- =====================================================
+
+                          MUSIC
+
+          ===================================================== -->
+          
+          <section class="media-area">
+            <div class="game-panel spotify-panel">
+              
+              <!-- =================================================
+
+                                  SPOTIFY HEADER
+
+              ================================================= -->
+              
+              <div class="spotify-heading-row">
+                <div class="spotify-heading-copy">
+                  <div class="spotify-title">
+                    SPOTIFY
+                  </div>
+                  <div id="spotify-status">
+                    Connect Spotify to load your playlists
+                  </div>
                 </div>
-
-
-                <!-- HIGH / LOW -->
-
-                <div id="weather-range">
-                  High --° · Low --°
-                </div>
-
-
-                <!-- SUNRISE / SUNSET -->
-
-                <div id="sun-times">
-                  Sunrise -- · Sunset --
-                </div>
-
-              </section>
-
+                <button class="spotify-login" id="spotify-login" type="button">
+                  Connect
+                </button>
+              </div>
 
               <!-- =================================================
-                   RIGHT: OUTLOOK + ALERTS
-                   ================================================= -->
 
-              <section class="weather-alert-side">
+                                  PLAYER
 
-                <!-- OUTLOOK -->
+              ================================================= -->
+              
+              <div class="mini-player" id="spotify-player">
+          
+          <!-- =================================================
 
-                <div class="weather-upcoming">
+          SPOTIFY MOOD BUTTONS
 
-                  <div class="weather-alert-heading">
-                    OUTLOOK
+          ================================================= -->
+                <div class="spotify-selection">
+                  <div class="spotify-moods">
+                    <button class="mood-button mood-morning" id="mood-morning" type="button">
+                      <span aria-hidden="true" class="mood-icon">
+                        ☀
+                      </span>
+                      <span>
+                        MORNING
+                      </span>
+                    </button>
+                    <button class="mood-button mood-focus" id="mood-focus" type="button">
+                      <span aria-hidden="true" class="mood-icon">
+                        ◆
+                      </span>
+                      <span>
+                        FOCUS
+                      </span>
+                    </button>
+                    <button class="mood-button mood-winddown" id="mood-winddown" type="button">
+                      <span aria-hidden="true" class="mood-icon">
+                        ☾
+                      </span>
+                      <span>
+                        WIND DOWN
+                      </span>
+                    </button>
+                  </div>
+                  <div class="playlist-picker">
+                    <button aria-expanded="false" aria-label="All playlists" class="playlist-button" id="playlist-button" title="All playlists" type="button">
+                      +
+                    </button>
+                    <div class="playlist-menu" hidden="" id="playlist-menu">
+                    </div>
+                  </div>
+                </div>
+                <div class="spotify-playback-layout">
+                  <div class="spotify-now-playing">
+                    <div class="album-container">
+                      <img alt="Album artwork" hidden="" id="album-art" src=""/>
+                      <div aria-live="polite" id="album-placeholder" role="status" style="
+
+                                        font-size: clamp(1.25rem, 2vw, 2rem);
+
+                                        line-height: 1.15;
+
+                                        padding: 12px;
+
+                                    ">
+                        Select playlist
+                      </div>
+                    </div>
+                    <div class="track-info">
+                      <div id="track-name">
+                      </div>
+                      <div id="track-artist">
+                      </div>
+                    </div>
                   </div>
 
+                  <div class="spotify-playback-actions">
 
-                  <!-- AFTERNOON WEATHER -->
+                    <!-- =========================================
+                        MAIN PLAYBACK CONTROLS
+                        ========================================= -->
 
-                  <div
-                    id="weather-afternoon"
-                    class="forecast-line"
-                    hidden
-                  >
+                    <div class="player-controls">
 
-                    <img
-                      class="weather-forecast-icon"
-                      src="./icons/afternoon-icon.png"
-                      alt=""
-                    >
+                      <button
+                        id="previous-track"
+                        type="button"
+                        aria-label="Previous track"
+                      >
+                        <img src="./icons/player-previous.png" alt="">
+                      </button>
 
-                    <span
-                      id="weather-afternoon-text"
-                    ></span>
+                      <button
+                        id="play-pause"
+                        type="button"
+                        aria-label="Play or pause"
+                      >
+                        <img
+                          id="play-pause-icon"
+                          src="./icons/player-play.png"
+                          alt=""
+                        >
+                      </button>
 
-                  </div>
+                      <button
+                        id="next-track"
+                        type="button"
+                        aria-label="Next track"
+                      >
+                        <img src="./icons/player-next.png" alt="">
+                      </button>
 
+                    </div>
 
-                  <!-- OVERNIGHT WEATHER -->
+                    <!-- =========================================
+                        SHUFFLE + VOLUME
+                        ========================================= -->
 
-                  <div
-                    id="weather-overnight"
-                    class="forecast-line"
-                    hidden
-                  >
+                    <div class="audio-controls">
 
-                    <img
-                      class="weather-forecast-icon"
-                      src="./icons/overnight-icon.png"
-                      alt=""
-                    >
+                      <button
+                        id="spotify-shuffle"
+                        type="button"
+                        role="switch"
+                        aria-label="Shuffle"
+                        aria-checked="true"
+                      >
+                        <span>Shuffle</span>
+                        <span class="shuffle-track" aria-hidden="true">
+                          <span class="shuffle-thumb"></span>
+                        </span>
+                      </button>
 
-                    <span
-                      id="weather-overnight-text"
-                    ></span>
+                      <div class="volume-controls">
 
-                  </div>
+                        <button
+                          id="volume-mute"
+                          type="button"
+                          aria-label="Mute or unmute"
+                        >
+                          <span aria-hidden="true">🔇</span>
+                        </button>
 
+                        <button
+                          id="volume-down"
+                          type="button"
+                          aria-label="Volume down"
+                        >
+                          <span aria-hidden="true">🔉</span>
+                        </button>
 
-                  <!-- MAJOR UPCOMING WEATHER -->
+                        <button
+                          id="volume-up"
+                          type="button"
+                          aria-label="Volume up"
+                        >
+                          <span aria-hidden="true">🔊</span>
+                        </button>
 
-                  <div id="weather-event">
+                      </div>
 
-                    <img
-                      id="weather-event-icon"
-                      src="./icons/weather-major-event.png"
-                      alt=""
-                      hidden
-                    >
+                    </div>
 
-                    <span
-                      id="weather-event-text"
-                      class="no-weather-events"
-                    >
-                      No forecasted events or storms.
-                    </span>
+                    <!-- VOLUME INDICATOR -->
+                    <div id="volume-feedback" hidden>
+                      <div id="volume-level"></div>
+                    </div>
 
                   </div>
 
                 </div>
-
-
-                <!-- DIVIDER -->
-
-                <div
-                  class="weather-alert-divider"
-                ></div>
-
-
-                <!-- OFFICIAL ALERTS -->
-
-                <div class="weather-alert-heading">
-                  ALERTS
-                </div>
-
-
-                <div id="weather-alerts">
-
-                  <div class="no-weather-alerts">
-                    No watches, warnings, or advisories.
-                  </div>
-
-                </div>
-
-              </section>
-
+                <!-- ALBUM ART -->
+                <!-- TRACK INFO -->
+                <!-- PLAYER CONTROLS -->
+              </div>
             </div>
+          </section>
 
-          </div>
+          <!-- =====================================================
 
+                          QUOTE
 
-          <!-- ===================================================
-               UPCOMING DATES
-               =================================================== -->
+          ===================================================== -->
+          <blockquote id="quote">
+            Build for 75% Sam.
+          </blockquote>
 
-          <div class="game-panel upcoming-panel">
+          
+          <span id="app-version">v1.4.1</span>
 
-            <div class="upcoming-title">
-              THIS WEEK
-            </div>
-
-            <div
-              id="home-upcoming-list"
-              class="upcoming-dates"
-            >
-              Loading...
-            </div>
-
-            <a
-              class="upcoming-see-all"
-              href="./html/upcoming.html"
-            >
-              See all
-            </a>
-
-          </div>
 
         </section>
-
-
-        <!-- =====================================================
-             MUSIC
-             ===================================================== -->
-
-        <section class="media-area">
-
-          <div class="game-panel spotify-panel">
-
-
-            <!-- =================================================
-                 SPOTIFY HEADER
-                 ================================================= -->
-
-            <div class="spotify-heading-row">
-
-              <div class="spotify-heading-copy">
-
-                <div class="spotify-title">
-                  SPOTIFY
-                </div>
-
-                <div id="spotify-status">
-                  Connect Spotify to load your playlists
-                </div>
-
-              </div>
-
-
-              <button
-                id="spotify-login"
-                class="spotify-login"
-                type="button"
-              >
-                Connect
-              </button>
-
-            </div>
-
-
-            <!-- =================================================
-                 PLAYER
-                 ================================================= -->
-
-            <div
-              id="spotify-player"
-              class="mini-player"
-            >
-
-
-              <!-- PLAYLIST PICKER -->
-
-              <div class="playlist-picker">
-
-                <button
-                  id="playlist-button"
-                  class="playlist-button"
-                  type="button"
-                >
-                  Choose a playlist...
-                </button>
-
-
-                <div
-                  id="playlist-menu"
-                  class="playlist-menu"
-                  hidden
-                ></div>
-
-              </div>
-
-
-              <!-- ALBUM ART -->
-
-              <div class="album-container">
-
-                <img
-                  id="album-art"
-                  src=""
-                  alt="Album artwork"
-                  hidden
-                >
-
-                <div
-                  id="album-placeholder"
-                  role="status"
-                  aria-live="polite"
-                  style="
-                    font-size: clamp(1.25rem, 2vw, 2rem);
-                    line-height: 1.15;
-                    padding: 12px;
-                  "
-                >
-                  Select playlist
-                </div>
-
-              </div>
-
-
-              <!-- TRACK INFO -->
-
-              <div class="track-info">
-                <div id="track-name"></div>
-                <div id="track-artist"></div>
-              </div>
-
-
-              <!-- PLAYER CONTROLS -->
-
-              <div class="player-controls">
-
-                <!-- PREVIOUS -->
-
-                <button
-                  id="previous-track"
-                  type="button"
-                  aria-label="Previous track"
-                >
-                  <img
-                    src="./icons/player-previous.png"
-                    alt=""
-                  >
-                </button>
-
-                <!-- PLAY / PAUSE -->
-
-                <button
-                  id="play-pause"
-                  type="button"
-                  aria-label="Play or pause"
-                >
-                  <img
-                    id="play-pause-icon"
-                    src="./icons/player-play.png"
-                    alt=""
-                  >
-                </button>
-
-                <!-- NEXT -->
-
-                <button
-                  id="next-track"
-                  type="button"
-                  aria-label="Next track"
-                >
-                  <img
-                    src="./icons/player-next.png"
-                    alt=""
-                  >
-                </button>
-
-                <!-- SHUFFLE -->
-
-                <button
-                  id="spotify-shuffle"
-                  type="button"
-                  role="switch"
-                  aria-label="Shuffle"
-                  aria-checked="true"
-                >
-                  <span>Shuffle</span>
-
-                  <span
-                    class="shuffle-track"
-                    aria-hidden="true"
-                  >
-                    <span class="shuffle-thumb"></span>
-                  </span>
-                </button>
-
-              </div>
-
-            </div>
-
-          </div>
-
-        </section>
-
-
-        <!-- =====================================================
-             QUOTE
-             ===================================================== -->
-
-        <blockquote id="quote">
-          Build for Future Sam.
-        </blockquote>
-
-
       </section>
+    </main>
 
-    </section>
+    <!-- =========================================================
 
-  </main>
+              SCRIPTS
 
+    ========================================================= -->
 
-  <!-- =========================================================
-       SCRIPTS
-       ========================================================= -->
-
-  <script
-    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
-  ></script>
-
-  <script src="./config.js"></script>
-
-  <script src="./scripts/app.js"></script>
-  <script src="./scripts/nav.js"></script>
-  <script src="./scripts/weather.js"></script>
-  <script src="./scripts/spotify.js"></script>
-  <script src="./scripts/android.js"></script>
-  <script src="./scripts/home-upcoming.js"></script>
-  <script src="./scripts/home.js"></script>
-
-</body>
-
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="./config.js">
+    </script>
+    <script src="./scripts/app.js">
+    </script>
+    <script src="./scripts/nav.js">
+    </script>
+    <script src="./scripts/weather.js">
+    </script>
+    <script src="./scripts/spotify.js">
+    </script>
+    <script src="./scripts/android.js">
+    </script>
+    <script src="./scripts/home-upcoming.js">
+    </script>
+    <script src="./scripts/home.js">
+    </script>
+  </body>
 </html>

@@ -1,70 +1,44 @@
-
-
-/* =========================================================
-   LEFT COLUMN
-   ========================================================= */
-
+/* LEFT COLUMN */
 .orientation {
   grid-column: 1;
   grid-row: 1;
-
   width: 100%;
   height: 100%;
-
   min-width: 0;
   min-height: 0;
-
   display: grid;
-
   grid-template-rows:
-    minmax(125px, 0.75fr)
-    minmax(220px, 1.45fr)
-    minmax(160px, 0.95fr);
-
+  minmax(175px, 0.85fr)
+  minmax(300px, 2fr);
   gap: var(--panel-gap);
 }
 
-
-/* =========================================================
-   DATE / TIME
-   ========================================================= */
-
+/* DATE / TIME */
 .date-panel {
   display: flex;
   flex-direction: column;
-
   align-items: center;
   justify-content: center;
-
   padding: 12px 20px;
-
   text-align: center;
 }
 
 #date {
   margin: 0;
-
   font-family: "vt323", sans-serif;
   font-size: clamp(3.1rem, 3.8vw, 4.8rem);
-
   font-weight: 400;
-
   line-height: 0.95;
 }
 
 #time {
   margin-top: 14px;
-
   display: flex;
-
   align-items: baseline;
   justify-content: center;
-
   gap: 8px;
-
   font-family: "vt323", sans-serif;
   font-size: clamp(2.6rem, 3vw, 3.7rem);
-
   line-height: 1;
 }
 
@@ -76,11 +50,7 @@
   font-size: 0.48em;
 }
 
-
-/* =========================================================
-   WEATHER
-   ========================================================= */
-
+/* WEATHER */
 .weather-panel {
   padding: 18px 22px;
 }
@@ -88,44 +58,32 @@
 .weather {
   width: 100%;
   height: 100%;
-
   display: grid;
-
   grid-template-columns:
-    minmax(0, 1.08fr)
-    minmax(0, 0.92fr);
-
+  minmax(0, 1.08fr)
+  minmax(0, 0.92fr);
   align-items: stretch;
 }
 
-
-/* =========================================================
-   WEATHER — LEFT
-   ========================================================= */
-
+/* WEATHER — LEFT */
 .weather-current-heading {
   margin: 0 0 18px;
-
   font-family: "vt323", sans-serif;
   font-size: clamp(1.65rem, 1.9vw, 2rem);
-
   line-height: 1;
 }
 
 .weather-forecast-side {
   min-width: 0;
-
   display: flex;
   flex-direction: column;
-
   align-items: flex-start;
   justify-content: flex-start;
-
   padding:
-    10px
-    24px
-    10px
-    0;
+  10px
+  24px
+  10px
+  0;
 }
 
 .weather-text-stack {
@@ -136,7 +94,6 @@
 
 .weather-current-row {
   display: flex;
-
   align-items: center;
   justify-content: flex-start;
 }
@@ -145,9 +102,7 @@
   display: flex;
   align-items: center;
   gap: 18px;
-
   min-width: 0;
-
   margin-top: 4px;
 }
 
@@ -162,16 +117,13 @@
   display: flex;
   align-items: center;
   gap: 10px;
-
   min-width: 0;
 }
-
 
 .weather-temp-row img,
 .weather-condition-row img {
   flex: 0 0 auto;
 }
-
 
 #weather-temp,
 #weather-condition {
@@ -182,54 +134,41 @@
 #weather-icon {
   width: 42px;
   height: 42px;
-
   object-fit: contain;
-
   image-rendering: pixelated;
 }
 
 #weather-range {
   margin-top: 24px;
-
   font-size:
-    clamp(
-      1.35rem,
-      1.55vw,
-      1.6rem
-    );
-
+  clamp(
+  1.35rem,
+  1.55vw,
+  1.6rem
+  );
   letter-spacing: 0.03em;
 }
 
-
-/* =========================================================
-   WEATHER — RIGHT
-   ========================================================= */
-
+/* WEATHER — RIGHT */
 .weather-alert-side {
   min-width: 0;
   min-height: 0;
-
   display: flex;
   flex-direction: column;
-
   justify-content: flex-start;
-
   padding:
-    10px
-    0
-    10px
-    30px;
-
+  10px
+  0
+  10px
+  30px;
   border-left:
-    2px solid
-    rgba(122, 90, 58, 0.6);
+  2px solid
+  rgba(122, 90, 58, 0.6);
 }
 
 .weather-upcoming {
   display: flex;
   flex-direction: column;
-
   gap: 0;
 }
 
@@ -248,79 +187,58 @@
 
 .forecast-line {
   display: flex;
-
   align-items: center;
-
   gap: 8px;
-
   margin: 0;
-
   font-family: "vt323", sans-serif;
   font-size: clamp(1.35rem, 1.5vw, 1.75rem);
-
   line-height: 1.05;
 }
 
 .weather-forecast-icon {
   width: 28px;
   height: 28px;
-
   flex: 0 0 auto;
-
   object-fit: contain;
-
   image-rendering: pixelated;
 }
 
 .weather-alert-divider {
   width: 100%;
-
   margin: 24px 0 14px;
-
   border-top:
-    1px solid
-    rgba(122, 90, 58, 0.35);
+  1px solid
+  rgba(122, 90, 58, 0.35);
 }
 
 .weather-alert-heading {
   margin-bottom: 8px;
-
   font-family: "vt323", sans-serif;
   font-size: clamp(1.35rem, 1.5vw, 1.75rem);
 }
 
 #weather-event {
   display: flex;
-
   align-items: flex-start;
-
   gap: 10px;
-
   margin: 0;
-
   font-family: "vt323", sans-serif;
   font-size: clamp(1.15rem, 1.3vw, 1.55rem);
-
   line-height: 1.15;
 }
 
 #weather-event-icon {
   width: 30px;
   height: 30px;
-
   flex: 0 0 auto;
-
   object-fit: contain;
-
   image-rendering: pixelated;
 }
 
 #weather-alerts {
   font-family: "vt323", sans-serif;
   font-size: clamp(1.15rem, 1.3vw, 1.5rem);
-
   line-height: 1.15;
-
   opacity: 0.72;
 }
 
@@ -334,49 +252,33 @@
 
 .weather-alert-line {
   display: flex;
-
   align-items: flex-start;
-
   gap: 10px;
-
   margin-bottom: 10px;
-
   opacity: 1;
 }
 
 .weather-alert-icon {
   width: 30px;
   height: 30px;
-
   flex: 0 0 auto;
-
   object-fit: contain;
-
   image-rendering: pixelated;
 }
 
-
-/* =========================================================
-   UPCOMING
-   ========================================================= */
-
+/* UPCOMING */
 .upcoming-panel {
   position: relative;
-
   min-width: 0;
   min-height: 0;
-
   width: 100%;
   max-width: none;
-
   padding: 18px 24px 54px;
-
   overflow: hidden;
 }
 
 .upcoming-title {
   margin-bottom: 14px;
-
   font-family: "vt323", sans-serif;
   font-size: clamp(1.5rem, 1.6vw, 1.9rem);
 }
@@ -384,54 +286,37 @@
 .upcoming-dates {
   min-width: 0;
   width: 100%;
-
   column-count: 2;
   column-gap: 34px;
-
   font-family: "vt323", sans-serif;
   font-size: clamp(1.25rem, 1.4vw, 1.65rem);
-
   line-height: 1.25;
 }
 
 .upcoming-dates > div {
   break-inside: avoid;
-
   margin-bottom: 7px;
 }
 
 .upcoming-see-all {
   position: absolute;
-
   right: 20px;
   bottom: 16px;
-
   padding: 6px 12px;
-
   border: 2px solid var(--border);
-
   background: var(--button);
-
   color: var(--text);
-
   font-family: "vt323", sans-serif;
   font-size: clamp(1rem, 1.1vw, 1.3rem);
-
   cursor: pointer;
 }
 
-
-/* =========================================================
-   MEDIA COLUMN
-   ========================================================= */
-
+/* MEDIA COLUMN */
 .media-area {
   grid-column: 2;
   grid-row: 1;
-
   width: 100%;
   height: 100%;
-
   min-width: 0;
   min-height: 0;
 }
@@ -439,29 +324,19 @@
 .spotify-panel {
   width: 100%;
   height: 100%;
-
   min-width: 0;
   min-height: 0;
-
   display: flex;
   flex-direction: column;
-
   padding: 28px 30px;
 }
 
-
-/* =========================================================
-   SPOTIFY HEADER
-   ========================================================= */
-
+/* SPOTIFY HEADER */
 .spotify-heading-row {
   display: flex;
-
   align-items: center;
   justify-content: space-between;
-
   gap: 24px;
-
   flex: 0 0 auto;
 }
 
@@ -472,246 +347,177 @@
 .spotify-title {
   font-family: "vt323", sans-serif;
   font-size: clamp(1.8rem, 2vw, 2.4rem);
-
   line-height: 1;
 }
 
 #spotify-status {
   margin-top: 4px;
-
   max-width: 420px;
-
   font-family: "vt323", sans-serif;
   font-size: clamp(1.15rem, 1.2vw, 1.45rem);
-
   line-height: 1;
-
   opacity: 0.55;
 }
 
-
-/* =========================================================
-   CONNECT BUTTON
-   ========================================================= */
-
+/* CONNECT BUTTON */
 #spotify-login {
   flex: 0 0 auto;
-
   min-width: 0;
-
   padding: 8px 14px;
-
   background:
-    linear-gradient(
-      to bottom,
-      #f8eac8 0%,
-      #f1dcae 55%,
-      #e7cb92 100%
-    );
-
+  linear-gradient(
+  to bottom,
+  #f8eac8 0%,
+  #f1dcae 55%,
+  #e7cb92 100%
+  );
   color: var(--text);
-
   border: 2px solid var(--text);
-
   border-radius: 0;
-
   font-family: "vt323", sans-serif;
   font-size: clamp(1rem, 1.1vw, 1.3rem);
-
   line-height: 1;
-
   box-shadow:
-    2px 2px 0 #7a5833,
-    3px 3px 0 rgba(47, 42, 36, 0.15);
-
+  2px 2px 0 #7a5833,
+  3px 3px 0 rgba(47, 42, 36, 0.15);
   cursor: pointer;
 }
 
 #spotify-login:hover {
   background:
-    linear-gradient(
-      to bottom,
-      #fff1d0 0%,
-      #f6e1b4 55%,
-      #ecd19a 100%
-    );
+  linear-gradient(
+  to bottom,
+  #fff1d0 0%,
+  #f6e1b4 55%,
+  #ecd19a 100%
+  );
 }
 
 #spotify-login:active {
   transform: translate(3px, 3px);
-
   box-shadow:
-    1px 1px 0 #7a5833;
+  1px 1px 0 #7a5833;
 }
 
-
-/* =========================================================
-   PLAYER
-   ========================================================= */
-
+/* PLAYER */
 .mini-player {
   flex: 1;
-
   width: 100%;
-
   min-width: 0;
   min-height: 0;
-
   display: grid;
-
-  grid-template-rows:
-    auto
-    minmax(0, 1fr)
-    auto
-    auto;
-
-  gap: 14px;
-
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 18px;
   padding-top: 14px;
 }
 
+/* PLAYLIST */
+/* SPOTIFY PLAYBACK — ART LEFT, CONTROLS RIGHT */
+.spotify-playback-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  gap: 24px;
+  align-items: center;
+  min-width: 0;
+  min-height: 0;
+}
 
-/* =========================================================
-   PLAYLIST
-   ========================================================= */
+.spotify-now-playing {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-width: 0;
+  min-height: 0;
+}
 
-.playlist-picker {
-  position: relative;
-
+.spotify-now-playing .track-info {
   width: 100%;
-
-  z-index: 5;
 }
 
-.playlist-button {
+.spotify-playback-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+  min-width: 0;
   width: 100%;
-
-  min-height: 56px;
-
-  padding: 10px 16px;
-
-  border: none;
-
-  border-radius: 10px;
-
-  background:
-    rgba(255, 255, 255, 0.76);
-
-  color: var(--text);
-
-  font-family: "vt323", sans-serif;
-  font-size: clamp(1.3rem, 1.4vw, 1.65rem);
-
-  text-align: left;
-
-  cursor: pointer;
 }
 
-.playlist-button::after {
-  content: "⌄";
-
-  float: right;
-
-  opacity: 0.45;
+#album-art[hidden],
+#album-placeholder[hidden] {
+  display: none;
 }
 
+/* PLAYLIST MENU */
 .playlist-menu {
   position: absolute;
-
   top: calc(100% + 8px);
-
-  left: 0;
   right: 0;
-
-  max-height: min(45vh, 400px);
-
+  left: auto;
+  width: min(360px, calc(100vw - 48px));
+  max-height: 300px;
+  box-sizing: border-box;
   overflow-y: auto;
-
   padding: 8px;
-
-  border-radius: 12px;
-
-  background:
-    rgba(250, 246, 236, 0.98);
-
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  background: #faf6ec;
   box-shadow:
-    0 12px 30px
-    rgba(47, 42, 36, 0.15);
-
+  4px 4px 0 rgba(79, 57, 38, 0.3);
   z-index: 20;
+}
+
+.playlist-menu[hidden] {
+  display: none;
 }
 
 .playlist-item {
   width: 100%;
-
   padding: 12px;
-
   border: none;
-
   border-radius: 8px;
-
   background: transparent;
-
   color: var(--text);
-
   font-family: "vt323", sans-serif;
   font-size: clamp(1.15rem, 1.25vw, 1.5rem);
-
   text-align: left;
-
   cursor: pointer;
 }
 
 .playlist-item:hover {
   background:
-    rgba(47, 42, 36, 0.08);
+  rgba(47, 42, 36, 0.08);
 }
 
-
-/* =========================================================
-   ALBUM ART
-   ========================================================= */
-
+/* ALBUM ART */
 .album-container {
   position: relative;
-
-  height: 100%;
-
-  min-height: 0;
-
+  width: min(100%, 210px);
+  max-height: 100%;
   aspect-ratio: 1 / 1;
-
-  justify-self: center;
-
+  flex: 0 1 auto;
   overflow: hidden;
-
   border-radius: 12px;
-
-  background:
-    rgba(47, 42, 36, 0.08);
+  background: rgba(47, 42, 36, 0.08);
 }
 
 #album-art {
   width: 100%;
   height: 100%;
-
   object-fit: cover;
-
   display: block;
 }
 
 #album-placeholder {
   position: absolute;
-
   inset: 0;
-
   display: flex;
-
   align-items: center;
   justify-content: center;
-
   text-align: center;
-
   opacity: 0.48;
 }
 
@@ -720,220 +526,254 @@
   font-size: clamp(4rem, 5vw, 6rem);
 }
 
-
-/* =========================================================
-   TRACK INFO
-   ========================================================= */
-
+/* TRACK INFO */
 .track-info {
   min-width: 0;
-
   text-align: center;
 }
 
 #track-name {
   font-family: "vt323", sans-serif;
   font-size: clamp(1.55rem, 1.8vw, 2.2rem);
-
   line-height: 1;
-
   white-space: nowrap;
-
   overflow: hidden;
-
   text-overflow: ellipsis;
 }
 
 #track-artist {
   margin-top: 6px;
-
   font-family: "vt323", sans-serif;
   font-size: clamp(1.2rem, 1.4vw, 1.65rem);
-
   opacity: 0.65;
-
   white-space: nowrap;
-
   overflow: hidden;
-
   text-overflow: ellipsis;
 }
 
-
-/* =========================================================
-   PLAYER CONTROLS
-   ========================================================= */
+/* PLAYER CONTROLS */
 
 .player-controls {
-  position: relative;
-
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 18px;
-
-  width: max-content;
-  margin-inline: auto;
+  width: 100%;
+  margin: 0;
 }
 
 .player-controls button {
-  width: clamp(58px, 4vw, 72px);
-  height: clamp(58px, 4vw, 72px);
+  width: clamp(88px, 6vw, 112px);
+  height: clamp(88px, 6vw, 112px);
 
   display: flex;
-
   align-items: center;
   justify-content: center;
 
   padding: 0;
 
-  border: none;
-
+  border: 3px solid var(--border);
   border-radius: 50%;
 
-  background:
-    rgba(255, 255, 255, 0.82);
+  background: #f8eac8;
+
+  box-shadow: 4px 4px 0 rgba(79, 57, 38, 0.3);
 
   cursor: pointer;
+
+  transition:
+    transform 0.1s,
+    box-shadow 0.1s,
+    background 0.1s;
 }
 
-.player-controls button:hover {
-  background:
-    rgba(255, 255, 255, 0.98);
+.player-controls button:hover:not(:disabled) {
+  background: #fff3d7;
+  transform: translateY(-2px);
+  box-shadow: 5px 6px 0 rgba(79, 57, 38, 0.25);
+}
+
+.player-controls button:active:not(:disabled) {
+  transform: translate(3px, 3px);
+  box-shadow: 1px 1px 0 rgba(79, 57, 38, 0.3);
+}
+
+.player-controls button:focus-visible {
+  outline: 3px solid var(--text);
+  outline-offset: 4px;
+}
+
+/* Make Play/Pause the primary control */
+.player-controls #play-pause {
+  width: clamp(104px, 7vw, 132px);
+  height: clamp(104px, 7vw, 132px);
 }
 
 .player-controls button img {
   width: 100%;
   height: 100%;
-
   object-fit: contain;
-
   image-rendering: pixelated;
 }
 
+.audio-controls #spotify-shuffle:focus-visible {
+  outline: 3px solid var(--border);
+  outline-offset: 4px;
+}
 
-/* =========================================================
-   QUOTE
-   ========================================================= */
-
-.journal > blockquote {
-  grid-column: 1 / -1;
-  grid-row: 2;
-
+.audio-controls {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 42px;
   width: 100%;
-  height: 100%;
+}
 
+.audio-controls #spotify-shuffle {
+  position: static;
+  transform: none;
   margin: 0;
+  padding: 0;
+  width: 90px;
+  height: auto;
+
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
 
   display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
 
+#volume-feedback[hidden] {
+  display: none;
+}
+
+
+.volume-controls {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  margin-top: 34px;
+}
+
+.volume-controls button {
+  width: 64px;
+  height: 64px;
+
+  display: flex;
   align-items: center;
   justify-content: center;
 
-  text-align: center;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
 
+  font-size: 3rem;
+  line-height: 1;
+
+  cursor: pointer;
+}
+
+.volume-controls button:hover {
+  transform: scale(1.1);
+}
+
+.volume-controls button:active {
+  transform: scale(0.92);
+}
+
+.volume-controls button:focus-visible {
+  outline: 3px solid var(--border);
+  outline-offset: 3px;
+}
+
+/* QUOTE */
+.journal > blockquote {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
   font-family: "vt323", sans-serif;
   font-size: clamp(1.45rem, 1.7vw, 2rem);
-
   font-style: italic;
 }
 
-/* =========================================================
-   HOME UPCOMING
-   ========================================================= */
 
-.home-upcoming-item {
-  margin-bottom: 6px;
-
-  line-height: 1.15;
-
-  display: flex;
-  align-items: baseline;
-  flex-wrap: nowrap;
-  gap: 4px;
-
+#app-version {
+  font-family: "vt323", sans-serif;
+  font-size: 1.25rem;
+  color: var(--text);
+  opacity: 0.55;
   white-space: nowrap;
 }
 
 
+/* HOME UPCOMING */
+.home-upcoming-item {
+  margin-bottom: 6px;
+  line-height: 1.15;
+  display: flex;
+  align-items: baseline;
+  flex-wrap: nowrap;
+  gap: 4px;
+  white-space: nowrap;
+}
+
 .home-upcoming-item:last-child {
   margin-bottom: 0;
 }
-
 
 .home-upcoming-date,
 .home-upcoming-time {
   white-space: nowrap;
 }
 
-
 .home-upcoming-separator {
   margin:
-    0
-    4px;
-
+  0
+  4px;
   opacity: 0.7;
 }
-
 
 .home-upcoming-title {
   font-weight: normal;
 }
 
-
 .home-upcoming-empty {
   opacity: 0.65;
 }
 
-
 .upcoming-see-all {
   text-decoration: none;
-
   color:
-    var(--text);
-
+  var(--text);
   cursor: pointer;
 }
-/* =========================================================
-   SHUFFLE SWITCH
-   ========================================================= */
 
-.player-controls #spotify-shuffle {
-  position: absolute;
-  left: calc(100% + 18px);
-  top: 50%;
-  transform: translateY(-50%);
+/* SHUFFLE SWITCH */
 
-  width: 78px;
-  height: 72px;
 
-  padding: 0;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 7px;
-
-  font-family: inherit;
-  font-size: 1.15rem;
-  color: var(--border, #7a5a3a);
-}
 #spotify-shuffle .shuffle-track {
   display: block;
   position: relative;
   box-sizing: border-box;
-
-  width: 48px;
-  height: 26px;
-
-  border: 2px solid #7a5a3a;
-  border-radius: 15px;
+  width: 72px;
+  height: 38px;
+  border: 3px solid #7a5a3a;
+  border-radius: 22px;
   background: #b9b3a7;
-
   transition: background 0.15s;
 }
 
@@ -941,11 +781,11 @@
   display: block;
   position: absolute;
 
-  left: 2px;
-  top: 2px;
+  left: 3px;
+  top: 3px;
 
-  width: 18px;
-  height: 18px;
+  width: 26px;
+  height: 26px;
 
   border-radius: 50%;
   background: #fff8ed;
@@ -958,7 +798,7 @@
 }
 
 #spotify-shuffle[aria-checked="true"] .shuffle-thumb {
-  transform: translateX(22px);
+  transform: translateX(33px);
 }
 
 #spotify-shuffle:disabled {
@@ -974,15 +814,184 @@
 }
 
 /* Spotify connection button */
-
 #spotify-login[data-connected="true"],
 #spotify-login[data-connected="true"]:hover,
 #spotify-login[data-connected="true"]:active {
   background: #dce4cf;
   color: #586449;
   border-color: #788367;
-
   opacity: 1;
   cursor: default;
   transform: none;
+}
+
+/* BEDROOM HOME — LEFT COLUMN */
+/* Hide old Home panels without removing their
+elements or breaking existing JavaScript. */
+.orientation > .weather-panel,
+.orientation > .upcoming-panel {
+  display: none;
+}
+
+/* MORNING ROUTINE */
+.morning-panel {
+  min-width: 0;
+  min-height: 0;
+  padding: 24px 30px;
+  overflow: hidden;
+}
+
+.morning-title {
+  font-family: "vt323", sans-serif;
+  font-size: clamp(2rem, 2.4vw, 3rem);
+  line-height: 1;
+  margin-bottom: 24px;
+}
+
+.morning-list {
+  margin: 0;
+  padding-left: 1.4em;
+  font-family: "vt323", sans-serif;
+  font-size: clamp(1.8rem, 2vw, 2.6rem);
+  line-height: 1.25;
+}
+
+.morning-list li {
+  padding-left: 8px;
+  margin-bottom: 10px;
+}
+
+.morning-list li::marker {
+  color: #779454;
+}
+
+/* SPOTIFY MOOD BUTTONS */
+.spotify-moods {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  min-width: 0;
+}
+
+.mood-button {
+  min-width: 0;
+  min-height: 100px;
+  padding: 12px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 3px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-family: "vt323", sans-serif;
+  font-size: clamp(1.5rem, 1.8vw, 2rem);
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 4px 4px 0 rgba(79, 57, 38, 0.3);
+}
+
+.mood-icon {
+  font-family: sans-serif;
+  font-size: clamp(2.4rem, 3vw, 3.5rem);
+  line-height: 1;
+}
+
+.mood-morning {
+  background: #f0cc80;
+}
+
+.mood-focus {
+  background: #bad1bd;
+}
+
+.mood-winddown {
+  background: #bfc4df;
+}
+
+.mood-button:hover {
+  filter: brightness(1.08);
+}
+
+.mood-button:active {
+  transform: translate(3px, 3px);
+  box-shadow: 1px 1px 0 rgba(79, 57, 38, 0.3);
+}
+
+.mood-button:focus-visible {
+  outline: 3px solid var(--text);
+  outline-offset: 4px;
+}
+
+.spotify-selection {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 92px;
+  gap: 14px;
+  align-items: stretch;
+  width: 100%;
+}
+
+.playlist-picker {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  justify-content: stretch;
+  width: 100%;
+  min-width: 0;
+}
+
+.playlist-button {
+  width: 100%;
+  height: 100%;
+  min-height: 100px;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 3px solid var(--border);
+  border-radius: 8px;
+  background: var(--tab);
+  color: var(--text);
+  font-family: Arial, sans-serif;
+  font-size: 3rem;
+  font-weight: bold;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 3px 3px 0 rgba(79, 57, 38, 0.3);
+}
+
+.playlist-button:hover {
+  filter: brightness(1.08);
+}
+
+.playlist-button:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 rgba(79, 57, 38, 0.3);
+}
+
+
+/* TEMPORARY VOLUME INDICATOR */
+
+#volume-feedback {
+  width: 220px;
+  height: 12px;
+
+  overflow: hidden;
+
+  border: 2px solid var(--border);
+  border-radius: 20px;
+  background: rgba(47, 42, 36, 0.15);
+}
+
+#volume-level {
+  width: 80%;
+  height: 100%;
+  background: #779454;
+  transition: width 0.15s ease;
+}
+
+#volume-feedback[hidden] {
+  display: none;
 }
