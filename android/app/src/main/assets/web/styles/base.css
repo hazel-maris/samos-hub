@@ -9,7 +9,7 @@
    ========================================================= */
 
 @font-face {
-  font-family: "VT323";
+  font-family: "vt323";
   src: url("../fonts/vt323-latin-400-normal.woff2") format("woff2");
   font-weight: 400;
   font-style: normal;
@@ -75,7 +75,7 @@ body {
 
   overflow: hidden;
 
-  font-family: "VT323", sans-serif;
+  font-family: "vt323", sans-serif;
   color: var(--text);
 
   background-color: #e4d4b8;
@@ -156,7 +156,7 @@ body {
 
   padding: 10px 18px;
 
-  font-family: "VT323", sans-serif;
+  font-family: "vt323", sans-serif;
   font-size: clamp(1.1rem, 1.4vw, 1.5rem);
 
   color: var(--text);
