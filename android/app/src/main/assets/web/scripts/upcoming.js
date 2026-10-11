@@ -3297,7 +3297,7 @@ function samosSetExternalKeyboardMode(root = document) {
   root.querySelectorAll?.(
     "#upcoming-title, #upcoming-date, #upcoming-time, .upcoming-edit-title, .upcoming-edit-date, .upcoming-edit-time"
   ).forEach(input => {
-    input.setAttribute("inputmode", "none");
+    // input.setAttribute("inputmode", "none");
     input.setAttribute("autocomplete", "off");
   });
 }

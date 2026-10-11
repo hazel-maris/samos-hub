@@ -318,7 +318,7 @@ window.samosHandleExternalMouse = (
     return true;
   }
 
-  if (target.matches("input")) {
+  /* if (target.matches("input")) {
     // inputmode=none keeps Android's soft keyboard out of the way,
     // while a physical/Bluetooth keyboard can still type into the field.
     if (
@@ -328,7 +328,7 @@ window.samosHandleExternalMouse = (
     }
     target.focus({ preventScroll: true });
     return true;
-  }
+  } */
 
   // Native <select> elements are upgraded to SamOS menus on Upcoming.
   // If another select remains, focus it but don't depend on a synthetic
