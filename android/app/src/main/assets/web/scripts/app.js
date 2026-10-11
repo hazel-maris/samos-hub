@@ -58,78 +58,58 @@ function setSetting(
   );
 }
 
+ // ============================================================
+ // SERVICE WORKER — REMOVE LEGACY REGISTRATION
+ // ============================================================
 
-// ============================================================
-// SERVICE WORKER
-// ============================================================
+ // SamOS Hub no longer uses a service worker.
+ // Remove any previously registered SamOS worker
+ // and its old file caches without deleting user data.
 
-const isLocalDevelopment =
-  window.location.hostname ===
-    "127.0.0.1" ||
-  window.location.hostname ===
-    "localhost";
+ if ("serviceWorker" in navigator) {
+   window.addEventListener("load", async () => {
+     try {
+       const registrations =
+         await navigator.serviceWorker.getRegistrations();
 
+       const appPath = window.location.pathname
+         .replace(/\/[^/]*$/, "/");
 
-if (
-  "serviceWorker"
-  in navigator
-) {
-  if (isLocalDevelopment) {
-    navigator.serviceWorker
-      .getRegistrations()
+       for (const registration of registrations) {
+         const scope = new URL(registration.scope);
 
-      .then(
-        registrations => {
-          registrations.forEach(
-            registration => {
-              registration.unregister();
-            }
-          );
-        }
-      );
+         if (
+           scope.origin === window.location.origin &&
+           scope.pathname === appPath
+         ) {
+           await registration.unregister();
+           console.log(
+             "SamOS: legacy service worker removed"
+           );
+         }
+       }
 
+       if ("caches" in window) {
+         const cacheNames = await caches.keys();
 
-    if (
-      "caches"
-      in window
-    ) {
-      caches
-        .keys()
+         await Promise.all(
+           cacheNames
+             .filter(name =>
+               name.startsWith("samos-hub-")
+             )
+             .map(name => caches.delete(name))
+         );
+       }
 
-        .then(
-          cacheNames => {
-            cacheNames.forEach(
-              cacheName => {
-                caches.delete(
-                  cacheName
-                );
-              }
-            );
-          }
-        );
-    }
-  }
-
-  else {
-    const root =
-      document.body.dataset.root ||
-      ".";
-
-    navigator.serviceWorker
-      .register(
-        `${root}/service-worker.js`
-      )
-
-      .catch(
-        error => {
-          console.error(
-            "Service worker registration failed:",
-            error
-          );
-        }
-      );
-  }
-}
+       console.log("SamOS: legacy caches cleared");
+     } catch (error) {
+       console.warn(
+         "SamOS: cleanup failed",
+         error
+       );
+     }
+   });
+ }
 
 // ============================================================
 // SUPABASE

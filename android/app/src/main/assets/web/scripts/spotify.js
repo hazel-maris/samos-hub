@@ -25,6 +25,20 @@ const SPOTIFY_SCOPES = [
 ];
 
 let selectedPlaylistUri = null;
+
+
+/* ============================================================
+   MOOD PLAYLISTS
+   ============================================================ */
+
+const MOOD_PLAYLISTS = {
+  morning: "https://open.spotify.com/playlist/1Uj2sAGxr2SGat3RlpMFiS?si=Q7p4UyVhRUau6ehos_7M0g",
+  focus: null,
+  winddown: null
+};
+
+const spotifyPlaylistLookup = new Map();
+
 let spotifyPlaybackPoll = null;
 let spotifyIsPlaying = false;
 
@@ -266,6 +280,72 @@ async function connectHubPlayer() {
 
   return spotifyPlayerReady;
 }
+
+
+/* =========================================================
+   SPOTIFY VOLUME CONTROLS
+   ========================================================= */
+
+let previousSpotifyVolume = 0.8;
+let spotifyVolumeFeedbackTimer = null;
+
+async function changeSpotifyVolume(action) {
+  if (!spotifyPlayer || !spotifyDeviceId) {
+    setSpotifyStatus("Spotify player is not ready");
+    return;
+  }
+
+  try {
+    const current = await spotifyPlayer.getVolume();
+    let next = current;
+
+    if (action === "up") {
+      next = Math.min(1, current + 0.1);
+    }
+
+    if (action === "down") {
+      next = Math.max(0, current - 0.1);
+    }
+
+    if (action === "mute") {
+      if (current > 0) {
+        previousSpotifyVolume = current;
+        next = 0;
+      } else {
+        next = previousSpotifyVolume || 0.8;
+      }
+    }
+
+    next = Math.round(next * 100) / 100;
+
+    await spotifyPlayer.setVolume(next);
+
+    showSpotifyVolumeFeedback(next);
+  } catch (error) {
+    console.error("Spotify volume error:", error);
+    setSpotifyStatus("Could not change volume");
+  }
+}
+
+function showSpotifyVolumeFeedback(volume) {
+  const feedback = document.getElementById("volume-feedback");
+  const level = document.getElementById("volume-level");
+
+  if (!feedback || !level) return;
+
+  const percentage = Math.round(volume * 100);
+
+  level.style.width = `${percentage}%`;
+
+  feedback.hidden = false;
+
+  clearTimeout(spotifyVolumeFeedbackTimer);
+
+  spotifyVolumeFeedbackTimer = setTimeout(() => {
+    feedback.hidden = true;
+  }, 1800);
+}
+
 
 
 function activateHubAudio() {
@@ -971,6 +1051,13 @@ async function loadPlaylists() {
         continue;
       }
 
+    
+    spotifyPlaylistLookup.set(
+      playlist.uri,
+      playlist
+    );
+
+
       const item =
         document.createElement("button");
 
@@ -1336,6 +1423,61 @@ shuffleButton.addEventListener("click", () => {
     renderShuffleButton();
   });
 });
+
+
+/* ============================================================
+   MOOD BUTTON CONTROLS
+   ============================================================ */
+
+async function playMoodPlaylist(mood) {
+  const playlistUri = MOOD_PLAYLISTS[mood];
+
+  if (!playlistUri) {
+    setSpotifyStatus(
+      `No playlist assigned to ${mood} yet`
+    );
+    return;
+  }
+
+  await startPlaylist(playlistUri);
+}
+
+document.getElementById("mood-morning")
+  ?.addEventListener("click", () => {
+    playMoodPlaylist("morning");
+  });
+
+document.getElementById("mood-focus")
+  ?.addEventListener("click", () => {
+    playMoodPlaylist("focus");
+  });
+
+document.getElementById("mood-winddown")
+  ?.addEventListener("click", () => {
+    playMoodPlaylist("winddown");
+  });
+
+
+/* =========================================================
+   VOLUME BUTTON EVENTS
+   ========================================================= */
+
+document.getElementById("volume-mute")
+  ?.addEventListener("click", () => {
+    changeSpotifyVolume("mute");
+  });
+
+document.getElementById("volume-down")
+  ?.addEventListener("click", () => {
+    changeSpotifyVolume("down");
+  });
+
+document.getElementById("volume-up")
+  ?.addEventListener("click", () => {
+    changeSpotifyVolume("up");
+  });
+
+
 
 renderShuffleButton();
 updateSpotifyControlAvailability();
