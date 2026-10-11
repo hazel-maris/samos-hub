@@ -1,3 +1,30 @@
+
+ // SamOS Hub — Service Worker Retirement
+
+ self.addEventListener("install", event => {
+   self.skipWaiting();
+ });
+
+ self.addEventListener("activate", event => {
+   event.waitUntil(
+     (async () => {
+       const keys = await caches.keys();
+
+       await Promise.all(
+         keys
+           .filter(name =>
+             name.startsWith("samos-hub-")
+           )
+           .map(name => caches.delete(name))
+       );
+
+       await self.clients.claim();
+       await self.registration.unregister();
+     })()
+   );
+ });
+
+/* 
 const CACHE = "samos-hub-reset-v1";
 
 const STATIC_FILES = [
@@ -57,3 +84,4 @@ self.addEventListener("fetch", event => {
     )
   );
 });
+ */
