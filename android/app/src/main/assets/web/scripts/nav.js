@@ -235,20 +235,3 @@ function setupPersistentNavigation() {
 
 
 }
-
-
-// Suppress the software keyboard without blocking physical keyboard input.
-function samosConfigureKeyboard(root = document) {
-  root.querySelectorAll?.("input:not([type=checkbox]):not([type=radio]):not([type=file]), textarea")
-    .forEach(input => input.setAttribute("inputmode", "none"));
-}
-samosConfigureKeyboard();
-new MutationObserver(mutations => {
-  for (const mutation of mutations) {
-    for (const node of mutation.addedNodes) {
-      if (!(node instanceof Element)) continue;
-      if (node.matches("input, textarea")) node.setAttribute("inputmode", "none");
-      samosConfigureKeyboard(node);
-    }
-  }
-}).observe(document.body, { childList: true, subtree: true });

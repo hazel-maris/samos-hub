@@ -318,17 +318,10 @@ window.samosHandleExternalMouse = (
     return true;
   }
 
-  /* if (target.matches("input")) {
-    // inputmode=none keeps Android's soft keyboard out of the way,
-    // while a physical/Bluetooth keyboard can still type into the field.
-    if (
-      target.matches("#upcoming-date, #upcoming-time, .upcoming-edit-date, .upcoming-edit-time")
-    ) {
-      target.setAttribute("inputmode", "none");
-    }
-    target.focus({ preventScroll: true });
-    return true;
-  } */
+if (target.matches("input")) {
+  target.focus({ preventScroll: true });
+  return true;
+}
 
   // Native <select> elements are upgraded to SamOS menus on Upcoming.
   // If another select remains, focus it but don't depend on a synthetic
