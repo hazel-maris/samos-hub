@@ -427,3 +427,58 @@
   }
 
 }
+
+/* ============================================================
+   SamOS Hub — compact mobile letter tabs
+   Append to the END of styles/mobile.css.
+   Uses existing .journal-tab data-page attributes: no JS changes.
+   ============================================================ */
+@media (max-width: 600px) {
+  /* Existing navigation wrapper, regardless of its underlying element. */
+  #nav-container {
+    width: 100%;
+    min-width: 0;
+  }
+
+  /* Make links themselves fixed-size tabs instead of their desktop text width. */
+  #nav-container .journal-tab {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    min-width: 38px;
+    max-width: 38px;
+    height: 38px;
+    min-height: 38px;
+    box-sizing: border-box;
+    padding: 0;
+    margin-right: 3px;
+    font-size: 0 !important; /* hide rendered text, preserve accessible name */
+    line-height: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-decoration: none;
+    vertical-align: bottom;
+  }
+
+  #nav-container .journal-tab::after {
+    display: block;
+    font-size: 17px;
+    line-height: 1;
+    font-weight: 700;
+    color: inherit;
+  }
+
+  #nav-container .journal-tab[data-page="home"]::after { content: "H"; }
+  #nav-container .journal-tab[data-page="upcoming"]::after { content: "U"; }
+  #nav-container .journal-tab[data-page="groceries"]::after { content: "G"; }
+  #nav-container .journal-tab[data-page="quotes"]::after { content: "Q"; }
+  #nav-container .journal-tab[data-page="settings"]::after { content: "S"; }
+
+  /* Preserve normal focus visibility for keyboard navigation. */
+  #nav-container .journal-tab:focus-visible {
+    outline: 2px solid #617548;
+    outline-offset: 2px;
+  }
+}
