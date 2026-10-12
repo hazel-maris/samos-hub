@@ -1,25 +1,14 @@
+
+$ErrorActionPreference = "Stop"
+
+# ============================================================
+# SamOS Hub — Web Asset Sync
+# ============================================================
+
 $source = "C:\Projects\samos-hub"
-$dest   = "C:\Projects\samos-hub\android\app\src\main\assets\web"
+$dest = Join-Path $source "android\app\src\main\assets\web"
 
-Write-Host ""
-Write-Host "Syncing SamOS web files..." -ForegroundColor Cyan
-
-
-# ============================================================
-# CLEAN OLD WEB ASSETS
-# ============================================================
-
-if (Test-Path $dest) {
-    Remove-Item $dest -Recurse -Force
-}
-
-New-Item -ItemType Directory -Force -Path $dest | Out-Null
-
-
-# ============================================================
-# ROOT FILES
-# ============================================================
-
+# Root-level files to include in the APK
 $files = @(
     "index.html",
     "config.js",
@@ -30,62 +19,113 @@ $files = @(
     "icon-512.png"
 )
 
+# Web asset directories
+$folders = @(
+    "components",
+    "data",
+    "fonts",
+    "html",
+    "icons",
+    "scripts",
+    "styles"
+)
+
+Write-Host "`nSyncing SamOS web files..." -ForegroundColor Cyan
+
+# ============================================================
+# VALIDATE SOURCE
+# ============================================================
+
+if (-not (Test-Path -LiteralPath $source -PathType Container)) {
+    throw "Source directory not found: $source"
+}
 
 foreach ($file in $files) {
-    $sourceFile =
-        Join-Path $source $file
+    $path = Join-Path $source $file
 
-    if (Test-Path $sourceFile) {
-        Copy-Item `
-            $sourceFile `
-            (Join-Path $dest $file) `
-            -Force
+    if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
+        throw "Required file missing: $path"
+    }
+}
+
+foreach ($folder in $folders) {
+    $path = Join-Path $source $folder
+
+    if (-not (Test-Path -LiteralPath $path -PathType Container)) {
+        throw "Required folder missing: $path"
+    }
+}
+
+# ============================================================
+# PREPARE STAGING AREA
+# ============================================================
+
+$parent = Split-Path $dest -Parent
+New-Item -ItemType Directory -Force -Path $parent | Out-Null
+
+$stage = Join-Path $parent ("web-stage-" + [guid]::NewGuid().ToString("N"))
+$backup = Join-Path $parent ("web-backup-" + [guid]::NewGuid().ToString("N"))
+
+New-Item -ItemType Directory -Path $stage | Out-Null
+
+try {
+    # ========================================================
+    # COPY ROOT FILES
+    # ========================================================
+
+    foreach ($file in $files) {
+        Copy-Item -LiteralPath (Join-Path $source $file) `
+            -Destination (Join-Path $stage $file) -Force
 
         Write-Host "  copied $file"
     }
-    else {
-        Write-Host "  missing $file" -ForegroundColor Yellow
-    }
-}
 
+    # ========================================================
+    # COPY WEB FOLDERS
+    # ========================================================
 
-# ============================================================
-# WEB FOLDERS
-# ============================================================
-
-$folders = @(
-    "components",
-    "html",
-    "scripts",
-    "styles",
-    "icons",
-    "fonts"
-)
-
-
-foreach ($folder in $folders) {
-    $sourceFolder =
-        Join-Path $source $folder
-
-    $destFolder =
-        Join-Path $dest $folder
-
-
-    if (Test-Path $sourceFolder) {
-        Copy-Item `
-            $sourceFolder `
-            $destFolder `
-            -Recurse `
-            -Force
+    foreach ($folder in $folders) {
+        Copy-Item -LiteralPath (Join-Path $source $folder) `
+            -Destination (Join-Path $stage $folder) `
+            -Recurse -Force
 
         Write-Host "  copied $folder\"
     }
-    else {
-        Write-Host "  missing $folder\" -ForegroundColor Yellow
+
+    # ========================================================
+    # REPLACE DESTINATION
+    # ========================================================
+
+    $hadPrevious = Test-Path -LiteralPath $dest
+
+    if ($hadPrevious) {
+        Move-Item -LiteralPath $dest -Destination $backup
+    }
+
+    try {
+        Move-Item -LiteralPath $stage -Destination $dest
+    }
+    catch {
+        if ($hadPrevious -and
+            (Test-Path -LiteralPath $backup) -and
+            -not (Test-Path -LiteralPath $dest)) {
+
+            Move-Item -LiteralPath $backup -Destination $dest
+        }
+
+        throw
+    }
+
+    # Remove backup after successful replacement
+    if (Test-Path -LiteralPath $backup) {
+        Remove-Item -LiteralPath $backup -Recurse -Force
+    }
+
+    Write-Host "`nSamOS web sync complete." -ForegroundColor Green
+}
+finally {
+    # Clean up unfinished staging
+    if (Test-Path -LiteralPath $stage) {
+        Remove-Item -LiteralPath $stage -Recurse -Force
     }
 }
-
-
-Write-Host ""
-Write-Host "SamOS web sync complete." -ForegroundColor Green
-Write-Host ""

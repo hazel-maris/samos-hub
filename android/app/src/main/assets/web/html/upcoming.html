@@ -1,1235 +1,343 @@
-<!doctype html>
-
+<!DOCTYPE html>
 <html lang="en">
-
-
-
-<head>
-
-  <meta charset="utf-8">
-
-
-
-  <meta
-
-    name="viewport"
-
-    content="width=device-width, initial-scale=1, viewport-fit=cover"
-
-  >
-
-
-
-  <meta
-
-    name="theme-color"
-
-    content="#e4d4b8"
-
-  >
-
-
-
-  <title>
-
-    SamOS Hub · Upcoming
-
-  </title>
-
-
-
-  <link
-
-    rel="manifest"
-
-    href="../manifest.webmanifest"
-
-  >
-
-
-
-  <link
-
-    rel="stylesheet"
-
-    href="../styles/base.css"
-
-  >
-
-
-
-  <link
-
-    rel="stylesheet"
-
-    href="../styles/upcoming.css"
-
-  >
-
-
-
-  <link
-
-    rel="stylesheet"
-
-    href="../styles/mobile.css"
-
-  >
-
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1, viewport-fit=cover" name="viewport"/>
+  <meta content="#e4d4b8" name="theme-color"/>
+  <title>
+   SamOS Hub &middot; Upcoming
+  </title>
+  <link href="../manifest.webmanifest" rel="manifest"/>
+  <link href="../styles/base.css" rel="stylesheet"/>
+  <link href="../styles/upcoming.css" rel="stylesheet"/>
+  <link href="../styles/mobile.css" rel="stylesheet"/>
   <style>
-    /* Upcoming opens task-first; expand the existing Add Item form as needed. */
-    .upcoming-add-section > summary {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      cursor: pointer;
-      list-style: none;
-      user-select: none;
-    }
-    .upcoming-add-section > summary::-webkit-details-marker { display: none; }
-    .upcoming-add-chevron { font-size: 1.25em; line-height: 1; }
-    .upcoming-add-section[open] .upcoming-add-chevron { transform: rotate(180deg); }
-    .upcoming-add-section > summary:focus-visible {
-      outline: 2px solid var(--border, #7a5a3a);
-      outline-offset: 4px;
-    }
+   /* Collapsible Add Item panel — uses a button for iOS compatibility. */
+   .upcoming-add-toggle {
+     display: flex;
+     align-items: center;
+     justify-content: space-between;
+     width: 100%;
+     gap: 12px;
+     cursor: pointer;
+     text-align: left;
+     color: inherit;
+     font: inherit;
+     background: transparent;
+     border: 0;
+     padding: 0;
+     -webkit-appearance: none;
+     appearance: none;
+     touch-action: manipulation;
+   }
+   .upcoming-add-chevron { font-size: 1.25em; line-height: 1; }
+   .upcoming-add-toggle[aria-expanded="true"] .upcoming-add-chevron { transform: rotate(180deg); }
+   .upcoming-add-toggle:focus-visible {
+     outline: 2px solid var(--border, #7a5a3a);
+     outline-offset: 4px;
+   }
+   #upcoming-add-panel[hidden] { display: none !important; }
   </style>
-</head>
-
-
-
-
-
-<body data-root="..">
-
-
-
-  <main class="home">
-
-
-
-
-
-    <!-- =====================================================
-
-         DELETE CONFIRMATION
-
-         ===================================================== -->
-
-
-
-    <div
-
-      id="delete-confirm-overlay"
-
-      class="delete-confirm-overlay"
-
-      hidden
-
-    >
-
-
-
-      <div class="delete-confirm-box">
-
-
-
-        <div class="delete-confirm-title">
-
-          Delete item?
-
-        </div>
-
-
-
-
-
-        <div
-
-          id="delete-confirm-name"
-
-          class="delete-confirm-name"
-
-        ></div>
-
-
-
-
-
-        <div class="delete-confirm-actions">
-
-
-
-          <button
-
-            id="delete-cancel"
-
-            type="button"
-
-          >
-
-            Cancel
-
-          </button>
-
-
-
-
-
-          <button
-
-            id="delete-confirm"
-
-            type="button"
-
-          >
-
-            Delete
-
-          </button>
-
-
-
-        </div>
-
-
-
-      </div>
-
-
-
-    </div>
-
-
-
-<!-- =====================================================
-
-     TIME PICKER
-
-     ===================================================== -->
-
-
-
-<div
-
-  id="time-overlay"
-
-  class="time-overlay"
-
-  hidden
-
->
-
-
-
-  <div
-
-    class="time-box"
-
-    role="dialog"
-
-    aria-modal="true"
-
-    aria-label="Choose time"
-
-  >
-
-
-
-    <div class="time-picker-title">
-
-      Choose Time
-
-    </div>
-
-
-
-
-
-    <div class="time-picker-mode">
-
-
-
-      <button
-
-        id="time-mode-hour"
-
-        class="time-mode-button active"
-
-        type="button"
-
-      >
-
-        Hour
-
-      </button>
-
-
-
-      <button
-
-        id="time-mode-minute"
-
-        class="time-mode-button"
-
-        type="button"
-
-      >
-
-        Minute
-
-      </button>
-
-
-
-    </div>
-
-
-
-
-
-    <div
-
-      id="time-clock-face"
-
-      class="time-clock-face"
-
-    ></div>
-
-
-
-
-
-    <div
-
-      id="time-minute-adjust"
-
-      class="time-minute-adjust"
-
-      hidden
-
-    >
-
-
-
-      <button
-
-        id="time-minute-minus"
-
-        type="button"
-
-        aria-label="Previous minute"
-
-      >
-
-        −
-
-      </button>
-
-
-
-      <div
-
-        id="time-exact-minute"
-
-        class="time-exact-minute"
-
-      >
-
-        00
-
-      </div>
-
-
-
-      <button
-
-        id="time-minute-plus"
-
-        type="button"
-
-        aria-label="Next minute"
-
-      >
-
-        +
-
-      </button>
-
-
-
-    </div>
-
-
-
-
-
-    <div class="time-period-row">
-
-
-
-      <button
-
-        id="time-am"
-
-        class="time-period-button"
-
-        type="button"
-
-      >
-
-        AM
-
-      </button>
-
-
-
-      <button
-
-        id="time-pm"
-
-        class="time-period-button"
-
-        type="button"
-
-      >
-
-        PM
-
-      </button>
-
-
-
-    </div>
-
-
-
-
-
-    <div
-
-      id="time-preview"
-
-      class="time-preview"
-
-    >
-
-      12:00 PM
-
-    </div>
-
-
-
-
-
-    <div class="time-picker-actions">
-
-
-
-      <button
-
-        id="time-cancel"
-
-        type="button"
-
-      >
-
-        Cancel
-
-      </button>
-
-
-
-      <button
-
-        id="time-done"
-
-        type="button"
-
-      >
-
-        Done
-
-      </button>
-
-
-
-    </div>
-
-
-
-  </div>
-
-
-
-</div>
-
-
-
-
-
-    <!-- =====================================================
-
-         CALENDAR PICKER
-
-         ===================================================== -->
-
-
-
-    <div
-
-      id="calendar-overlay"
-
-      class="calendar-overlay"
-
-      hidden
-
-    >
-
-
-
-      <div
-
-        class="calendar-box"
-
-        role="dialog"
-
-        aria-modal="true"
-
-        aria-label="Choose date"
-
-      >
-
-
-
-        <div class="calendar-top-row">
-
-
-
-          <button
-
-            id="calendar-prev"
-
-            class="calendar-nav-button"
-
-            type="button"
-
-            aria-label="Previous month"
-
-          >
-
-            &lt;
-
-          </button>
-
-
-
-
-
-          <div
-
-            id="calendar-heading"
-
-            class="calendar-heading"
-
-          >
-
-            October 2026
-
-          </div>
-
-
-
-
-
-          <button
-
-            id="calendar-next"
-
-            class="calendar-nav-button"
-
-            type="button"
-
-            aria-label="Next month"
-
-          >
-
-            &gt;
-
-          </button>
-
-
-
-        </div>
-
-
-
-
-
-        <div class="calendar-controls">
-
-
-
-          <label>
-
-
-
-            <span>
-
-              Month
-
-            </span>
-
-
-
-            <select
-
-              id="calendar-month"
-
-            ></select>
-
-
-
-          </label>
-
-
-
-
-
-          <label>
-
-
-
-            <span>
-
-              Year
-
-            </span>
-
-
-
-            <select
-
-            id="calendar-year"
-
-            ></select>
-
-
-
-          </label>
-
-
-
-
-
-          <button
-
-            id="calendar-today"
-
-            type="button"
-
-          >
-
-            Today
-
-          </button>
-
-
-
-        </div>
-
-
-
-
-
-        <div class="calendar-weekdays">
-
-
-
-          <span>Sun</span>
-
-          <span>Mon</span>
-
-          <span>Tue</span>
-
-          <span>Wed</span>
-
-          <span>Thu</span>
-
-          <span>Fri</span>
-
-          <span>Sat</span>
-
-
-
-        </div>
-
-
-
-
-
-        <div
-
-          id="calendar-grid"
-
-          class="calendar-grid"
-
-        ></div>
-
-
-
-
-
-        <div class="calendar-bottom-row">
-
-
-
-          <button
-
-            id="calendar-cancel"
-
-            type="button"
-
-          >
-
-            Cancel
-
-          </button>
-
-
-
-        </div>
-
-
-
-      </div>
-
-
-
-    </div>
-
-
-
-
-
-    <!-- =====================================================
-
-         MAIN JOURNAL
-
-         ===================================================== -->
-
-
-
-    <section class="journal-shell">
-
-
-
-      <div id="nav-container"></div>
-
-
-
-
-
-      <section class="journal upcoming-journal">
-
-
-
-        <section class="upcoming-area">
-
-
-
-          <div class="game-panel upcoming-page-panel">
-
-
-
-            <div class="upcoming-page-title">
-
-              Upcoming
-
-            </div>
-
-
-
-
-
-            <!-- =================================================
-
-                 ADD ITEM
-
-                 ================================================= -->
-
-
-
-            <details class="upcoming-add-section" id="upcoming-add-details">
-
-
-
-              <summary class="upcoming-section-title upcoming-add-toggle">Add Item <span class="upcoming-add-chevron" aria-hidden="true">▾</span></summary>
-
-
-
-
-
-            <div class="upcoming-form">
-
-
-
-
-
-            <!-- TITLE -->
-
-
-
-            <label class="upcoming-field">
-
-
-
-                <span>
-
-                Title
-
-                </span>
-
-
-
-                <input
-
-                id="upcoming-title"
-
-                type="text"
-
-                placeholder="What’s coming up?"
-
-                autocomplete="off"
-
-                >
-
-
-
-            </label>
-
-
-
-
-
-            <!-- DATE -->
-
-
-
-            <label class="upcoming-field">
-
-
-
-                <span>
-
-                Date
-
-                </span>
-
-
-
-                <div class="date-input-wrap">
-
-
-
-                <input
-
-                    id="upcoming-date"
-
-                    type="text"
-
-                    inputmode="numeric"
-
-                    maxlength="10"
-
-                    placeholder="MM/DD/YYYY"
-
-                    autocomplete="off"
-
-                >
-
-
-
-                <button
-
-                    class="date-picker-button"
-
-                    type="button"
-
-                    data-date-target="upcoming-date"
-
-                    aria-label="Open calendar"
-
-                    title="Open calendar"
-
-                >
-
-                    ▦
-
-                </button>
-
-
-
-                </div>
-
-
-
-            </label>
-
-
-
-
-
-            <!-- TIME -->
-
-
-
-            <label class="upcoming-field">
-
-
-
-                <span>
-
-                Time
-
-                </span>
-
-
-
-                <div class="time-input-wrap">
-
-
-
-                <input
-
-                    id="upcoming-time"
-
-                    type="text"
-
-                    inputmode="text"
-
-                    placeholder="3:30 PM"
-
-                    autocomplete="off"
-
-                >
-
-
-
-                <button
-
-                    class="time-picker-button"
-
-                    type="button"
-
-                    data-time-target="upcoming-time"
-
-                    aria-label="Open time picker"
-
-                    title="Open time picker"
-
-                >
-
-                    ◷
-
-                </button>
-
-
-
-                </div>
-
-
-
-            </label>
-
-
-
-
-
-            <!-- TYPE -->
-
-
-
-            <label class="upcoming-field">
-
-
-
-                <span>
-
-                Type
-
-                </span>
-
-
-
-                <select id="upcoming-type">
-
-
-
-                <option value="task">
-
-                    Task
-
-                </option>
-
-
-
-                <option value="event">
-
-                    Event
-
-                </option>
-
-
-
-                <option value="appointment">
-
-                    Appointment
-
-                </option>
-
-
-
-                </select>
-
-
-
-            </label>
-
-
-
-
-
-            <!-- REPEATS -->
-
-
-
-            <label class="upcoming-field">
-
-
-
-                <span>
-
-                Repeats
-
-                </span>
-
-
-
-                <select id="upcoming-recurrence">
-
-
-
-                <option value="">
-
-                    Does not repeat
-
-                </option>
-
-
-
-                <option value="daily">
-
-                    Daily
-
-                </option>
-
-
-
-                <option value="weekly">
-
-                    Weekly
-
-                </option>
-
-
-
-                <option value="monthly">
-
-                    Monthly
-
-                </option>
-
-
-
-                <option value="yearly">
-
-                    Yearly
-
-                </option>
-
-
-
-                </select>
-
-
-
-            </label>
-
-
-
-
-
-            <!-- ADD -->
-
-
-
-            <button
-
-                id="upcoming-add"
-
-                type="button"
-
-            >
-
-                Add
-
-            </button>
-
-
-
-
-
-            <div
-
-                id="upcoming-form-status"
-
-                class="upcoming-form-status"
-
-            ></div>
-
-
-
-            </div>
-
-
-
-            </details>
-
-
-
-
-
-            <!-- =================================================
-
-                 UPCOMING ITEMS
-
-                 ================================================= -->
-
-
-
-            <div class="upcoming-section-title">
-
-              Upcoming Items
-
-            </div>
-
-
-
-
-
-            <div id="upcoming-list">
-
-              Loading...
-
-            </div>
-
-
-
-          </div>
-
-
-
-        </section>
-
-
-
-      </section>
-
-
-
-    </section>
-
-
-
-  </main>
-
-
-
-
-
-  <!-- =========================================================
-
-       SCRIPTS
-
-       ========================================================= -->
-
-
-
-  <script
-
-    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
-
-  ></script>
-
-
-
-  <script
-
-    src="../config.js"
-
-  ></script>
-
-
-
-  <script
-
-    src="../scripts/app.js"
-
-  ></script>
-
-
-
-  <script
-
-    src="../scripts/nav.js"
-
-  ></script>
-
-
-
-  <script
-
-    src="../scripts/upcoming.js"
-
-  ></script>
-
-
-
-  <script
-
-    src="../scripts/upcoming-android.js"
-
-  ></script>
-
-
-
-  <script>
-    // Return to the task list after an item is successfully added.
-    (() => {
-      const panel = document.getElementById("upcoming-add-details");
-      const status = document.getElementById("upcoming-form-status");
-      if (!panel || !status) return;
-      new MutationObserver(() => {
-        if (status.textContent.trim() === "Added!") {
-          panel.open = false;
-        }
-      }).observe(status, { childList: true, characterData: true, subtree: true });
-    })();
+ </head>
+ <body data-root="..">
+  <main class="home">
+   <!-- =====================================================
+         DELETE CONFIRMATION
+         ===================================================== -->
+   <div class="delete-confirm-overlay" hidden="" id="delete-confirm-overlay">
+    <div class="delete-confirm-box">
+     <div class="delete-confirm-title">
+      Delete item?
+     </div>
+     <div class="delete-confirm-name" id="delete-confirm-name">
+     </div>
+     <div class="delete-confirm-actions">
+      <button id="delete-cancel" type="button">
+       Cancel
+      </button>
+      <button id="delete-confirm" type="button">
+       Delete
+      </button>
+     </div>
+    </div>
+   </div>
+   <!-- =====================================================
+     TIME PICKER
+     ===================================================== -->
+   <div class="time-overlay" hidden="" id="time-overlay">
+    <div aria-label="Choose time" aria-modal="true" class="time-box" role="dialog">
+     <div class="time-picker-title">
+      Choose Time
+     </div>
+     <div class="time-picker-mode">
+      <button class="time-mode-button active" id="time-mode-hour" type="button">
+       Hour
+      </button>
+      <button class="time-mode-button" id="time-mode-minute" type="button">
+       Minute
+      </button>
+     </div>
+     <div class="time-clock-face" id="time-clock-face">
+     </div>
+     <div class="time-minute-adjust" hidden="" id="time-minute-adjust">
+      <button aria-label="Previous minute" id="time-minute-minus" type="button">
+       &minus;
+      </button>
+      <div class="time-exact-minute" id="time-exact-minute">
+       00
+      </div>
+      <button aria-label="Next minute" id="time-minute-plus" type="button">
+       +
+      </button>
+     </div>
+     <div class="time-period-row">
+      <button class="time-period-button" id="time-am" type="button">
+       AM
+      </button>
+      <button class="time-period-button" id="time-pm" type="button">
+       PM
+      </button>
+     </div>
+     <div class="time-preview" id="time-preview">
+      12:00 PM
+     </div>
+     <div class="time-picker-actions">
+      <button id="time-cancel" type="button">
+       Cancel
+      </button>
+      <button id="time-done" type="button">
+       Done
+      </button>
+     </div>
+    </div>
+   </div>
+   <!-- =====================================================
+         CALENDAR PICKER
+         ===================================================== -->
+   <div class="calendar-overlay" hidden="" id="calendar-overlay">
+    <div aria-label="Choose date" aria-modal="true" class="calendar-box" role="dialog">
+     <div class="calendar-top-row">
+      <button aria-label="Previous month" class="calendar-nav-button" id="calendar-prev" type="button">
+       &lt;
+      </button>
+      <div class="calendar-heading" id="calendar-heading">
+       October 2026
+      </div>
+      <button aria-label="Next month" class="calendar-nav-button" id="calendar-next" type="button">
+       &gt;
+      </button>
+     </div>
+     <div class="calendar-controls">
+      <label>
+       <span>
+        Month
+       </span>
+       <select id="calendar-month">
+       </select>
+      </label>
+      <label>
+       <span>
+        Year
+       </span>
+       <select id="calendar-year">
+       </select>
+      </label>
+      <button id="calendar-today" type="button">
+       Today
+      </button>
+     </div>
+     <div class="calendar-weekdays">
+      <span>
+       Sun
+      </span>
+      <span>
+       Mon
+      </span>
+      <span>
+       Tue
+      </span>
+      <span>
+       Wed
+      </span>
+      <span>
+       Thu
+      </span>
+      <span>
+       Fri
+      </span>
+      <span>
+       Sat
+      </span>
+     </div>
+     <div class="calendar-grid" id="calendar-grid">
+     </div>
+     <div class="calendar-bottom-row">
+      <button id="calendar-cancel" type="button">
+       Cancel
+      </button>
+     </div>
+    </div>
+   </div>
+   <!-- =====================================================
+         MAIN JOURNAL
+         ===================================================== -->
+   <section class="journal-shell">
+    <div id="nav-container">
+    </div>
+    <section class="journal upcoming-journal">
+     <section class="upcoming-area">
+      <div class="game-panel upcoming-page-panel">
+       <div class="upcoming-page-title">
+        Upcoming
+       </div>
+       <!-- =================================================
+                 ADD ITEM
+                 ================================================= -->
+       <section class="upcoming-add-section" id="upcoming-add-details">
+        <button class="upcoming-section-title upcoming-add-toggle" id="upcoming-add-toggle" type="button" aria-controls="upcoming-add-panel" aria-expanded="false">
+         Add Item
+         <span aria-hidden="true" class="upcoming-add-chevron">
+          &dtrif;
+         </span>
+        </button>
+        <div class="upcoming-form" id="upcoming-add-panel" hidden>
+         <!-- TITLE -->
+         <label class="upcoming-field">
+          <span>
+           Title
+          </span>
+          <input autocomplete="off" id="upcoming-title" placeholder="What&rsquo;s coming up?" type="text"/>
+         </label>
+         <!-- DATE -->
+         <label class="upcoming-field">
+          <span>
+           Date
+          </span>
+          <div class="date-input-wrap">
+           <input autocomplete="off" id="upcoming-date" inputmode="numeric" maxlength="10" placeholder="MM/DD/YYYY" type="text"/>
+           <button aria-label="Open calendar" class="date-picker-button" data-date-target="upcoming-date" title="Open calendar" type="button">
+            ▦
+           </button>
+          </div>
+         </label>
+         <!-- TIME -->
+         <label class="upcoming-field">
+          <span>
+           Time
+          </span>
+          <div class="time-input-wrap">
+           <input autocomplete="off" id="upcoming-time" inputmode="text" placeholder="3:30 PM" type="text"/>
+           <button aria-label="Open time picker" class="time-picker-button" data-time-target="upcoming-time" title="Open time picker" type="button">
+            ◷
+           </button>
+          </div>
+         </label>
+         <!-- TYPE -->
+         <label class="upcoming-field">
+          <span>
+           Type
+          </span>
+          <select id="upcoming-type">
+           <option value="task">
+            Task
+           </option>
+           <option value="event">
+            Event
+           </option>
+           <option value="appointment">
+            Appointment
+           </option>
+          </select>
+         </label>
+         <!-- REPEATS -->
+         <label class="upcoming-field">
+          <span>
+           Repeats
+          </span>
+          <select id="upcoming-recurrence">
+           <option value="">
+            Does not repeat
+           </option>
+           <option value="daily">
+            Daily
+           </option>
+           <option value="weekly">
+            Weekly
+           </option>
+           <option value="monthly">
+            Monthly
+           </option>
+           <option value="yearly">
+            Yearly
+           </option>
+          </select>
+         </label>
+         <!-- ADD -->
+         <button id="upcoming-add" type="button">
+          Add
+         </button>
+         <div class="upcoming-form-status" id="upcoming-form-status">
+         </div>
+        </div>
+       </section>
+       <!-- =================================================
+                 UPCOMING ITEMS
+                 ================================================= -->
+       <div class="upcoming-section-title">
+        Upcoming Items
+       </div>
+       <div id="upcoming-list">
+        Loading...
+       </div>
+      </div>
+     </section>
+    </section>
+   </section>
+  </main>
+  <!-- =========================================================
+       SCRIPTS
+       ========================================================= -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
   </script>
-</body>
+  <script src="../config.js">
+  </script>
+  <script src="../scripts/app.js">
+  </script>
+  <script src="../scripts/nav.js">
+  </script>
+  <script src="../scripts/upcoming.js">
+  </script>
+  <script src="../scripts/upcoming-android.js">
+  </script>
+  <script>
+   // Use an explicit button instead of relying on native <details> toggling.
+   (() => {
+     const toggle = document.getElementById("upcoming-add-toggle");
+     const panel = document.getElementById("upcoming-add-panel");
+     const status = document.getElementById("upcoming-form-status");
+     if (!toggle || !panel || !status) return;
 
+     function setAddPanelOpen(open) {
+       panel.hidden = !open;
+       toggle.setAttribute("aria-expanded", String(open));
+     }
 
+     toggle.addEventListener("click", () => {
+       setAddPanelOpen(panel.hidden);
+     });
 
+     // Return to the task list after an item is successfully added.
+     new MutationObserver(() => {
+       if (status.textContent.trim() === "Added!") {
+         setAddPanelOpen(false);
+       }
+     }).observe(status, {
+       childList: true,
+       characterData: true,
+       subtree: true
+     });
+   })();
+  </script>
+ </body>
 </html>
+
