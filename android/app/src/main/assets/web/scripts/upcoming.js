@@ -610,9 +610,11 @@ function renderUpcomingItems(
       later: "LATER", all: "ALL UPCOMING"
     };
     const options = [
-      ["today", "Today"], ["week", "This Week"],
-      ["month", "This Month"], ["later", "Later"],
-      ["all", "All Upcoming"]
+      ["today", "Today", groups.today.length],
+      ["week", "This Week", groups.week.length],
+      ["month", "This Month", groups.month.length],
+      ["later", "Later", groups.later.length],
+      ["all", "All Upcoming", items.length]
     ];
     const visible = upcomingMobileFilter === "all"
       ? items
@@ -621,15 +623,14 @@ function renderUpcomingItems(
       <div class="upcoming-mobile-filter-bar">
         <label for="upcoming-mobile-filter">Show tasks</label>
         <select id="upcoming-mobile-filter" aria-label="Show tasks">
-          ${options.map(([key, label]) =>
-            `<option value="${key}" ${key === upcomingMobileFilter ? "selected" : ""}>${label}</option>`
+          ${options.map(([key, label, count]) =>
+            `<option value="${key}" ${key === upcomingMobileFilter ? "selected" : ""}>${label} (${count})</option>`
           ).join("")}
         </select>
       </div>
       <section class="upcoming-mobile-results" aria-label="${labels[upcomingMobileFilter]}">
         <div class="upcoming-mobile-results-heading">
           <span>${labels[upcomingMobileFilter]}</span>
-          <span>${visible.length} ${visible.length === 1 ? "item" : "items"}</span>
         </div>
         <div class="upcoming-mobile-items">
           ${visible.length ? visible.map(item =>
