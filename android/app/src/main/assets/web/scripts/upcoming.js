@@ -622,15 +622,28 @@ function renderUpcomingItems(
     upcomingList.innerHTML = `
       <div class="upcoming-mobile-filter-bar">
         <label for="upcoming-mobile-filter">Show tasks</label>
-        <select id="upcoming-mobile-filter" aria-label="Show tasks">
-          ${options.map(([key, label, count]) =>
-            `<option value="${key}" ${key === upcomingMobileFilter ? "selected" : ""}>${label} (${count})</option>`
-          ).join("")}
-        </select>
+        <div class="upcoming-filter-control">
+          <button type="button" id="upcoming-mobile-filter"
+            aria-label="Show tasks: ${options.find(([key]) => key === upcomingMobileFilter)?.[1] || "Today"}"
+            aria-haspopup="true" aria-expanded="false">
+            <span>${options.find(([key]) => key === upcomingMobileFilter)?.[1] || "Today"}</span>
+            <span class="upcoming-filter-current-count">${visible.length}</span>
+            <span class="upcoming-filter-chevron" aria-hidden="true">▾</span>
+          </button>
+          <div class="upcoming-filter-menu" id="upcoming-filter-menu" hidden>
+            ${options.map(([key, label, count]) => `
+              <button type="button" class="upcoming-filter-option"
+                data-upcoming-filter="${key}" aria-current="${key === upcomingMobileFilter ? "true" : "false"}">
+                <span>${label}</span><span class="upcoming-filter-count">${count}</span>
+              </button>
+            `).join("")}
+          </div>
+        </div>
       </div>
       <section class="upcoming-mobile-results" aria-label="${labels[upcomingMobileFilter]}">
         <div class="upcoming-mobile-results-heading">
           <span>${labels[upcomingMobileFilter]}</span>
+
         </div>
         <div class="upcoming-mobile-items">
           ${visible.length ? visible.map(item =>
@@ -1098,11 +1111,30 @@ async function confirmDeleteUpcomingItem() {
   await loadUpcomingItems();
 }
 // Filter changes only the mobile view; all item data stays intact.
-upcomingList.addEventListener("change", event => {
-  if (event.target.id !== "upcoming-mobile-filter") return;
-  upcomingMobileFilter = event.target.value;
-  editingItemId = null;
-  renderUpcomingItems(buildUpcomingDisplayItems(upcomingItems));
+upcomingList.addEventListener("click", event => {
+  const option = event.target.closest("[data-upcoming-filter]");
+  if (option) {
+    upcomingMobileFilter = option.dataset.upcomingFilter;
+    editingItemId = null;
+    renderUpcomingItems(buildUpcomingDisplayItems(upcomingItems));
+    return;
+  }
+  const trigger = event.target.closest("#upcoming-mobile-filter");
+  if (trigger) {
+    const menu = upcomingList.querySelector("#upcoming-filter-menu");
+    if (!menu) return;
+    const opening = menu.hidden;
+    menu.hidden = !opening;
+    trigger.setAttribute("aria-expanded", String(opening));
+  }
+});
+document.addEventListener("click", event => {
+  if (event.target.closest(".upcoming-filter-control")) return;
+  const menu = upcomingList.querySelector("#upcoming-filter-menu");
+  if (menu && !menu.hidden) {
+    menu.hidden = true;
+    upcomingList.querySelector("#upcoming-mobile-filter")?.setAttribute("aria-expanded", "false");
+  }
 });
 // Resize across the mobile/desktop breakpoint without duplicate task elements.
 upcomingPhoneQuery.addEventListener("change", () => {
