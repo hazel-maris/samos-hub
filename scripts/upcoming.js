@@ -20,9 +20,9 @@ const upcomingTime =
   document.getElementById(
     "upcoming-time"
   );
-const upcomingType =
+const upcomingLocation =
   document.getElementById(
-    "upcoming-type"
+    "upcoming-location"
   );
 const upcomingRecurrence =
   document.getElementById(
@@ -42,6 +42,8 @@ const upcomingFormStatus =
 let upcomingItems = [];
 let editingItemId =
   null;
+// Keep collapse states across list refreshes and edits.
+const upcomingCollapsedSections = new Set(["month", "later"]);
 // ============================================================
 // DELETE MODAL
 // ============================================================
@@ -412,11 +414,19 @@ function getNextOccurrence(
       now.getDate(),
       12
     );
-  const end =
-    addDays(
-      today,
-      366
-    );
+  // One-time events must not disappear just because they are more
+  // than one year away (e.g. an appointment in 2027 or later).
+  if (!item.recurrence) {
+    const occurrenceDate = item.date;
+    const eventDate = isoToDate(occurrenceDate);
+    if (!eventDate || eventDate < today ||
+        occurrenceHasPassed(item, occurrenceDate, now)) {
+      return null;
+    }
+    return { ...item, occurrenceDate };
+  }
+  // Recurring dates may be farther away than a year, too.
+  const end = addDays(today, 366 * 5);
   let cursor =
     new Date(today);
   while (
@@ -552,13 +562,9 @@ function groupUpcomingItems(
     dateToISO(
       today
     );
-  const weekEndISO =
-    dateToISO(
-      addDays(
-        today,
-        6
-      )
-    );
+  // Calendar week ends Saturday; not a rolling seven-day window.
+  const weekEndISO = dateToISO(addDays(today, 6 - today.getDay()));
+  const monthEndISO = dateToISO(new Date(today.getFullYear(), today.getMonth() + 1, 0, 12));
   return {
     today:
       items.filter(
@@ -574,12 +580,13 @@ function groupUpcomingItems(
           item.occurrenceDate <=
             weekEndISO
       ),
+    month:
+      items.filter(item =>
+        item.occurrenceDate > weekEndISO &&
+        item.occurrenceDate <= monthEndISO
+      ),
     later:
-      items.filter(
-        item =>
-          item.occurrenceDate >
-          weekEndISO
-      )
+      items.filter(item => item.occurrenceDate > monthEndISO)
   };
 }
 // ============================================================
@@ -588,71 +595,35 @@ function groupUpcomingItems(
 function renderUpcomingItems(
   items
 ) {
-  if (!items.length) {
-    upcomingList.innerHTML = `
-      <div class="upcoming-empty">
-        No upcoming items yet.
-      </div>
-    `;
-    return;
-  }
-  const groups =
-    groupUpcomingItems(
-      items
-    );
-  upcomingList.innerHTML =
-    [
-      renderUpcomingSection(
-        "TODAY",
-        groups.today
-      ),
-      renderUpcomingSection(
-        "THIS WEEK",
-        groups.week
-      ),
-      renderUpcomingSection(
-        "LATER",
-        groups.later
-      )
-    ]
-      .filter(Boolean)
-      .join("");
+  const groups = groupUpcomingItems(items);
+  upcomingList.innerHTML = `
+    ${renderUpcomingSection("TODAY", groups.today, "today")}
+    ${renderUpcomingSection("THIS WEEK", groups.week, "week")}
+    ${renderUpcomingSection("THIS MONTH", groups.month, "month")}
+    ${renderUpcomingSection("LATER", groups.later, "later")}
+  `;
 }
 // ============================================================
 // RENDER SECTION
 // ============================================================
-function renderUpcomingSection(
-  title,
-  items
-) {
-  if (!items.length) {
-    return "";
-  }
+function renderUpcomingSection(title, items, key) {
+  // Keep the Later header visible even when there are no future items.
+
+  const collapsed = upcomingCollapsedSections.has(key);
   return `
-    <section class="upcoming-list-section">
-      <div class="upcoming-section-title">
-        ${title}
-      </div>
-      <div class="upcoming-section-items">
-        ${
-          items
-            .map(
-              item => {
-                if (
-                  item.id ===
-                  editingItemId
-                ) {
-                  return renderEditableItem(
-                    item
-                  );
-                }
-                return renderDisplayItem(
-                  item
-                );
-              }
-            )
-            .join("")
-        }
+    <section class="upcoming-list-section${collapsed ? " is-collapsed" : ""}" data-section="${key}">
+      <button class="upcoming-section-toggle" type="button"
+        data-section-toggle="${key}"
+        aria-expanded="${!collapsed}"
+        aria-label="${collapsed ? "Expand" : "Collapse"} ${title}">
+        <span class="upcoming-section-title">${title}</span>
+        <span class="upcoming-section-count">${items.length}</span>
+        <span class="upcoming-section-chevron" aria-hidden="true">▾</span>
+      </button>
+      <div class="upcoming-section-items" ${collapsed ? "hidden" : ""} tabindex="0" aria-label="${title} items">
+        ${items.length ? items.map(item =>
+          item.id === editingItemId ? renderEditableItem(item) : renderDisplayItem(item)
+        ).join("") : '<div class="upcoming-empty">Nothing scheduled.</div>'}
       </div>
     </section>
   `;
@@ -667,6 +638,8 @@ function renderDisplayItem(
     formatUpcomingDate(
       item.occurrenceDate
     );
+  const weekday = isoToDate(item.occurrenceDate)
+    .toLocaleDateString("en-US", { weekday: "short" });
   const time =
     item.time
       ? formatUpcomingTime(
@@ -689,7 +662,7 @@ function renderDisplayItem(
       data-id="${item.id}"
     >
       <div class="upcoming-item-date">
-        ${date}
+        <span class="upcoming-weekday">${weekday}</span> ${date}
       </div>
       <div class="upcoming-item-main">
         <div class="upcoming-item-title">
@@ -703,17 +676,7 @@ function renderDisplayItem(
               ? `<span>${time}</span>`
               : ""
           }
-          ${
-            item.type
-              ? `
-                <span>
-                  ${capitalize(
-                    item.type
-                  )}
-                </span>
-              `
-              : ""
-          }
+          ${item.location ? `<span class="upcoming-location">${escapeHtml(item.location)}</span>` : ""}
           ${recurrence}
         </div>
       </div>
@@ -772,7 +735,7 @@ function renderEditableItem(
           <input
             class="upcoming-edit-date"
             type="text"
-            inputmode="numeric"
+            inputmode="text"
             maxlength="10"
             placeholder="MM/DD/YYYY"
             value="${escapeHtmlAttribute(
@@ -813,41 +776,13 @@ function renderEditableItem(
             ◷
           </button>
         </div>
-        <select
-          class="upcoming-edit-type"
-          aria-label="Type"
+        <input
+          class="upcoming-edit-location"
+          type="text"
+          value="${escapeHtmlAttribute(item.location || "") }"
+          placeholder="Location (optional)"
+          aria-label="Location (optional)"
         >
-          <option
-            value="task"
-            ${
-              item.type === "task"
-                ? "selected"
-                : ""
-            }
-          >
-            Task
-          </option>
-          <option
-            value="event"
-            ${
-              item.type === "event"
-                ? "selected"
-                : ""
-            }
-          >
-            Event
-          </option>
-          <option
-            value="appointment"
-            ${
-              item.type === "appointment"
-                ? "selected"
-                : ""
-            }
-          >
-            Appointment
-          </option>
-        </select>
         <select
           class="upcoming-edit-recurrence"
           aria-label="Repeats"
@@ -921,6 +856,14 @@ function renderEditableItem(
         <button
           class="upcoming-icon-button"
           type="button"
+          data-action="cancel-edit"
+          data-id="${item.id}"
+          aria-label="Cancel editing without saving"
+          title="Cancel"
+        >✕</button>
+        <button
+          class="upcoming-icon-button"
+          type="button"
           data-action="delete"
           data-id="${item.id}"
           aria-label="Delete item"
@@ -987,12 +930,9 @@ async function saveUpcomingItem(
           editTimeInput.value
         )
       : null;
-  const type =
-    itemElement
-      .querySelector(
-        ".upcoming-edit-type"
-      )
-      .value;
+  const location = itemElement
+    .querySelector(".upcoming-edit-location")
+    .value.trim() || null;
   const recurrence =
     itemElement
       .querySelector(
@@ -1031,7 +971,7 @@ async function saveUpcomingItem(
         title,
         date,
         time,
-        type,
+        location,
         recurrence,
         updated_at:
           new Date()
@@ -1118,6 +1058,20 @@ async function confirmDeleteUpcomingItem() {
 upcomingList.addEventListener(
   "click",
   async event => {
+    const sectionToggle = event.target.closest("[data-section-toggle]");
+    if (sectionToggle) {
+      const key = sectionToggle.dataset.sectionToggle;
+      if (upcomingCollapsedSections.has(key)) upcomingCollapsedSections.delete(key);
+      else upcomingCollapsedSections.add(key);
+      const section = sectionToggle.closest(".upcoming-list-section");
+      const body = section.querySelector(".upcoming-section-items");
+      const closed = upcomingCollapsedSections.has(key);
+      body.hidden = closed;
+      section.classList.toggle("is-collapsed", closed);
+      sectionToggle.setAttribute("aria-expanded", String(!closed));
+      sectionToggle.setAttribute("aria-label", `${closed ? "Expand" : "Collapse"} ${sectionToggle.querySelector(".upcoming-section-title").textContent}`);
+      return;
+    }
     const button =
       event.target.closest(
         "[data-action]"
@@ -1135,6 +1089,12 @@ upcomingList.addEventListener(
       editUpcomingItem(
         itemId
       );
+      return;
+    }
+    if (action === "cancel-edit") {
+      editingItemId = null;
+      upcomingFormStatus.textContent = "";
+      renderUpcomingItems(buildUpcomingDisplayItems(upcomingItems));
       return;
     }
     if (
@@ -1271,8 +1231,8 @@ function dateInputToISO(
   value
 ) {
   const match =
-    value.match(
-      /^(\d{2})\/(\d{2})\/(\d{4})$/
+    String(value).trim().match(
+      /^(\d{1,2})\/(\d{1,2})\/(\d{2}|\d{4})$/
     );
   if (!match) {
     return null;
@@ -1286,9 +1246,7 @@ function dateInputToISO(
       match[2]
     );
   const year =
-    Number(
-      match[3]
-    );
+    Number(match[3].length === 2 ? `20${match[3]}` : match[3]);
   const date =
     new Date(
       year,
@@ -1336,31 +1294,14 @@ function dateInputToDate(
 }
 // ============================================================
 // DATE INPUT EVENTS
-// ============================================================
-upcomingDate.addEventListener(
-  "input",
-  () => {
-    upcomingDate.value =
-      formatDateInput(
-        upcomingDate.value
-      );
-  }
-);
-upcomingList.addEventListener(
-  "input",
-  event => {
-    if (
-      event.target.matches(
-        ".upcoming-edit-date"
-      )
-    ) {
-      event.target.value =
-        formatDateInput(
-          event.target.value
-        );
-    }
-  }
-);
+// Let people enter slashes naturally. Expand two-digit years on blur,
+// without altering the field while the user is still typing.
+document.addEventListener("focusout", event => {
+  const input = event.target;
+  if (!input?.matches?.("#upcoming-date, .upcoming-edit-date")) return;
+  const iso = dateInputToISO(input.value);
+  if (iso) input.value = isoToDateInput(iso);
+});
 // ============================================================
 // TIME INPUT HELPERS
 // ============================================================
@@ -2015,8 +1956,8 @@ async function addUpcomingItem() {
           upcomingTime.value
         )
       : null;
-  const type =
-    upcomingType.value;
+  const type = "task";
+  const location = upcomingLocation.value.trim() || null;
   const recurrence =
     upcomingRecurrence.value ||
     null;
@@ -2054,6 +1995,7 @@ async function addUpcomingItem() {
         date,
         time,
         type,
+        location,
         recurrence
       });
   if (error) {
@@ -2073,8 +2015,8 @@ async function addUpcomingItem() {
     "";
   upcomingTime.value =
     "";
-  upcomingType.value =
-    "task";
+  upcomingLocation.value =
+    "";
   upcomingRecurrence.value =
     "";
   upcomingFormStatus.textContent =
@@ -2117,25 +2059,19 @@ function setupCalendarMonths() {
       .join("");
 }
 function setupCalendarYears() {
-  const currentYear =
-    new Date()
-      .getFullYear();
-  let html =
-    "";
-  for (
-    let year = currentYear;
-    year <=
-      currentYear + 10;
-    year++
-  ) {
-    html += `
-      <option value="${year}">
-        ${year}
-      </option>
-    `;
-  }
-  calendarYear.innerHTML =
-    html;
+  // Year is a text input: accepts YY (20YY) or YYYY.
+  calendarYear.value = String(new Date().getFullYear());
+}
+function parseCalendarYear(value) {
+  const raw = String(value).trim();
+  if (!/^\d{2}$|^\d{4}$/.test(raw)) return null;
+  const year = Number(raw.length === 2 ? `20${raw}` : raw);
+  return year >= 2000 && year <= 2099 ? year : null;
+}
+function setCalendarMonthSafely(month) {
+  // Reset to day 1 to avoid overflowing into a later month (e.g. Jan 31 -> Mar).
+  calendarViewDate.setDate(1);
+  calendarViewDate.setMonth(month);
 }
 function openCalendar(
   input
@@ -2167,8 +2103,17 @@ function renderCalendar() {
       .getMonth();
   calendarHeading.textContent =
     `${CALENDAR_MONTHS[month]} ${year}`;
-  calendarMonth.value =
-    String(month);
+  // Explicitly select the displayed month (avoids a stale January display).
+  for (const option of calendarMonth.options) {
+    option.selected = Number(option.value) === month;
+  }
+  calendarMonth.value = String(month);
+  calendarMonth.selectedIndex = month;
+  // The external-display input bridge renders a separate button for selects.
+  // Keep that visible label synchronized as well as the hidden native select.
+  const visibleMonth = calendarMonth.closest(".samos-select")
+    ?.querySelector(".samos-select-button");
+  if (visibleMonth) visibleMonth.textContent = CALENDAR_MONTHS[month];
   calendarYear.value =
     String(year);
   const firstWeekday =
@@ -2324,25 +2269,28 @@ calendarNext.addEventListener(
 calendarMonth.addEventListener(
   "change",
   () => {
-    calendarViewDate.setMonth(
-      Number(
-        calendarMonth.value
-      )
-    );
+    setCalendarMonthSafely(Number(calendarMonth.value));
     renderCalendar();
   }
 );
-calendarYear.addEventListener(
-  "change",
-  () => {
-    calendarViewDate.setFullYear(
-      Number(
-        calendarYear.value
-      )
-    );
-    renderCalendar();
+function applyCalendarYear() {
+  const year = parseCalendarYear(calendarYear.value);
+  if (year !== null) {
+    calendarViewDate.setDate(1);
+    calendarViewDate.setFullYear(year);
   }
-);
+  // Invalid values restore the displayed year without changing the calendar.
+  renderCalendar();
+}
+calendarYear.addEventListener("change", applyCalendarYear);
+calendarYear.addEventListener("blur", applyCalendarYear);
+calendarYear.addEventListener("keydown", event => {
+  if (event.key === "Enter") {
+    event.preventDefault();
+    applyCalendarYear();
+    calendarYear.blur();
+  }
+});
 calendarToday.addEventListener(
   "click",
   () => {

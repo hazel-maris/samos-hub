@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#e4d4b8">
+  <title>SamOS Hub · Triage</title>
+  <link rel="stylesheet" href="../styles/base.css">
+  <link rel="stylesheet" href="../styles/mobile.css">
+  <link rel="stylesheet" href="../styles/triage.css">
+</head>
+<body data-root="..">
+  <main class="home"><section class="journal-shell">
+    <div id="nav-container"></div>
+    <section class="journal triage-journal"><section class="triage-area">
+      <div class="game-panel triage-panel">
+        <h1>Triage</h1>
+        <p class="triage-description">Get it out of your head. Figure it out later.</p>
+        <form id="triage-form" class="triage-form">
+          <input id="triage-input" type="text" maxlength="1000" placeholder="What's on your mind?" aria-label="New thought" autocomplete="off">
+          <button type="submit" id="triage-add">Add</button>
+        </form>
+        <p id="triage-message" role="status" aria-live="polite"></p>
+        <div id="triage-list" class="triage-list" aria-live="polite">Loading…</div>
+      </div>
+    </section></section>
+  </section></main>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../config.js"></script>
+  <script src="../scripts/app.js"></script>
+  <script src="../scripts/nav.js"></script>
+  <script src="../scripts/triage.js"></script>
+</body>
+</html>

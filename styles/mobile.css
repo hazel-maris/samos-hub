@@ -482,3 +482,5 @@
     outline-offset: 2px;
   }
 }
+
+@media (max-width: 700px) { #nav-container .journal-tab[data-page="triage"]::after { content: "T"; } }

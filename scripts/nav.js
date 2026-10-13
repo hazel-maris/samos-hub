@@ -72,6 +72,8 @@ function setActiveNavTab() {
     currentPage = "settings";
   } else if (path.includes("upcoming.html")) {
     currentPage = "upcoming";
+  } else if (path.includes("triage.html")) {
+    currentPage = "triage";
   } else if (path.includes("groceries.html")) {
     currentPage = "groceries";
   } else if (path.includes("quotes.html")) {

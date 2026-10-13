@@ -1,6 +1,8 @@
 
 $ErrorActionPreference = "Stop"
 
+# git add . && git commit -m "Update SamOS Hub" && git push
+
 # ============================================================
 # SamOS Hub — Web Asset Sync
 # ============================================================

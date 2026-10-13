@@ -32,9 +32,9 @@ let selectedPlaylistUri = null;
    ============================================================ */
 
 const MOOD_PLAYLISTS = {
-  morning: "https://open.spotify.com/playlist/1Uj2sAGxr2SGat3RlpMFiS?si=Q7p4UyVhRUau6ehos_7M0g",
-  focus: null,
-  winddown: null
+  morning: "https://open.spotify.com/playlist/4cfHtrRtWO4E83sL98lwn2?si=02e97bec4ab143e2",
+  focus: "https://open.spotify.com/playlist/0WVDI5MmhCFlVneKMy4VI6?si=130cc41f7946454b",
+  winddown: "https://open.spotify.com/playlist/7ruQZGQ9mifFZfePppIZEc?si=dbd64ea3c5ce4bbe"
 };
 
 const spotifyPlaylistLookup = new Map();
