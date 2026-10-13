@@ -12,30 +12,6 @@
   <link href="../styles/upcoming.css" rel="stylesheet"/>
   <link href="../styles/mobile.css" rel="stylesheet"/>
   <style>
-   /* Collapsible Add Item panel — uses a button for iOS compatibility. */
-   .upcoming-add-toggle {
-     display: flex;
-     align-items: center;
-     justify-content: space-between;
-     width: 100%;
-     gap: 12px;
-     cursor: pointer;
-     text-align: left;
-     color: inherit;
-     font: inherit;
-     background: transparent;
-     border: 0;
-     padding: 0;
-     -webkit-appearance: none;
-     appearance: none;
-     touch-action: manipulation;
-   }
-   .upcoming-add-chevron { font-size: 1.25em; line-height: 1; }
-   .upcoming-add-toggle[aria-expanded="true"] .upcoming-add-chevron { transform: rotate(180deg); }
-   .upcoming-add-toggle:focus-visible {
-     outline: 2px solid var(--border, #7a5a3a);
-     outline-offset: 4px;
-   }
    #upcoming-add-panel[hidden] { display: none !important; }
   </style>
  </head>
@@ -139,8 +115,7 @@
        <span>
         Year
        </span>
-       <select id="calendar-year">
-       </select>
+       <input id="calendar-year" type="text" inputmode="numeric" maxlength="4" placeholder="2026" aria-label="Calendar year (YY or YYYY)" autocomplete="off">
       </label>
       <button id="calendar-today" type="button">
        Today
@@ -187,19 +162,13 @@
     <section class="journal upcoming-journal">
      <section class="upcoming-area">
       <div class="game-panel upcoming-page-panel">
-       <div class="upcoming-page-title">
-        Upcoming
-       </div>
-       <!-- =================================================
-                 ADD ITEM
-                 ================================================= -->
-       <section class="upcoming-add-section" id="upcoming-add-details">
-        <button class="upcoming-section-title upcoming-add-toggle" id="upcoming-add-toggle" type="button" aria-controls="upcoming-add-panel" aria-expanded="false">
-         Add Item
-         <span aria-hidden="true" class="upcoming-add-chevron">
-          &dtrif;
-         </span>
+       <div class="upcoming-top-row">
+        <h1 class="upcoming-page-title">UPCOMING</h1>
+        <button class="upcoming-add-toggle" id="upcoming-add-toggle" type="button" aria-label="Add Item" title="Add Item" aria-controls="upcoming-add-panel" aria-expanded="false">
+         <span class="upcoming-add-plus" aria-hidden="true">+</span>
         </button>
+       </div>
+       <section class="upcoming-add-section" id="upcoming-add-details">
         <div class="upcoming-form" id="upcoming-add-panel" hidden>
          <!-- TITLE -->
          <label class="upcoming-field">
@@ -214,7 +183,7 @@
            Date
           </span>
           <div class="date-input-wrap">
-           <input autocomplete="off" id="upcoming-date" inputmode="numeric" maxlength="10" placeholder="MM/DD/YYYY" type="text"/>
+           <input autocomplete="off" id="upcoming-date" inputmode="text" maxlength="10" placeholder="MM/DD/YYYY" type="text"/>
            <button aria-label="Open calendar" class="date-picker-button" data-date-target="upcoming-date" title="Open calendar" type="button">
             ▦
            </button>
@@ -232,22 +201,10 @@
            </button>
           </div>
          </label>
-         <!-- TYPE -->
+         <!-- OPTIONAL LOCATION -->
          <label class="upcoming-field">
-          <span>
-           Type
-          </span>
-          <select id="upcoming-type">
-           <option value="task">
-            Task
-           </option>
-           <option value="event">
-            Event
-           </option>
-           <option value="appointment">
-            Appointment
-           </option>
-          </select>
+          <span>Location (optional)</span>
+          <input autocomplete="off" id="upcoming-location" placeholder="Address, town, suite #, anything" type="text"/>
          </label>
          <!-- REPEATS -->
          <label class="upcoming-field">
@@ -283,9 +240,6 @@
        <!-- =================================================
                  UPCOMING ITEMS
                  ================================================= -->
-       <div class="upcoming-section-title">
-        Upcoming Items
-       </div>
        <div id="upcoming-list">
         Loading...
        </div>

@@ -1,7 +1,7 @@
 
 $ErrorActionPreference = "Stop"
 
-# git add . && git commit -m "Update SamOS Hub" && git push
+# powershell.exe -ExecutionPolicy Bypass -File ./sync-web.ps1
 
 # ============================================================
 # SamOS Hub — Web Asset Sync
