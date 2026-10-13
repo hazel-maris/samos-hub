@@ -42,6 +42,10 @@ const upcomingFormStatus =
 let upcomingItems = [];
 let editingItemId =
   null;
+// Mobile list selector; desktop retains the four-panel dashboard.
+const upcomingPhoneQuery = window.matchMedia("(max-width: 900px) and (orientation: portrait)");
+let upcomingMobileFilter = "today";
+
 // Keep collapse states across list refreshes and edits.
 const upcomingCollapsedSections = new Set(
   window.matchMedia("(max-width: 900px) and (orientation: portrait)").matches
@@ -600,6 +604,42 @@ function renderUpcomingItems(
   items
 ) {
   const groups = groupUpcomingItems(items);
+  if (upcomingPhoneQuery.matches) {
+    const labels = {
+      today: "TODAY", week: "THIS WEEK", month: "THIS MONTH",
+      later: "LATER", all: "ALL UPCOMING"
+    };
+    const options = [
+      ["today", "Today"], ["week", "This Week"],
+      ["month", "This Month"], ["later", "Later"],
+      ["all", "All Upcoming"]
+    ];
+    const visible = upcomingMobileFilter === "all"
+      ? items
+      : groups[upcomingMobileFilter] || [];
+    upcomingList.innerHTML = `
+      <div class="upcoming-mobile-filter-bar">
+        <label for="upcoming-mobile-filter">Show tasks</label>
+        <select id="upcoming-mobile-filter" aria-label="Show tasks">
+          ${options.map(([key, label]) =>
+            `<option value="${key}" ${key === upcomingMobileFilter ? "selected" : ""}>${label}</option>`
+          ).join("")}
+        </select>
+      </div>
+      <section class="upcoming-mobile-results" aria-label="${labels[upcomingMobileFilter]}">
+        <div class="upcoming-mobile-results-heading">
+          <span>${labels[upcomingMobileFilter]}</span>
+          <span>${visible.length} ${visible.length === 1 ? "item" : "items"}</span>
+        </div>
+        <div class="upcoming-mobile-items">
+          ${visible.length ? visible.map(item =>
+            item.id === editingItemId ? renderEditableItem(item) : renderDisplayItem(item)
+          ).join("") : '<div class="upcoming-empty">Nothing scheduled here.</div>'}
+        </div>
+      </section>
+    `;
+    return;
+  }
   upcomingList.innerHTML = `
     ${renderUpcomingSection("TODAY", groups.today, "today")}
     ${renderUpcomingSection("THIS WEEK", groups.week, "week")}
@@ -1056,6 +1096,20 @@ async function confirmDeleteUpcomingItem() {
     "Deleted!";
   await loadUpcomingItems();
 }
+// Filter changes only the mobile view; all item data stays intact.
+upcomingList.addEventListener("change", event => {
+  if (event.target.id !== "upcoming-mobile-filter") return;
+  upcomingMobileFilter = event.target.value;
+  editingItemId = null;
+  renderUpcomingItems(buildUpcomingDisplayItems(upcomingItems));
+});
+// Resize across the mobile/desktop breakpoint without duplicate task elements.
+upcomingPhoneQuery.addEventListener("change", () => {
+  if (upcomingItems.length || upcomingList.querySelector(".upcoming-list-section, .upcoming-mobile-results")) {
+    editingItemId = null;
+    renderUpcomingItems(buildUpcomingDisplayItems(upcomingItems));
+  }
+});
 // ============================================================
 // ITEM ACTIONS
 // ============================================================
