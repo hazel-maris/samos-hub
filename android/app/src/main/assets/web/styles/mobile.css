@@ -484,3 +484,110 @@
 }
 
 @media (max-width: 700px) { #nav-container .journal-tab[data-page="triage"]::after { content: "T"; } }
+
+/* SamOS Upcoming: portrait phone-only layout. Does not affect desktop or other tabs. */
+@media (max-width: 900px) and (orientation: portrait) {
+  body:has(.upcoming-journal) .home {
+    min-height: 100dvh;
+    align-items: stretch;
+    justify-content: flex-start;
+    padding: max(22px, env(safe-area-inset-top)) 10px max(16px, env(safe-area-inset-bottom));
+    box-sizing: border-box;
+  }
+  body:has(.upcoming-journal) .journal-shell {
+    width: 100%;
+    height: auto;
+    min-height: calc(100dvh - max(22px, env(safe-area-inset-top)) - max(16px, env(safe-area-inset-bottom)));
+    margin: 0;
+  }
+  body:has(.upcoming-journal) .upcoming-journal {
+    flex: 1 1 auto;
+    min-height: 0;
+    padding: 12px 12px 16px;
+    overflow: visible;
+  }
+  body:has(.upcoming-journal) .upcoming-page-panel {
+    min-height: 100%;
+    height: auto;
+    padding: 16px 14px;
+    overflow: visible;
+    box-sizing: border-box;
+  }
+  body:has(.upcoming-journal) #upcoming-list {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto;
+    gap: 12px;
+    min-height: 0;
+  }
+  body:has(.upcoming-journal) .upcoming-list-section {
+    min-width: 0;
+    height: 265px;
+    min-height: 0;
+  }
+  body:has(.upcoming-journal) .upcoming-list-section.is-collapsed { height: 53px; }
+  body:has(.upcoming-journal) .upcoming-section-items {
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    padding: 6px;
+  }
+  body:has(.upcoming-journal) .upcoming-form,
+  body:has(.upcoming-journal) .upcoming-edit-fields {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  body:has(.upcoming-journal) .upcoming-form > *,
+  body:has(.upcoming-journal) .upcoming-edit-fields > * {
+    min-width: 0;
+    grid-column: 1 / -1;
+  }
+  body:has(.upcoming-journal) .upcoming-field input,
+  body:has(.upcoming-journal) .upcoming-field select,
+  body:has(.upcoming-journal) .upcoming-edit-fields input,
+  body:has(.upcoming-journal) .upcoming-edit-fields select { font-size: 16px; }
+  body:has(.upcoming-journal) .upcoming-item {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: "date actions" "main actions";
+    gap: 4px 10px;
+    align-items: start;
+    padding: 9px 8px;
+  }
+  body:has(.upcoming-journal) .upcoming-item-date {
+    grid-area: date;
+    white-space: nowrap;
+    font-size: 1.35rem;
+  }
+  body:has(.upcoming-journal) .upcoming-item-main { grid-area: main; }
+  body:has(.upcoming-journal) .upcoming-item-title {
+    font-size: 1.5rem;
+    overflow-wrap: anywhere;
+  }
+  body:has(.upcoming-journal) .upcoming-item-actions {
+    grid-area: actions;
+    display: flex;
+    flex-direction: row;
+    align-self: center;
+    gap: 4px;
+  }
+  body:has(.upcoming-journal) .upcoming-icon-button {
+    width: 36px;
+    height: 38px;
+    padding: 3px;
+  }
+  /* Unicode symbols stay legible even when the icon PNGs do not load. */
+  body:has(.upcoming-journal) .upcoming-icon-button[data-action="edit"] img,
+  body:has(.upcoming-journal) .upcoming-icon-button[data-action="delete"] img { display: none; }
+  body:has(.upcoming-journal) .upcoming-icon-button[data-action="edit"]::after { content: "✎"; font: 26px/1 Arial, sans-serif; }
+  body:has(.upcoming-journal) .upcoming-icon-button[data-action="delete"]::after { content: "×"; font: 29px/1 Arial, sans-serif; }
+  body:has(.upcoming-journal) .upcoming-item-editing {
+    display: grid;
+    grid-template-columns: minmax(0,1fr);
+    grid-template-areas: none;
+  }
+  body:has(.upcoming-journal) .upcoming-item-editing .upcoming-item-actions { grid-area: auto; }
+}

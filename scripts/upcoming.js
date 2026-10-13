@@ -43,7 +43,11 @@ let upcomingItems = [];
 let editingItemId =
   null;
 // Keep collapse states across list refreshes and edits.
-const upcomingCollapsedSections = new Set(["month", "later"]);
+const upcomingCollapsedSections = new Set(
+  window.matchMedia("(max-width: 900px) and (orientation: portrait)").matches
+    ? ["week", "month", "later"]
+    : ["month", "later"]
+);
 // ============================================================
 // DELETE MODAL
 // ============================================================
