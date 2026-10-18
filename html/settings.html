@@ -1,214 +1,89 @@
+
 <!doctype html>
 <html lang="en">
-
 <head>
   <meta charset="utf-8">
-
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1, viewport-fit=cover"
-  >
-
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#e4d4b8">
-
   <title>SamOS Hub · Settings</title>
-
-  <link
-    rel="manifest"
-    href="../manifest.webmanifest"
-  >
-
-  <link
-    rel="stylesheet"
-    href="../styles/base.css?v=20261006-1"
-  >
-
-  <link
-    rel="stylesheet"
-    href="../styles/settings.css?v=20261006-1"
-  >
-
-  <link
-    rel="stylesheet"
-    href="../styles/mobile.css?v=20261006-1"
-  >
+  <link rel="manifest" href="../manifest.webmanifest">
+  <link rel="stylesheet" href="../styles/base.css">
+  <link rel="stylesheet" href="../styles/mobile.css">
+  <link rel="stylesheet" href="../styles/settings.css">
 </head>
 
-
 <body data-root="..">
-
   <main class="home">
-
     <section class="journal-shell">
-
       <div id="nav-container"></div>
 
-
       <section class="journal settings-journal">
-
         <section class="settings-area">
-
           <div class="game-panel settings-panel">
-
-            <div class="settings-title">
-              Settings
-            </div>
-
-
-            <!-- WEATHER -->
-
-            <div class="settings-section">
-
-              <div class="settings-section-title">
-                Weather
-              </div>
-
-              <label class="settings-row">
-
-                <span>
-                  Show sunrise and sunset
-                </span>
-
-                <input
-                  id="setting-sun-times"
-                  type="checkbox"
-                >
-
-              </label>
-
-            </div>
-
+            <h1 class="settings-title">Settings</h1>
 
             <!-- ACCOUNT -->
-
-            <div class="settings-section">
-
-              <div class="settings-section-title">
-                Account
-              </div>
-
-              <div id="supabase-auth-status">
+            <section class="settings-section">
+              <h2 class="settings-section-title">Account</h2>
+              <div id="supabase-auth-status" role="status" aria-live="polite">
                 Not signed in
               </div>
 
-              <div
-                id="supabase-login-form"
-                class="settings-login"
-              >
-
+              <div id="supabase-login-form" class="settings-login">
                 <input
                   id="supabase-email"
                   type="email"
                   placeholder="Email"
+                  aria-label="Email"
+                  autocomplete="email"
                 >
-
                 <input
                   id="supabase-password"
                   type="password"
                   placeholder="Password"
+                  aria-label="Password"
+                  autocomplete="current-password"
                 >
-
-                <button
-                  id="supabase-login"
-                  type="button"
-                >
-                  Sign in
-                </button>
-
+                <button id="supabase-login" type="button">Sign in</button>
               </div>
 
-              <button
-                id="supabase-logout"
-                type="button"
-                hidden
-              >
-                Sign out
-              </button>
-
-            </div>
-
+              <button id="supabase-logout" type="button" hidden>Sign out</button>
+            </section>
 
             <!-- UPCOMING -->
-
-            <div class="settings-section">
-
-              <div class="settings-section-title">
-                Upcoming
-              </div>
+            <section class="settings-section">
+              <h2 class="settings-section-title">Upcoming</h2>
 
               <label class="settings-row">
-
-                <span>
-                  Show daily tasks
-                </span>
-
-                <input
-                  id="setting-daily-tasks"
-                  type="checkbox"
-                >
-
+                <span>Show daily tasks</span>
+                <input id="setting-daily-tasks" type="checkbox">
               </label>
 
               <label class="settings-row">
-
-                <span>
-                  Show weekly tasks
-                </span>
-
-                <input
-                  id="setting-weekly-tasks"
-                  type="checkbox"
-                >
-
+                <span>Show weekly tasks</span>
+                <input id="setting-weekly-tasks" type="checkbox">
               </label>
 
               <label class="settings-row">
-
-                <span>
-                  Show monthly tasks
-                </span>
-
-                <input
-                  id="setting-monthly-tasks"
-                  type="checkbox"
-                >
-
+                <span>Show monthly tasks</span>
+                <input id="setting-monthly-tasks" type="checkbox">
               </label>
 
               <label class="settings-row">
-
-                <span>
-                  Show yearly tasks
-                </span>
-
-                <input
-                  id="setting-yearly-tasks"
-                  type="checkbox"
-                >
-
+                <span>Show yearly tasks</span>
+                <input id="setting-yearly-tasks" type="checkbox">
               </label>
-
-            </div>
-
+            </section>
           </div>
-
         </section>
-
       </section>
-
     </section>
-
   </main>
 
-
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
   <script src="../config.js"></script>
-
   <script src="../scripts/app.js"></script>
   <script src="../scripts/nav.js"></script>
   <script src="../scripts/settings.js"></script>
-
 </body>
-
 </html>

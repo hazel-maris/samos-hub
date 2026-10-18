@@ -221,6 +221,16 @@
       .eq("user_id", userId).in("id", matches.map(item => item.id));
   }
 
+  // Phone-only filter disclosure. Desktop filters remain permanently visible.
+  const filterToggle = $("grocery-filter-toggle");
+  const filterPanel = $("grocery-filters");
+  filterToggle?.addEventListener("click", () => {
+    const open = filterToggle.getAttribute("aria-expanded") !== "true";
+    filterToggle.setAttribute("aria-expanded", String(open));
+    filterToggle.textContent = open ? "⚙ Filters ▴" : "⚙ Filters ▾";
+    filterPanel.classList.toggle("is-open", open);
+  });
+
   addToggle.addEventListener("click", () => setAddOpen(addForm.hidden));
   $("grocery-add-cancel").addEventListener("click", () => setAddOpen(false));
   addForm.addEventListener("submit", async event => {
