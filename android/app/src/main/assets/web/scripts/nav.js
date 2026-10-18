@@ -1,7 +1,6 @@
 // ============================================================
 // SamOS Hub — Shared Navigation
 // ============================================================
-
 const navContainer = document.getElementById("nav-container");
 
 if (navContainer) {
@@ -12,58 +11,31 @@ if (navContainer) {
       if (!response.ok) {
         throw new Error(`Nav failed to load: ${response.status}`);
       }
-
       return response.text();
     })
     .then(html => {
       navContainer.innerHTML = html;
+      
+      navContainer.querySelectorAll(".nav-icon").forEach(icon => {
+        const filename = icon.getAttribute("src").split("/").pop();
+        icon.src = `${root}/icons/${filename}`;
+      });
 
-      // Add Groceries next to Upcoming if the shared nav doesn't
-      // already include it. This keeps the current nav.html usable.
-      if (!navContainer.querySelector('.journal-tab[data-page="groceries"]')) {
-        const groceriesTab = document.createElement("a");
-        groceriesTab.className = "journal-tab";
-        groceriesTab.dataset.page = "groceries";
-        groceriesTab.dataset.path = "html/groceries.html";
-        groceriesTab.textContent = "Groceries";
-
-        const upcomingTab = navContainer.querySelector(
-          '.journal-tab[data-page="upcoming"]'
-        );
-
-        if (upcomingTab) {
-          upcomingTab.insertAdjacentElement("afterend", groceriesTab);
-        } else {
-          const lastTab = navContainer.querySelector(".journal-tab:last-of-type");
-          if (lastTab) {
-            lastTab.insertAdjacentElement("afterend", groceriesTab);
-          } else {
-            navContainer.appendChild(groceriesTab);
-          }
-        }
-      }
-
-      const tabs = navContainer.querySelectorAll(".journal-tab");
-
-      tabs.forEach(tab => {
+      // All six navigation tabs now live in components/nav.html.
+      navContainer.querySelectorAll(".journal-tab").forEach(tab => {
         const path = tab.dataset.path;
-        if (path) {
-          tab.href = `${root}/${path}`;
-        }
+        if (path) tab.href = `${root}/${path}`;
       });
 
       setActiveNavTab();
       setupPersistentNavigation();
     })
-    .catch(error => {
-      console.error("Could not load navigation:", error);
-    });
+    .catch(error => console.error("Could not load navigation:", error));
 }
 
 // ============================================================
 // ACTIVE TAB
 // ============================================================
-
 function setActiveNavTab() {
   const path = window.location.pathname;
   let currentPage = "home";
@@ -82,6 +54,11 @@ function setActiveNavTab() {
 
   document.querySelectorAll(".journal-tab").forEach(tab => {
     tab.classList.toggle("active", tab.dataset.page === currentPage);
+    if (tab.dataset.page === currentPage) {
+      tab.setAttribute("aria-current", "page");
+    } else {
+      tab.removeAttribute("aria-current");
+    }
   });
 }
 
@@ -89,7 +66,6 @@ function setActiveNavTab() {
 // PERSISTENT NAVIGATION
 // Keep the Home document alive so Spotify keeps playing.
 // ============================================================
-
 function setupPersistentNavigation() {
   const tabs = navContainer?.querySelectorAll(".journal-tab") || [];
 
@@ -98,7 +74,6 @@ function setupPersistentNavigation() {
       if (tab.dataset.page === "home") {
         tab.addEventListener("click", event => {
           event.preventDefault();
-
           window.parent.postMessage(
             { type: "samos-navigation", page: "home" },
             window.location.origin
@@ -106,7 +81,6 @@ function setupPersistentNavigation() {
         });
       }
     });
-
     return;
   }
 
@@ -114,7 +88,6 @@ function setupPersistentNavigation() {
   if (!isHome) return;
 
   let pageFrame = document.getElementById("samos-page-frame");
-
   if (!pageFrame) {
     pageFrame = document.createElement("iframe");
     pageFrame.id = "samos-page-frame";
@@ -125,7 +98,6 @@ function setupPersistentNavigation() {
 
   tabs.forEach(tab => {
     if (tab.dataset.page === "home") return;
-
     tab.addEventListener("click", event => {
       event.preventDefault();
       pageFrame.src = tab.href;
@@ -134,13 +106,8 @@ function setupPersistentNavigation() {
   });
 
   window.addEventListener("message", event => {
-    if (
-      event.origin !== window.location.origin ||
-      event.data?.type !== "samos-navigation"
-    ) {
-      return;
-    }
-
+    if (event.origin !== window.location.origin ||
+        event.data?.type !== "samos-navigation") return;
     if (event.data.page === "home") {
       pageFrame.hidden = true;
       pageFrame.src = "about:blank";

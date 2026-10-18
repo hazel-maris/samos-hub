@@ -360,47 +360,16 @@ function itemOccursOnDate(
 // ============================================================
 // EXPIRED OCCURRENCES
 // ============================================================
-function occurrenceHasPassed(
-  item,
-  occurrenceDate,
-  now
-) {
-  const today =
-    dateToISO(
-      now
-    );
-  if (
-    occurrenceDate <
-    today
-  ) {
-    return true;
-  }
-  if (
-    occurrenceDate !== today ||
-    !item.time
-  ) {
-    return false;
-  }
-  const [
-    hour,
-    minute
-  ] =
-    item.time
-      .split(":")
-      .map(Number);
-  const occurrenceTime =
-    new Date(now);
-  occurrenceTime.setHours(
-    hour,
-    minute,
-    0,
-    0
-  );
-  return (
-    occurrenceTime <
-    now
-  );
+
+function occurrenceHasPassed(item, occurrenceDate, now) {
+  // An occurrence stays visible for its entire calendar day.
+  // Scheduled times do not cause today's tasks to disappear.
+
+  const today = dateToISO(now);
+
+  return occurrenceDate < today;
 }
+
 // ============================================================
 // NEXT OCCURRENCE
 // ============================================================

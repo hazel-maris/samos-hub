@@ -428,62 +428,55 @@
 
 }
 
-/* ============================================================
-   SamOS Hub — compact mobile letter tabs
-   Append to the END of styles/mobile.css.
-   Uses existing .journal-tab data-page attributes: no JS changes.
-   ============================================================ */
-@media (max-width: 600px) {
-  /* Existing navigation wrapper, regardless of its underlying element. */
-  #nav-container {
-    width: 100%;
-    min-width: 0;
-  }
+/* SamOS Hub — mobile icon-only navigation */
+/* SVG icons are embedded in nav.html; no external icon library needed. */
+#nav-container .journal-tab .nav-icon { display: none; }
 
-  /* Make links themselves fixed-size tabs instead of their desktop text width. */
+@media (max-width: 600px) {
+  #nav-container { width: 100%; min-width: 0; }
+  #nav-container .journal-tabs {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 5px;
+    padding-left: 0;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
   #nav-container .journal-tab {
     position: relative;
     display: inline-flex;
+    flex: 1 0 38px;
     align-items: center;
     justify-content: center;
-    width: 38px;
+    width: auto;
     min-width: 38px;
-    max-width: 38px;
-    height: 38px;
-    min-height: 38px;
+    max-width: none;
+    height: 44px;
+    min-height: 44px;
     box-sizing: border-box;
     padding: 0;
-    margin-right: 3px;
-    font-size: 0 !important; /* hide rendered text, preserve accessible name */
+    margin: 0;
+    font-size: inherit;
     line-height: 1;
     white-space: nowrap;
     overflow: hidden;
     text-decoration: none;
     vertical-align: bottom;
   }
-
-  #nav-container .journal-tab::after {
+  #nav-container .journal-tab .nav-label { display: none; }
+  #nav-container .journal-tab .nav-icon {
     display: block;
-    font-size: 17px;
-    line-height: 1;
-    font-weight: 700;
-    color: inherit;
+    width: 23px;
+    height: 23px;
+    flex: 0 0 auto;
   }
-
-  #nav-container .journal-tab[data-page="home"]::after { content: "H"; }
-  #nav-container .journal-tab[data-page="upcoming"]::after { content: "U"; }
-  #nav-container .journal-tab[data-page="groceries"]::after { content: "G"; }
-  #nav-container .journal-tab[data-page="quotes"]::after { content: "Q"; }
-  #nav-container .journal-tab[data-page="settings"]::after { content: "S"; }
-
-  /* Preserve normal focus visibility for keyboard navigation. */
+  #nav-container .journal-tab::after,
+  #nav-container .journal-tab::before { content: none; }
   #nav-container .journal-tab:focus-visible {
     outline: 2px solid #617548;
-    outline-offset: 2px;
+    outline-offset: -3px;
   }
 }
-
-@media (max-width: 700px) { #nav-container .journal-tab[data-page="triage"]::after { content: "T"; } }
 
 /* SamOS Upcoming: portrait phone-only layout. Does not affect desktop or other tabs. */
 @media (max-width: 900px) and (orientation: portrait) {
@@ -694,5 +687,75 @@
     text-align: left;
     -webkit-appearance: auto;
     appearance: auto;
+  }
+}
+
+
+/* Desktop: text labels only */
+#nav-container .nav-icon {
+  display: none;
+}
+
+/* Mobile: SVG icons only */
+@media (max-width: 600px) {
+  #nav-container .journal-tabs {
+    display: flex;
+    gap: 3px;
+    overflow-x: auto;
+    padding-left: 0;
+  }
+
+  #nav-container .journal-tab {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1 0 38px;
+    min-width: 38px;
+    height: 42px;
+    padding: 0;
+    margin: 0;
+    font-size: 0;
+  }
+
+  #nav-container .nav-label {
+    display: none;
+  }
+
+  #nav-container .nav-icon {
+    display: block;
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+  }
+
+  #nav-container .journal-tab::after {
+    content: none !important;
+    display: none !important;
+  }
+}
+
+
+/* SamOS navigation — pixel-art PNG icons */
+#nav-container .nav-icon {
+  display: none;
+}
+
+@media (max-width: 600px) {
+  #nav-container .nav-label {
+    display: none;
+  }
+
+  #nav-container .nav-icon {
+    display: block;
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+    image-rendering: pixelated;
+  }
+
+  #nav-container .journal-tab {
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 }
