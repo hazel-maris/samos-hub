@@ -1,0 +1,840 @@
+/* =========================================================
+   PORTRAIT / PHONE FALLBACK
+   ========================================================= */
+
+@media (max-width: 900px) and (orientation: portrait) {
+  html,
+  body {
+    height: auto;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  body {
+    min-height: 100dvh;
+  }
+
+  .home {
+    min-height: 100dvh;
+    align-items: flex-start;
+    padding:
+      max(18px, calc(env(safe-area-inset-top) + 12px))
+      12px
+      max(28px, calc(env(safe-area-inset-bottom) + 16px));
+  }
+
+  .journal-shell {
+    width: 100%;
+    height: auto;
+  }
+
+  .journal-tabs {
+    padding-left: 10px;
+    overflow-x: auto;
+  }
+
+  .journal {
+    grid-template-columns: 1fr;
+    grid-template-rows:
+      auto
+      auto
+      auto;
+    gap: 18px;
+    padding:
+      20px
+      14px
+      18px;
+  }
+
+  .orientation {
+    grid-column: 1;
+    grid-row: auto;
+    height: auto;
+    grid-template-rows:
+      auto
+      auto
+      auto;
+  }
+
+  .media-area {
+    grid-column: 1;
+    grid-row: auto;
+    height: auto;
+  }
+
+  .journal > blockquote {
+    grid-column: 1;
+    grid-row: auto;
+    padding:
+      8px
+      0;
+  }
+
+
+  /* =======================================================
+     DATE / TIME
+     ======================================================= */
+  #time {
+    display: none !important;
+  }
+
+  #date {
+    font-size:
+      clamp(
+        2rem,
+        7.5vw,
+        2.8rem
+      );
+  }
+
+
+  /* =======================================================
+     WEATHER
+     ======================================================= */
+  .weather {
+    grid-template-columns:
+      minmax(0, 1fr)
+      minmax(0, 1fr);
+  }
+
+  .weather-forecast-side {
+    padding-right: 0;
+  }
+
+  .weather-alert-side {
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding:
+      10px
+      0
+      10px
+      24px;
+    border-left:
+      2px solid
+      rgba(122, 90, 58, 0.6);
+    overflow: hidden;
+    font-size: 0.95em;
+  }
+
+  .weather-upcoming {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .weather-upcoming .weather-alert-heading {
+    margin-bottom: 10px;
+  }
+
+  .weather-upcoming .forecast-line {
+    margin:
+      0
+      0
+      6px;
+    font-family:
+      "vt323",
+      sans-serif;
+    font-size:
+      clamp(
+        1.3rem,
+        1.4vw,
+        1.65rem
+      );
+    line-height: 1.05;
+  }
+
+  #weather-afternoon:not([hidden]) ~ #weather-event,
+  #weather-overnight:not([hidden]) ~ #weather-event {
+    margin-top: 16px;
+  }
+
+  .weather-alert-divider {
+    width: 100%;
+    margin:
+      22px
+      0
+      14px;
+    border-top:
+      1px solid
+      rgba(122, 90, 58, 0.35);
+  }
+
+  .weather-alert-heading {
+    margin:
+      0
+      0
+      5px;
+    font-family:
+      "vt323",
+      sans-serif;
+    font-size:
+      clamp(
+        1.25rem,
+        1.4vw,
+        1.65rem
+      );
+    line-height: 1;
+  }
+
+  #weather-event {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin: 0;
+    font-family:
+      "vt323",
+      sans-serif;
+    font-size:
+      clamp(
+        1.05rem,
+        1.2vw,
+        1.4rem
+      );
+    line-height: 1.05;
+  }
+
+  #weather-alerts {
+    margin: 0;
+    font-family:
+      "vt323",
+      sans-serif;
+    font-size:
+      clamp(
+        1.05rem,
+        1.2vw,
+        1.4rem
+      );
+    line-height: 1.05;
+    opacity: 0.72;
+  }
+
+  .no-weather-alerts {
+    opacity: 0.75;
+  }
+
+  .weather-alert-line {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    margin:
+      0
+      0
+      6px;
+    opacity: 1;
+  }
+
+  .weather-alert-icon,
+  #weather-event-icon {
+    width: 26px;
+    height: 26px;
+    flex: 0 0 auto;
+    object-fit: contain;
+    image-rendering: pixelated;
+  }
+
+  #sun-times {
+    margin-top: 8px;
+    font-family:
+      "vt323",
+      sans-serif;
+    font-size:
+      clamp(
+        1.15rem,
+        1.3vw,
+        1.5rem
+      );
+    line-height: 1;
+    opacity: 0.75;
+  }
+
+
+  /* =======================================================
+     UPCOMING
+     ======================================================= */
+  .upcoming-dates {
+    column-count: 1;
+  }
+
+
+  /* =======================================================
+     SPOTIFY
+     ======================================================= */
+  .spotify-panel {
+    min-height: 520px;
+    padding:
+      22px
+      18px;
+  }
+
+  .spotify-heading-row {
+    align-items: flex-start;
+  }
+
+  .mini-player {
+    height: auto;
+  }
+
+  .album-container {
+    width:
+      min(
+        75vw,
+        300px
+      );
+    height: auto;
+  }
+
+}
+
+
+/* =========================================================
+   SMALL PHONE WEATHER
+   ========================================================= */
+
+@media (max-width: 600px) {
+  .weather-text-stack {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+  }
+
+}
+
+/* =========================================================
+   SMALL PHONE WEATHER
+   ========================================================= */
+
+@media (max-width: 600px) {
+  #weather-current {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .weather-temp-row,
+  .weather-condition-row {
+    gap: 8px;
+  }
+  #weather-temp {
+    font-size:
+      clamp(
+        1.8rem,
+        7vw,
+        2.4rem
+      );
+  }
+  #weather-condition {
+    font-size:
+      clamp(
+        1.65rem,
+        6vw,
+        2.2rem
+      );
+  }
+  .weather-temp-row img,
+  .weather-condition-row img {
+    width: 34px;
+    height: 34px;
+  }
+
+}
+
+/* =========================================================
+   MOBILE NAVIGATION — SIX PIXEL-ART PNG TABS
+   ========================================================= */
+#nav-container .nav-icon {
+  display: none;
+}
+
+@media (max-width: 600px) {
+  #nav-container {
+    width: 100%;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  #nav-container .journal-tabs {
+    display: flex;
+    flex-wrap: nowrap;
+    width: 100%;
+    gap: 3px;
+    padding: 0;
+    margin: 0;
+    overflow: visible;
+    transform: translateY(2px);
+  }
+
+  #nav-container .journal-tab {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1 1 0;
+    width: auto;
+    min-width: 0;
+    max-width: none;
+    height: 48px;
+    min-height: 48px;
+    padding: 0;
+    margin: 0;
+    font-size: 0;
+    line-height: 1;
+    box-sizing: border-box;
+    white-space: nowrap;
+    text-decoration: none;
+  }
+
+  #nav-container .nav-label {
+    display: none;
+  }
+
+  #nav-container .nav-icon {
+    display: block;
+    width: 28px;
+    height: 28px;
+    max-width: 100%;
+    object-fit: contain;
+    image-rendering: pixelated;
+    flex-shrink: 0;
+  }
+
+  #nav-container .journal-tab::before {
+    content: none;
+  }
+
+  #nav-container .journal-tab:focus-visible {
+    outline: 2px solid #617548;
+    outline-offset: -3px;
+  }
+}
+
+/* SamOS Upcoming: portrait phone-only layout. Does not affect desktop or other tabs. */
+@media (max-width: 900px) and (orientation: portrait) {
+  body:has(.upcoming-journal) .home {
+    min-height: 100dvh;
+    align-items: stretch;
+    justify-content: flex-start;
+    padding: max(22px, env(safe-area-inset-top)) 10px max(16px, env(safe-area-inset-bottom));
+    box-sizing: border-box;
+  }
+  body:has(.upcoming-journal) .journal-shell {
+    width: 100%;
+    height: auto;
+    min-height: calc(100dvh - max(22px, env(safe-area-inset-top)) - max(16px, env(safe-area-inset-bottom)));
+    margin: 0;
+  }
+  body:has(.upcoming-journal) .upcoming-journal {
+    flex: 1 1 auto;
+    min-height: 0;
+    padding: 12px 12px 16px;
+    overflow: visible;
+  }
+  body:has(.upcoming-journal) .upcoming-page-panel {
+    min-height: 100%;
+    height: auto;
+    padding: 16px 14px;
+    overflow: visible;
+    box-sizing: border-box;
+  }
+  body:has(.upcoming-journal) #upcoming-list {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto;
+    gap: 12px;
+    min-height: 0;
+  }
+  body:has(.upcoming-journal) .upcoming-list-section {
+    min-width: 0;
+    height: 265px;
+    min-height: 0;
+  }
+  body:has(.upcoming-journal) .upcoming-list-section.is-collapsed { height: 53px; }
+  body:has(.upcoming-journal) .upcoming-section-items {
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    padding: 6px;
+  }
+  body:has(.upcoming-journal) .upcoming-form,
+  body:has(.upcoming-journal) .upcoming-edit-fields {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  body:has(.upcoming-journal) .upcoming-form > *,
+  body:has(.upcoming-journal) .upcoming-edit-fields > * {
+    min-width: 0;
+    grid-column: 1 / -1;
+  }
+  body:has(.upcoming-journal) .upcoming-field input,
+  body:has(.upcoming-journal) .upcoming-field select,
+  body:has(.upcoming-journal) .upcoming-edit-fields input,
+  body:has(.upcoming-journal) .upcoming-edit-fields select { font-size: 16px; }
+  body:has(.upcoming-journal) .upcoming-item {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: "date actions" "main actions";
+    gap: 4px 10px;
+    align-items: start;
+    padding: 9px 8px;
+  }
+  body:has(.upcoming-journal) .upcoming-item-date {
+    grid-area: date;
+    white-space: nowrap;
+    font-size: 1.35rem;
+  }
+  body:has(.upcoming-journal) .upcoming-item-main { grid-area: main; }
+  body:has(.upcoming-journal) .upcoming-item-title {
+    font-size: 1.5rem;
+    overflow-wrap: anywhere;
+  }
+  body:has(.upcoming-journal) .upcoming-item-actions {
+    grid-area: actions;
+    display: flex;
+    flex-direction: row;
+    align-self: center;
+    gap: 4px;
+  }
+  body:has(.upcoming-journal) .upcoming-icon-button {
+    width: 36px;
+    height: 38px;
+    padding: 3px;
+  }
+  /* Unicode symbols stay legible even when the icon PNGs do not load. */
+  body:has(.upcoming-journal) .upcoming-icon-button[data-action="edit"] img,
+  body:has(.upcoming-journal) .upcoming-icon-button[data-action="delete"] img { display: none; }
+  body:has(.upcoming-journal) .upcoming-icon-button[data-action="edit"]::after { content: "✎"; font: 26px/1 Arial, sans-serif; }
+  body:has(.upcoming-journal) .upcoming-icon-button[data-action="delete"]::after { content: "×"; font: 29px/1 Arial, sans-serif; }
+  body:has(.upcoming-journal) .upcoming-item-editing {
+    display: grid;
+    grid-template-columns: minmax(0,1fr);
+    grid-template-areas: none;
+  }
+  body:has(.upcoming-journal) .upcoming-item-editing .upcoming-item-actions { grid-area: auto; }
+}
+
+
+/* Upcoming phone: a single filtered list, not four nested scroll regions. */
+@media (max-width: 900px) and (orientation: portrait) {
+  body:has(.upcoming-journal) #upcoming-list {
+    display: block;
+    min-height: 0;
+    width: 100%;
+  }
+  body:has(.upcoming-journal) .upcoming-mobile-filter-bar {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    margin: 4px 0 18px;
+  }
+  body:has(.upcoming-journal) .upcoming-mobile-filter-bar label {
+    font-size: 1.3rem;
+    font-weight: 600;
+  }
+  body:has(.upcoming-journal) #upcoming-mobile-filter {
+    width: 100%;
+    min-height: 48px;
+    box-sizing: border-box;
+    padding: 8px 12px;
+    font-size: 1.4rem;
+    color: var(--text, #352b21);
+    background: #f7edd3;
+    border: 2px solid #967b58;
+    border-radius: 0;
+  }
+  body:has(.upcoming-journal) .upcoming-mobile-results {
+    border: 2px solid rgba(122,90,58,.75);
+    background: rgba(255,252,241,.20);
+    min-width: 0;
+  }
+  body:has(.upcoming-journal) .upcoming-mobile-results-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 14px;
+    font-size: 1.55rem;
+    background: rgba(218,173,94,.22);
+    border-bottom: 1px solid rgba(122,90,58,.45);
+  }
+  body:has(.upcoming-journal) .upcoming-mobile-results-heading span:last-child {
+    font-size: 1.15rem;
+    opacity: .8;
+  }
+  body:has(.upcoming-journal) .upcoming-mobile-items {
+    padding: 8px;
+  }
+  body:has(.upcoming-journal) .upcoming-item {
+    display: grid;
+    grid-template-columns: minmax(0,1fr) auto;
+    grid-template-areas: "date actions" "main actions";
+    gap: 2px 8px;
+    align-items: center;
+    min-height: 0;
+    padding: 13px 9px;
+  }
+  body:has(.upcoming-journal) .upcoming-item-date {
+    grid-area: date;
+    font-size: 1.55rem;
+    font-weight: 700;
+    line-height: 1.1;
+  }
+  body:has(.upcoming-journal) .upcoming-item-title {
+    font-size: 1.34rem;
+    font-weight: 500;
+    line-height: 1.2;
+    overflow-wrap: anywhere;
+  }
+  body:has(.upcoming-journal) .upcoming-item-meta {
+    font-size: 1.32rem;
+    color: var(--text, #352b21);
+    opacity: 1;
+    line-height: 1.25;
+  }
+  body:has(.upcoming-journal) .upcoming-item-actions {
+    grid-area: actions;
+    flex-direction: row;
+    align-self: center;
+  }
+  body:has(.upcoming-journal) .upcoming-item-editing {
+    display: block;
+  }
+  body:has(.upcoming-journal) .upcoming-item-editing .upcoming-item-actions {
+    margin-top: 10px;
+  }
+}
+
+/* iPhone: use one native category picker; counts live in the option labels. */
+@media (max-width: 900px) and (orientation: portrait) {
+  body:has(.upcoming-journal) #upcoming-mobile-filter {
+    display: block;
+    width: 100%;
+    min-height: 48px;
+    font-family: inherit;
+    font-size: 1.35rem;
+    text-align: left;
+    -webkit-appearance: auto;
+    appearance: auto;
+  }
+}
+
+
+/* =========================================================
+   TRIAGE — FULL-HEIGHT MOBILE LAYOUT
+   ========================================================= */
+@media (max-width: 900px) and (orientation: portrait) {
+  body:has(.triage-journal) {
+    min-height: 100dvh;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  body:has(.triage-journal) .home {
+    min-height: 100dvh;
+    align-items: stretch;
+    justify-content: flex-start;
+    padding: max(22px, env(safe-area-inset-top))
+             10px
+             max(16px, env(safe-area-inset-bottom));
+  }
+
+  body:has(.triage-journal) .journal-shell {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: auto;
+    min-height: calc(100dvh - max(22px, env(safe-area-inset-top)) - max(16px, env(safe-area-inset-bottom)));
+    margin: 0;
+  }
+
+  body:has(.triage-journal) .triage-journal {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    height: auto;
+    min-height: 0;
+    padding: 12px 12px 16px;
+  }
+
+  body:has(.triage-journal) .triage-panel {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    width: 100%;
+    height: auto;
+    min-height: 0;
+  }
+}
+
+/* =========================================================
+   SPOTIFY — MOBILE VERTICAL PLAYER
+   Preserve desktop styling and playback functionality.
+   ========================================================= */
+@media (max-width: 900px) and (orientation: portrait) {
+  .media-area {
+    height: auto;
+    min-height: 0;
+  }
+
+  .spotify-panel {
+    height: auto;
+    min-height: 0;
+    padding: 20px 16px 24px;
+    overflow: visible;
+  }
+
+  .spotify-heading-row {
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  #spotify-login {
+    flex-shrink: 0;
+    padding: 7px 10px;
+  }
+
+  .mini-player {
+    flex: 0 0 auto;
+    display: grid;
+    grid-template-rows: auto auto;
+    height: auto;
+    min-height: 0;
+    gap: 20px;
+    padding-top: 16px;
+  }
+
+  .spotify-selection {
+    grid-template-columns: minmax(0, 1fr) clamp(48px, 13vw, 72px);
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .spotify-moods {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 7px;
+  }
+
+  .mood-button {
+    min-height: 80px;
+    padding: 8px 2px;
+    gap: 6px;
+    font-size: clamp(1.15rem, 4.4vw, 1.6rem);
+    line-height: 1;
+    overflow-wrap: anywhere;
+  }
+
+  .mood-icon {
+    font-size: clamp(1.7rem, 7vw, 2.4rem);
+  }
+
+  .playlist-button {
+    min-height: 80px;
+    font-size: 2.4rem;
+  }
+
+  .spotify-playback-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    justify-items: center;
+    gap: 18px;
+    min-height: 0;
+    width: 100%;
+  }
+
+  .spotify-now-playing {
+    width: 100%;
+    min-width: 0;
+    gap: 10px;
+  }
+
+  .album-container {
+    width: min(65vw, 220px);
+    max-width: 100%;
+    height: auto;
+    max-height: none;
+    flex: 0 0 auto;
+    aspect-ratio: 1 / 1;
+  }
+
+  .spotify-playback-actions {
+    width: 100%;
+    min-width: 0;
+    gap: 16px;
+  }
+
+  .player-controls {
+    width: 100%;
+    gap: clamp(10px, 4vw, 20px);
+    flex-wrap: nowrap;
+  }
+
+  .player-controls button {
+    width: clamp(56px, 17vw, 76px);
+    height: clamp(56px, 17vw, 76px);
+    flex: 0 0 auto;
+  }
+
+  .player-controls #play-pause {
+    width: clamp(68px, 20vw, 88px);
+    height: clamp(68px, 20vw, 88px);
+  }
+
+  .audio-controls {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    flex-wrap: nowrap;
+  }
+
+  .audio-controls #spotify-shuffle {
+    width: 78px;
+    min-width: 0;
+    flex: 0 0 auto;
+    font-size: 1.2rem;
+  }
+
+  .audio-controls #spotify-shuffle .shuffle-track {
+    transform: scale(0.85);
+    transform-origin: top center;
+    margin-bottom: -5px;
+  }
+
+  .volume-controls {
+    flex: 0 1 auto;
+    min-width: 0;
+    margin-top: 0;
+    gap: clamp(3px, 2vw, 12px);
+  }
+
+  .volume-controls button {
+    width: clamp(38px, 11vw, 52px);
+    height: clamp(38px, 11vw, 52px);
+    flex: 0 0 auto;
+    font-size: clamp(1.65rem, 7vw, 2.2rem);
+  }
+
+  #volume-feedback {
+    max-width: 100%;
+  }
+}
+
+
+/* =========================================================
+   SAMOS MORNING — PHONE COLOR OVERRIDES ONLY
+   ========================================================= */
+@media (max-width: 900px) and (orientation: portrait) {
+  .weather-alert-side { border-left-color: rgba(117,84,120,.55); }
+  .weather-alert-divider { border-top-color: rgba(117,84,120,.35); }
+  body:has(.upcoming-journal) #upcoming-mobile-filter { background: #fff5fa; border-color: var(--border); color: var(--text); }
+  body:has(.upcoming-journal) .upcoming-mobile-results { background: rgba(255,245,250,.25); border-color: rgba(117,84,120,.75); }
+  body:has(.upcoming-journal) .upcoming-mobile-results-heading { background: rgba(189,182,232,.33); border-bottom-color: rgba(117,84,120,.45); }
+}
+@media (max-width: 600px) {
+  #nav-container .journal-tab:focus-visible { outline-color: #8d79bf; }
+}

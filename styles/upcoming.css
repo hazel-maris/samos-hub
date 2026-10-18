@@ -1127,3 +1127,72 @@
 @media (max-width: 1000px) {
   #upcoming-list { align-content: start; }
 }
+
+
+/* =========================================================
+   SAMOS MORNING — PASTEL COLOR OVERRIDES (LAYOUT UNCHANGED)
+   ========================================================= */
+.upcoming-section-title { border-bottom-color: rgba(117,84,120,.35); }
+.upcoming-field input, .upcoming-field select,
+.upcoming-edit-fields input, .upcoming-edit-fields select,
+.calendar-controls input, .calendar-controls select { background: #fff5fa; border-color: rgba(117,84,120,.72); color: var(--text); }
+.upcoming-field input:focus, .upcoming-field select:focus { box-shadow: 2px 2px 0 rgba(117,84,120,.20); }
+.upcoming-field input::placeholder { color: #8f7798; }
+#upcoming-add, .calendar-nav-button,
+#calendar-today, #calendar-cancel,
+.delete-confirm-actions button,
+.time-mode-button, .time-period-button,
+.time-picker-actions button, .time-minute-adjust button { background: linear-gradient(180deg, #fce4ef, #e6b5d3); border-color: var(--border); color: var(--text); }
+.upcoming-form-status, .upcoming-item-meta, .upcoming-empty,
+.delete-confirm-name { color: #75647e; }
+.upcoming-item { background: rgba(255,245,250,.44); border-color: rgba(117,84,120,.3); }
+.upcoming-icon-button, .date-picker-button, .time-picker-button { background: linear-gradient(180deg, #edf4ff, #c6ddfc); border-color: var(--border); }
+.upcoming-icon-button:hover, .date-picker-button:hover, .time-picker-button:hover { background: #eaf2ff; }
+.delete-confirm-overlay, .calendar-overlay, .time-overlay { background: rgba(57,43,72,.35); }
+.delete-confirm-box, .calendar-box, .time-box { background: #fff0f7; box-shadow: 6px 6px 0 rgba(117,84,120,.25); }
+.calendar-day { background: #fff5fa; border-color: rgba(117,84,120,.3); }
+.calendar-day:hover { background: #eaf2ff; }
+.calendar-day.today { outline-color: #8d79bf; }
+.calendar-day.selected { background: #bdb6e8; }
+.time-mode-button.active, .time-period-button.active { background: #c6ddfc; box-shadow: inset 0 0 0 2px rgba(117,84,120,.15); }
+
+/* =========================================================
+   MORNING THEME OVERRIDES — UPCOMING SECTION BOXES
+   ========================================================= */
+
+
+/* =========================================================
+   MORNING THEME — UPCOMING HEADERS
+   ========================================================= */
+
+.upcoming-section-header,
+.upcoming-section-toggle {
+  background: linear-gradient(
+    180deg,
+    #d5f0e9 0%,
+    #a9d9d2 100%
+  );
+  border-bottom: 1px solid rgba(117, 84, 120, 0.45);
+  color: var(--text);
+}
+
+.upcoming-section-header:hover,
+.upcoming-section-toggle:hover {
+  background: linear-gradient(
+    180deg,
+    #e2f7f1 0%,
+    #bee8df 100%
+  );
+}
+
+/* Mobile filtered-list header */
+
+.upcoming-mobile-results-heading {
+  background: linear-gradient(
+    180deg,
+    #d5f0e9 0%,
+    #a9d9d2 100%
+  );
+  border-bottom: 1px solid rgba(117, 84, 120, 0.45);
+  color: var(--text);
+}
