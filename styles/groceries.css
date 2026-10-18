@@ -153,3 +153,87 @@
   max-width: 900px;
   margin-inline: auto;
 }
+
+/* Keep the grocery page within the Hub viewport instead of
+   allowing rows to spill through the journal frame. */
+.groceries-area > .groceries-panel {
+  display: flex;
+  flex-direction: column;
+  height: min(720px, calc(100dvh - 210px));
+  min-height: 0;
+  overflow: hidden;
+}
+
+.groceries-area > .groceries-panel {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 1180px;
+  height: min(720px, calc(100dvh - 210px));
+  min-height: 430px;
+  overflow: hidden;
+}
+.groceries-panel > .groceries-heading,
+.groceries-panel > .grocery-message { flex: 0 0 auto; }
+.grocery-workspace {
+  display: grid;
+  grid-template-columns: minmax(250px, 36%) minmax(0, 1fr);
+  gap: clamp(14px, 2vw, 26px);
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
+}
+.grocery-sidebar { min-width: 0; overflow-y: auto; padding: 0 5px 10px 0; }
+.grocery-sidebar .grocery-view-tabs { display: flex; flex-direction: column; margin-top: 4px; }
+.grocery-sidebar .grocery-view-tab { width: 100%; flex: 0 0 auto; }
+.grocery-sidebar .grocery-controls { display: flex; flex-direction: column; align-items: stretch; gap: 12px; }
+.grocery-sidebar .grocery-controls > label:not(.grocery-needed-filter) { flex: 0 0 auto; }
+.grocery-add-sidebar { width: 100%; margin: 5px 0 13px; }
+.grocery-results { display: flex; flex-direction: column; min-width: 0; min-height: 0; overflow: hidden; }
+.grocery-results .grocery-list-heading { flex: 0 0 auto; margin: 3px 0 12px; align-items: center; }
+.grocery-collapse-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+.groceries-panel .grocery-collapse-actions button { font-size: .8rem; min-height: 36px; padding: 5px 8px; background: rgba(255,255,255,.35); }
+.grocery-results #grocery-list { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding-right: 8px; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+.grocery-section-toggle { display: flex; align-items: center; width: 100%; gap: 9px; min-height: 39px !important; padding: 5px 3px !important; border: none !important; border-radius: 3px !important; background: transparent !important; text-align: left; font-weight: 700 !important; }
+.grocery-section-toggle:hover { background: rgba(97,117,72,.10) !important; }
+.grocery-section-chevron { width: 1em; flex-shrink: 0; }
+.grocery-section-count { margin-left: auto; font-weight: 400; opacity: .65; }
+.grocery-group.is-collapsed { margin-bottom: 2px; }
+.grocery-group h3 { margin: 0; padding: 0; }
+.grocery-sidebar .grocery-form { margin-bottom: 8px; }
+@media (max-width: 760px) {
+  .groceries-area > .groceries-panel { max-width: 900px; min-height: 0; height: calc(100dvh - 165px); }
+  .grocery-workspace { display: flex; flex-direction: column; gap: 2px; }
+  .grocery-sidebar { flex: 0 0 auto; overflow-y: auto; max-height: 62%; padding-right: 2px; }
+  .grocery-sidebar .grocery-view-tabs { flex-direction: row; margin-top: 10px; }
+  .grocery-sidebar .grocery-view-tab { flex: 1 1 0; }
+  .grocery-sidebar .grocery-controls { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 10px; }
+  .grocery-add-sidebar { width: 100%; margin: 0 0 6px; }
+  .grocery-results { flex: 1 1 auto; min-height: 125px; }
+  .grocery-results .grocery-list-heading { margin-top: 7px; }
+  .groceries-panel .grocery-collapse-actions button { min-height: 36px; }
+}
+@media (max-width: 420px) {
+  .grocery-results .grocery-list-heading { flex-direction: column; align-items: flex-start; }
+  .grocery-sidebar .grocery-controls { grid-template-columns: 1fr 1fr; }
+}
+
+/* ============================================
+   SamOS Groceries — Full-Width Desktop Layout
+   ============================================ */
+
+@media (min-width: 701px) {
+  .groceries-journal,
+  .groceries-area {
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+  }
+
+  .groceries-area > .groceries-panel {
+    width: 100%;
+    max-width: none;
+    flex: 1 1 auto;
+    margin: 0;
+  }
+}

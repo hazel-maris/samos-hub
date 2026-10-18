@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="../styles/base.css">
   <link rel="stylesheet" href="../styles/mobile.css">
   <link rel="stylesheet" href="../styles/groceries.css">
+  <link rel="stylesheet" href="../styles/groceries-layout-v3.css">
 </head>
 <body data-root="..">
   <main class="home">
@@ -21,65 +22,68 @@
               <h1>Groceries</h1>
               <p>Your shopping list and everyday grocery defaults, in one place.</p>
             </header>
-
             <div id="grocery-message" class="grocery-message" role="status" aria-live="polite"></div>
-
-            <div class="grocery-view-tabs" role="group" aria-label="Grocery list view">
-              <button id="grocery-view-shopping" class="grocery-view-tab active" type="button" aria-pressed="true">Shopping List</button>
-              <button id="grocery-view-default" class="grocery-view-tab" type="button" aria-pressed="false">Default List</button>
+            <div class="grocery-workspace">
+              <aside class="grocery-sidebar" aria-label="Grocery list controls">
+                <div class="grocery-view-tabs" role="group" aria-label="Grocery list view">
+                  <button id="grocery-view-shopping" class="grocery-view-tab active" type="button" aria-pressed="true">Shopping List</button>
+                  <button id="grocery-view-default" class="grocery-view-tab" type="button" aria-pressed="false">Default List</button>
+                </div>
+                <p id="grocery-view-description" class="grocery-view-description">Only what you need to buy right now.</p>
+                <section class="grocery-controls" aria-label="Grocery filters">
+                  <label>Store
+                    <select id="grocery-store-filter"><option value="">All stores</option></select>
+                  </label>
+                  <label>Storage
+                    <select id="grocery-storage-filter">
+                      <option value="">All storage</option>
+                      <option value="Shelf-stable">Shelf-stable</option>
+                      <option value="Refrigerator">Refrigerator</option>
+                      <option value="Freezer">Freezer</option>
+                      <option value="Fresh produce">Fresh produce</option>
+                      <option value="Cooking basics">Cooking basics</option>
+                      <option value="Seasonings">Seasonings</option>
+                    </select>
+                  </label>
+                </section>
+                <button id="grocery-add-toggle" class="grocery-primary grocery-add-sidebar" type="button" aria-expanded="false" aria-controls="grocery-add-form">+ Add item</button>
+                <form id="grocery-add-form" class="grocery-form" hidden>
+                  <label>Item name <input name="name" id="grocery-new-name" type="text" maxlength="100" required placeholder="e.g. Crackers" autocomplete="off"></label>
+                  <label>Storage category
+                    <select name="storage" required>
+                      <option value="Shelf-stable">Shelf-stable</option>
+                      <option value="Refrigerator">Refrigerator</option>
+                      <option value="Freezer">Freezer</option>
+                      <option value="Fresh produce">Fresh produce</option>
+                      <option value="Cooking basics">Cooking basics</option>
+                      <option value="Seasonings">Seasonings</option>
+                    </select>
+                  </label>
+                  <label>Stores (optional) <input name="stores" type="text" maxlength="200" placeholder="e.g. Dollar Tree, Walmart" autocomplete="off"></label>
+                  <p class="grocery-help">Separate multiple stores with commas. No brands or quantities needed.</p>
+                  <label class="grocery-inline-check"><input name="needed" type="checkbox" checked> Need to buy</label>
+                  <div class="grocery-form-actions">
+                    <button type="submit" class="grocery-primary">Save item</button>
+                    <button type="button" id="grocery-add-cancel">Cancel</button>
+                  </div>
+                </form>
+              </aside>
+              <section class="grocery-results" aria-label="Grocery items">
+                <div class="grocery-list-heading">
+                  <h2><span id="grocery-list-title">Shopping List</span> <span id="grocery-count"></span></h2>
+                  <div class="grocery-collapse-actions">
+                    <button id="grocery-collapse-all" type="button">Collapse all</button>
+                    <button id="grocery-expand-all" type="button">Expand all</button>
+                  </div>
+                </div>
+                <div id="grocery-list" class="grocery-list" aria-live="polite">Loading groceries…</div>
+              </section>
             </div>
-            <p id="grocery-view-description" class="grocery-view-description">Only what you need to buy right now.</p>
-
-            <section class="grocery-controls" aria-label="Grocery filters">
-              <label>Store
-                <select id="grocery-store-filter"><option value="">All stores</option></select>
-              </label>
-              <label>Storage
-                <select id="grocery-storage-filter">
-                  <option value="">All storage</option>
-                  <option value="Shelf-stable">Shelf-stable</option>
-                  <option value="Refrigerator">Refrigerator</option>
-                  <option value="Freezer">Freezer</option>
-                  <option value="Fresh produce">Fresh produce</option>
-                  <option value="Cooking basics">Cooking basics</option>
-                  <option value="Seasonings">Seasonings</option>
-                </select>
-              </label>
-            </section>
-
-            <div class="grocery-list-heading">
-              <h2><span id="grocery-list-title">Shopping List</span> <span id="grocery-count"></span></h2>
-              <button id="grocery-add-toggle" class="grocery-primary" type="button" aria-expanded="false" aria-controls="grocery-add-form">+ Add item</button>
-            </div>
-
-            <form id="grocery-add-form" class="grocery-form" hidden>
-              <label>Item name <input name="name" id="grocery-new-name" type="text" maxlength="100" required placeholder="e.g. Crackers" autocomplete="off"></label>
-              <label>Storage category
-                <select name="storage" required>
-                  <option value="Shelf-stable">Shelf-stable</option>
-                  <option value="Refrigerator">Refrigerator</option>
-                  <option value="Freezer">Freezer</option>
-                  <option value="Fresh produce">Fresh produce</option>
-                  <option value="Cooking basics">Cooking basics</option>
-                  <option value="Seasonings">Seasonings</option>
-                </select>
-              </label>
-              <label>Stores (optional) <input name="stores" type="text" maxlength="200" placeholder="e.g. Dollar Tree, Walmart" autocomplete="off"></label>
-              <p class="grocery-help">Separate multiple stores with commas. No brands or quantities needed.</p>
-              <label class="grocery-inline-check"><input name="needed" type="checkbox" checked> Need to buy</label>
-              <div class="grocery-form-actions">
-                <button type="submit" class="grocery-primary">Save item</button>
-                <button type="button" id="grocery-add-cancel">Cancel</button>
-              </div>
-            </form>
-
-            <div id="grocery-list" class="grocery-list" aria-live="polite">Loading groceries…</div>
           </div>
         </section>
       </section>
     </section>
   </main>
-
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="../config.js"></script>
   <script src="../scripts/app.js"></script>

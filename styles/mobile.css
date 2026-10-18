@@ -682,3 +682,17 @@
     margin-top: 10px;
   }
 }
+
+/* iPhone: use one native category picker; counts live in the option labels. */
+@media (max-width: 900px) and (orientation: portrait) {
+  body:has(.upcoming-journal) #upcoming-mobile-filter {
+    display: block;
+    width: 100%;
+    min-height: 48px;
+    font-family: inherit;
+    font-size: 1.35rem;
+    text-align: left;
+    -webkit-appearance: auto;
+    appearance: auto;
+  }
+}
