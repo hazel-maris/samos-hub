@@ -317,3 +317,67 @@
 @media (max-width: 360px) {
   .grocery-sidebar .grocery-controls.is-open { grid-template-columns: 1fr; }
 }
+
+
+/* ============================================================
+   SAMOS MORNING — PASTEL COLOR OVERRIDES (LAYOUT UNCHANGED)
+   ============================================================ */
+.groceries-panel input[type="text"],
+.groceries-panel select { background: #fff5fa; color: var(--text); border-color: var(--border); }
+.groceries-panel input[type="checkbox"] { accent-color: #8d79bf; }
+.groceries-panel button { background: linear-gradient(180deg, #eaf2ff, #c6ddfc); color: var(--text); border-color: var(--border); }
+.groceries-panel .grocery-primary,
+.groceries-panel .grocery-view-tab.active { background: linear-gradient(180deg, #d7f1e9, #a9d9d2); color: var(--text); border-color: var(--border); }
+.groceries-panel .grocery-view-tab { background: linear-gradient(180deg, #fce4ef, #e6b5d3); color: var(--text); border-color: var(--border); }
+.groceries-panel .grocery-collapse-actions button,
+.groceries-panel .grocery-filter-toggle { background: linear-gradient(180deg, #edf4ff, #c6ddfc); color: var(--text); border-color: var(--border); }
+.grocery-form { background: rgba(255, 245, 250, .5); border-color: rgba(117,84,120,.40); }
+.grocery-group h3,
+.grocery-item { border-color: rgba(117,84,120,.22); }
+.grocery-section-toggle:hover { background: rgba(169, 217, 210, .25) !important; }
+.grocery-sidebar .grocery-controls { border-color: rgba(117,84,120,.35); }
+.groceries-panel button:focus-visible,
+.groceries-panel input:focus-visible,
+.groceries-panel select:focus-visible { outline-color: #8d79bf; }
+.grocery-message.error { color: #a12f55; }
+
+/* =========================================================
+   MORNING THEME OVERRIDES — GROCERY VIEW TABS
+   ========================================================= */
+
+.groceries-panel .grocery-view-tab,
+.grocery-sidebar .grocery-view-tab {
+  background: linear-gradient(
+    180deg,
+    #f4d3e4 0%,
+    #e6b5d3 100%
+  );
+  color: var(--text);
+  border: 1px solid rgba(117, 84, 120, 0.55);
+  box-shadow:
+    inset 1px 1px 0 rgba(255, 255, 255, 0.55),
+    2px 2px 0 rgba(117, 84, 120, 0.12);
+}
+
+.groceries-panel .grocery-view-tab:hover,
+.grocery-sidebar .grocery-view-tab:hover {
+  background: linear-gradient(
+    180deg,
+    #f8dceb 0%,
+    #edc2db 100%
+  );
+}
+
+.groceries-panel .grocery-view-tab.active,
+.grocery-sidebar .grocery-view-tab.active {
+  background: linear-gradient(
+    180deg,
+    #f1cade 0%,
+    #dfabc9 100%
+  );
+  color: var(--text);
+  border-color: rgba(117, 84, 120, 0.7);
+  box-shadow:
+    inset 2px 2px 0 rgba(255, 255, 255, 0.45),
+    inset -1px -1px 0 rgba(117, 84, 120, 0.08);
+}

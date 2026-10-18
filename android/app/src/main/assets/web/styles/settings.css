@@ -1,173 +1,38 @@
-
 /* =========================================================
    SAMOS HUB — SETTINGS
    ========================================================= */
 
 /* JOURNAL */
-.settings-journal {
-  display: block;
-  width: 100%;
-  min-width: 0;
-  padding: clamp(30px, 3vw, 48px);
-  overflow: hidden;
-}
-
+.settings-journal { display: block; width: 100%; min-width: 0; padding: clamp(30px, 3vw, 48px); overflow: hidden; }
 /* CONTAINER */
-.settings-area {
-  width: 100%;
-  height: 100%;
-  min-width: 0;
-  min-height: 0;
-}
-
+.settings-area { width: 100%; height: 100%; min-width: 0; min-height: 0; }
 /* PANEL */
-.settings-panel {
-  width: 100%;
-  height: 100%;
-  min-height: 0;
-  padding: clamp(28px, 3vw, 42px);
-  overflow-y: auto;
-}
-
+.settings-panel { width: 100%; height: 100%; min-height: 0; padding: clamp(28px, 3vw, 42px); overflow-y: auto; }
 /* TITLE */
-.settings-title {
-  margin: 0 0 28px;
-  font-family: "vt323", sans-serif;
-  font-size: clamp(2.4rem, 3vw, 3.6rem);
-  font-weight: normal;
-  line-height: 1;
-}
-
+.settings-title { margin: 0 0 28px; font-family: "vt323", sans-serif; font-size: clamp(2.4rem, 3vw, 3.6rem); font-weight: normal; line-height: 1; }
 /* SECTIONS */
-.settings-section {
-  width: 100%;
-  max-width: 760px;
-  margin-bottom: 34px;
-}
-
-.settings-section-title {
-  margin: 0 0 16px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid rgba(122, 90, 58, 0.35);
-  font-family: "vt323", sans-serif;
-  font-size: clamp(1.7rem, 2vw, 2.2rem);
-  font-weight: normal;
-  line-height: 1;
-}
-
+.settings-section { width: 100%; max-width: 760px; margin-bottom: 34px; }
+.settings-section-title { margin: 0 0 16px; padding-bottom: 8px; border-bottom: 1px solid rgba(117, 84, 120, 0.35); font-family: "vt323", sans-serif; font-size: clamp(1.7rem, 2vw, 2.2rem); font-weight: normal; line-height: 1; }
 /* CHECKBOX ROWS */
-.settings-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-  width: 100%;
-  min-height: 54px;
-  padding: 10px 4px;
-  font-family: "vt323", sans-serif;
-  font-size: clamp(1.3rem, 1.5vw, 1.7rem);
-  line-height: 1.1;
-  cursor: pointer;
-}
-
-.settings-row input[type="checkbox"] {
-  width: 24px;
-  height: 24px;
-  flex: 0 0 auto;
-  accent-color: var(--border);
-  cursor: pointer;
-}
+.settings-row { display: flex; align-items: center; justify-content: space-between; gap: 24px; width: 100%; min-height: 54px; padding: 10px 4px; font-family: "vt323", sans-serif; font-size: clamp(1.3rem, 1.5vw, 1.7rem); line-height: 1.1; cursor: pointer; }
+.settings-row input[type="checkbox"] { width: 24px; height: 24px; flex: 0 0 auto; accent-color: #9e89d2; cursor: pointer; }
+.settings-row:focus-within { background: rgba(198, 221, 252, .18); }
 
 /* =========================================================
    MOBILE — FULL-HEIGHT SETTINGS
    ========================================================= */
-
 @media (max-width: 900px) and (orientation: portrait) {
-  body:has(.settings-journal) {
-    min-height: 100dvh;
-    overflow-x: hidden;
-    overflow-y: auto;
-  }
-
-  body:has(.settings-journal) .home {
-    min-height: 100dvh;
-    align-items: stretch;
-    justify-content: flex-start;
-    padding: max(22px, env(safe-area-inset-top))
-             10px
-             max(16px, env(safe-area-inset-bottom));
-  }
-
-  body:has(.settings-journal) .journal-shell {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    height: auto;
-    min-height: calc(
-      100dvh
-      - max(22px, env(safe-area-inset-top))
-      - max(16px, env(safe-area-inset-bottom))
-    );
-    margin: 0;
-  }
-
-  .settings-journal {
-    display: flex;
-    flex-direction: column;
-    flex: 1 1 auto;
-    min-height: 0;
-    padding: 12px 12px 16px;
-    overflow: visible;
-  }
-
-  .settings-area {
-    display: flex;
-    flex-direction: column;
-    flex: 1 1 auto;
-    height: auto;
-    min-height: 0;
-  }
-
-  .settings-panel {
-    flex: 1 1 auto;
-    width: 100%;
-    height: auto;
-    min-height: 0;
-    padding: 18px 16px;
-    overflow: visible;
-  }
-
-  .settings-title {
-    margin-bottom: 24px;
-    font-size: 2.2rem;
-  }
-
-  .settings-section {
-    max-width: none;
-    margin-bottom: 28px;
-  }
-
-  .settings-section-title {
-    font-size: 1.8rem;
-  }
-
-  .settings-row {
-    gap: 12px;
-    font-size: 1.5rem;
-  }
-
-  .settings-row input[type="checkbox"] {
-    width: 24px;
-    height: 24px;
-  }
-
-  .settings-login {
-    max-width: 100%;
-  }
-
-  .settings-login input {
-    max-width: 100%;
-    min-width: 0;
-    font-size: 16px;
-  }
+  body:has(.settings-journal) { min-height: 100dvh; overflow-x: hidden; overflow-y: auto; }
+  body:has(.settings-journal) .home { min-height: 100dvh; align-items: stretch; justify-content: flex-start; padding: max(22px, env(safe-area-inset-top)) 10px max(16px, env(safe-area-inset-bottom)); }
+  body:has(.settings-journal) .journal-shell { display: flex; flex-direction: column; width: 100%; height: auto; min-height: calc(100dvh - max(22px, env(safe-area-inset-top)) - max(16px, env(safe-area-inset-bottom))); margin: 0; }
+  .settings-journal { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; padding: 12px 12px 16px; overflow: visible; }
+  .settings-area { display: flex; flex-direction: column; flex: 1 1 auto; height: auto; min-height: 0; }
+  .settings-panel { flex: 1 1 auto; width: 100%; height: auto; min-height: 0; padding: 18px 16px; overflow: visible; }
+  .settings-title { margin-bottom: 24px; font-size: 2.2rem; }
+  .settings-section { max-width: none; margin-bottom: 28px; }
+  .settings-section-title { font-size: 1.8rem; }
+  .settings-row { gap: 12px; font-size: 1.5rem; }
+  .settings-row input[type="checkbox"] { width: 24px; height: 24px; }
+  .settings-login { max-width: 100%; }
+  .settings-login input { max-width: 100%; min-width: 0; font-size: 16px; }
 }

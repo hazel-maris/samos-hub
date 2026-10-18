@@ -1,0 +1,257 @@
+/* =========================================================
+   SAMOS HUB — NIGHT MODE
+   Load AFTER base.css and all page-specific CSS.
+   Colors only: no layout, spacing, or behavior changes.
+   Activated by html[data-samos-theme="night"].
+   ========================================================= */
+
+html[data-samos-theme="night"] {
+  color-scheme: dark;
+  --paper: #333f5e;
+  --paper-dark: #26314d;
+  --tab: #46557b;
+  --tab-hover: #596b97;
+  --button: #647fac;
+  --button-hover: #7795bf;
+  --border: #8794c6;
+  --shadow: #171e36;
+  --text: #edeaff;
+  --night-text-muted: #bcc5e7;
+  --night-panel: #394565;
+  --night-line: rgba(174, 181, 225, .32);
+  --night-field: #283451;
+  --night-blue: #789bc6;
+  --night-pink: #ad89ce;
+  --night-mint: #6fa9ad;
+}
+
+/* Background, frame, window */
+html[data-samos-theme="night"] body {
+  color: var(--text);
+  background-color: #202941;
+  background-image:
+    linear-gradient(90deg, rgba(192,196,255,.025) 1px, transparent 1px),
+    linear-gradient(rgba(192,196,255,.025) 1px, transparent 1px),
+    linear-gradient(180deg, #20283e 0%, #2d3957 46%, #34324e 100%);
+  background-size: 48px 48px, 48px 48px, 100% 100%;
+  background-repeat: repeat, repeat, no-repeat;
+}
+html[data-samos-theme="night"] #samos-page-frame { background: #222b42; }
+html[data-samos-theme="night"] .journal {
+  color: var(--text);
+  background: linear-gradient(180deg, #343f5d 0%, #323a58 55%, #38344f 100%);
+  border-color: #8290bd;
+  box-shadow: inset 2px 2px rgba(208,216,255,.12), 6px 6px 0 #171e35;
+}
+html[data-samos-theme="night"] .game-panel {
+  background: linear-gradient(180deg, rgba(105,117,168,.22), rgba(23,32,56,.16));
+  border-color: #8390c1;
+  box-shadow: inset 2px 2px rgba(201,209,255,.10), inset -2px -2px rgba(16,22,44,.36), 3px 3px 0 rgba(14,19,39,.48);
+}
+
+/* Navigation: lavender active, muted navy other tabs */
+html[data-samos-theme="night"] .journal-tab {
+  color: #e9e8ff;
+  background: linear-gradient(180deg, #526187 0%, #414e72 100%);
+  border-color: #8994c6;
+  box-shadow: inset 2px 2px rgba(227,225,255,.17), 2px -2px 0 rgba(12,17,39,.35);
+}
+html[data-samos-theme="night"] .journal-tab:hover {
+  background: linear-gradient(180deg, #66769f, #526089);
+}
+html[data-samos-theme="night"] .journal-tab.active {
+  color: #1e243f;
+  background: linear-gradient(180deg, #c1a5df 0%, #a78ccf 100%);
+}
+html[data-samos-theme="night"] .journal-tab.active::after { background: #a78ccf; }
+
+/* Shared typography, scrollbars and native controls */
+html[data-samos-theme="night"] input,
+html[data-samos-theme="night"] select,
+html[data-samos-theme="night"] textarea { color-scheme: dark; }
+html[data-samos-theme="night"] input[type="checkbox"] { accent-color: #a88ad0; }
+html[data-samos-theme="night"] :is(button, input, select, textarea, a):focus-visible {
+  outline-color: #bdd8ff;
+}
+html[data-samos-theme="night"] :is(.settings-panel, .upcoming-page-panel, .grocery-results, .grocery-sidebar, #grocery-list, #triage-list, .upcoming-section-items, .playlist-menu) {
+  scrollbar-color: #8292c4 #303954;
+}
+
+/* HOME — Spotify */
+html[data-samos-theme="night"] .mood-button,
+html[data-samos-theme="night"] .playlist-button {
+  color: #20253f;
+  border-color: #242941;
+  box-shadow: 4px 4px 0 rgba(14,20,39,.50);
+}
+html[data-samos-theme="night"] .mood-morning { background: linear-gradient(180deg, #c5a5de, #ab8cd0); }
+html[data-samos-theme="night"] .mood-focus { background: linear-gradient(180deg, #9fd1d2, #75adb9); }
+html[data-samos-theme="night"] .mood-winddown { background: linear-gradient(180deg, #93a7db, #788bc0); }
+html[data-samos-theme="night"] .playlist-button { background: linear-gradient(180deg, #a2b6e2, #829bce); }
+html[data-samos-theme="night"] .player-controls button {
+  background: linear-gradient(180deg, #526184, #465374);
+  border-color: #8394c8;
+  box-shadow: 4px 4px 0 rgba(11,16,35,.48);
+}
+html[data-samos-theme="night"] .player-controls button:hover:not(:disabled) {
+  background: linear-gradient(180deg, #64769c, #56658a);
+  box-shadow: 5px 6px 0 rgba(11,16,35,.40);
+}
+html[data-samos-theme="night"] .album-container { background: rgba(10,17,37,.22); }
+html[data-samos-theme="night"] #album-placeholder { color: #d0d1ee; opacity: .8; }
+html[data-samos-theme="night"] #spotify-shuffle .shuffle-track { background: #4e5679; border-color: #9b9ecb; }
+html[data-samos-theme="night"] #spotify-shuffle[aria-checked="true"] .shuffle-track { background: #6bafa9; }
+html[data-samos-theme="night"] #spotify-shuffle .shuffle-thumb { background: #f2efff; }
+html[data-samos-theme="night"] #volume-feedback { background: rgba(10,17,37,.35); }
+html[data-samos-theme="night"] #volume-level { background: #87bac6; }
+html[data-samos-theme="night"] #spotify-login {
+  color: #e9edff;
+  background: linear-gradient(180deg, #54688d, #425778);
+  border-color: #92a2cc;
+  box-shadow: 2px 2px 0 #1c2541;
+}
+html[data-samos-theme="night"] #spotify-login[data-connected="true"],
+html[data-samos-theme="night"] #spotify-login[data-connected="true"]:hover,
+html[data-samos-theme="night"] #spotify-login[data-connected="true"]:active {
+  background: #49797e;
+  color: #ecfff9;
+  border-color: #8bcac4;
+}
+html[data-samos-theme="night"] .playlist-menu {
+  background: #2f3957;
+  border-color: #8794bf;
+  box-shadow: 4px 4px 0 rgba(10,15,31,.45);
+}
+html[data-samos-theme="night"] .playlist-item { color: #eff0ff; }
+html[data-samos-theme="night"] .playlist-item:hover { background: rgba(154,176,230,.20); }
+
+/* Upcoming — mint section headers, dark readable rows */
+html[data-samos-theme="night"] .upcoming-section-title,
+html[data-samos-theme="night"] .settings-section-title { border-bottom-color: var(--night-line); }
+html[data-samos-theme="night"] .upcoming-list-section,
+html[data-samos-theme="night"] .upcoming-mobile-results {
+  background: rgba(20,29,50,.22);
+  border-color: #8190ba;
+}
+html[data-samos-theme="night"] .upcoming-section-toggle,
+html[data-samos-theme="night"] .upcoming-section-header,
+html[data-samos-theme="night"] .upcoming-mobile-results-heading {
+  color: #17273a;
+  background: linear-gradient(180deg, #9ecbc9, #74aead);
+  border-bottom-color: #5d8a97;
+}
+html[data-samos-theme="night"] .upcoming-section-toggle :is(.upcoming-section-title, span) { color: #17273a; }
+html[data-samos-theme="night"] .upcoming-section-toggle:hover,
+html[data-samos-theme="night"] .upcoming-section-header:hover {
+  background: linear-gradient(180deg, #b2ddda, #86c2bf);
+}
+html[data-samos-theme="night"] .upcoming-item,
+html[data-samos-theme="night"] .upcoming-item:nth-child(even) {
+  background: rgba(128,141,193,.07);
+  border-color: var(--night-line);
+}
+html[data-samos-theme="night"] .upcoming-item:nth-child(even) { background: rgba(150,159,209,.13); }
+html[data-samos-theme="night"] .upcoming-item-meta,
+html[data-samos-theme="night"] .upcoming-form-status { color: var(--night-text-muted); }
+html[data-samos-theme="night"] .upcoming-field :is(input,select),
+html[data-samos-theme="night"] .upcoming-edit-fields :is(input,select),
+html[data-samos-theme="night"] #upcoming-mobile-filter,
+html[data-samos-theme="night"] .calendar-controls :is(input, select) {
+  color: #f0efff;
+  background: #293553;
+  border-color: #8794bd;
+}
+html[data-samos-theme="night"] .upcoming-field input::placeholder { color: #b8bee1; }
+html[data-samos-theme="night"] #upcoming-add,
+html[data-samos-theme="night"] .upcoming-add-toggle,
+html[data-samos-theme="night"] .upcoming-icon-button,
+html[data-samos-theme="night"] .date-picker-button,
+html[data-samos-theme="night"] .time-picker-button {
+  color: #eef0ff;
+  background: linear-gradient(180deg, #526a96, #445a80);
+  border-color: #93a0c9;
+}
+html[data-samos-theme="night"] .delete-confirm-box,
+html[data-samos-theme="night"] .calendar-box,
+html[data-samos-theme="night"] .time-box {
+  color: var(--text);
+  background: #333e5d;
+  border-color: #96a1ce;
+  box-shadow: 6px 6px 0 #151b32;
+}
+html[data-samos-theme="night"] .calendar-day { background: #445172; color: #f4f1ff; border-color: #7b87b4; }
+html[data-samos-theme="night"] .calendar-day:hover { background: #536389; }
+html[data-samos-theme="night"] .calendar-day.selected { background: #9c81c4; color: #161a30; }
+html[data-samos-theme="night"] .calendar-day.today { outline-color: #c9bae6; }
+html[data-samos-theme="night"] .time-mode-button.active,
+html[data-samos-theme="night"] .time-period-button.active { background: #aa9bd4; color: #19223c; }
+html[data-samos-theme="night"] .upcoming-icon-button img { filter: brightness(.96); }
+
+/* Groceries — lavender tabs and blue controls */
+html[data-samos-theme="night"] .groceries-panel :is(input[type="text"], select),
+html[data-samos-theme="night"] .triage-form input,
+html[data-samos-theme="night"] .settings-login input {
+  background: #293450;
+  color: #f1efff;
+  border-color: #939bc8;
+}
+html[data-samos-theme="night"] .groceries-panel input[type="text"]::placeholder,
+html[data-samos-theme="night"] .triage-form input::placeholder { color: #c1c3e0; }
+html[data-samos-theme="night"] .groceries-panel button {
+  background: linear-gradient(180deg, #6784ae, #52698f);
+  color: #f3f1ff;
+  border-color: #8497c4;
+}
+html[data-samos-theme="night"] .groceries-panel .grocery-view-tab,
+html[data-samos-theme="night"] .grocery-sidebar .grocery-view-tab {
+  color: #221f3c;
+  background: linear-gradient(180deg, #bd9ed8, #a78bcf);
+  border-color: #8e78b8;
+}
+html[data-samos-theme="night"] .groceries-panel .grocery-view-tab.active,
+html[data-samos-theme="night"] .grocery-sidebar .grocery-view-tab.active {
+  background: linear-gradient(180deg, #ac8dca, #9879bf);
+  color: #191d32;
+  border-color: #ad95d4;
+}
+html[data-samos-theme="night"] .groceries-panel .grocery-primary,
+html[data-samos-theme="night"] .groceries-panel #grocery-add-toggle {
+  background: linear-gradient(180deg, #86bebd, #6baba9);
+  color: #152c36;
+  border-color: #8cc7c2;
+}
+html[data-samos-theme="night"] .grocery-form,
+html[data-samos-theme="night"] .grocery-sidebar .grocery-controls { background: rgba(17,26,47,.28); border-color: #7182b0; }
+html[data-samos-theme="night"] .grocery-group h3,
+html[data-samos-theme="night"] .grocery-item { border-color: var(--night-line); }
+html[data-samos-theme="night"] .grocery-section-toggle { color: #f0efff; }
+html[data-samos-theme="night"] .grocery-section-toggle:hover { background: rgba(129,155,206,.20) !important; }
+html[data-samos-theme="night"] .grocery-item.is-not-needed .grocery-item-name { opacity: .7; }
+html[data-samos-theme="night"] .grocery-item-actions button { background: linear-gradient(180deg, #657ba8, #52668f); }
+
+/* Triage, settings, quotes and dialog interactions */
+html[data-samos-theme="night"] .triage-panel button { background: linear-gradient(180deg, #6d82af, #526993); color: #f1f0ff; border-color: #909bc9; }
+html[data-samos-theme="night"] #triage-add { background: linear-gradient(180deg, #90c5bf, #6baca9); color: #152c36; border-color: #7db8b6; }
+html[data-samos-theme="night"] .triage-row { border-bottom-color: var(--night-line); }
+html[data-samos-theme="night"] .triage-remove { background: transparent !important; color: #e9eaff; }
+html[data-samos-theme="night"] .settings-row:focus-within { background: rgba(131,151,201,.18); }
+html[data-samos-theme="night"] .settings-row input[type="checkbox"] { accent-color: #b097d7; }
+html[data-samos-theme="night"] .quotes-message { color: #c5b5ed; }
+html[data-samos-theme="night"] .delete-confirm-actions button,
+html[data-samos-theme="night"] .calendar-nav-button,
+html[data-samos-theme="night"] #calendar-today,
+html[data-samos-theme="night"] #calendar-cancel,
+html[data-samos-theme="night"] .time-mode-button,
+html[data-samos-theme="night"] .time-period-button,
+html[data-samos-theme="night"] .time-picker-actions button,
+html[data-samos-theme="night"] .time-minute-adjust button {
+  background: #52658f;
+  color: #f4f0ff;
+  border-color: #94a2d1;
+}
+
+/* Mobile overrides: only colors, no changes to sizing or scrolling */
+html[data-samos-theme="night"] .upcoming-mobile-results-heading { color: #18263c; }
+html[data-samos-theme="night"] #nav-container .journal-tab:focus-visible { outline-color: #c8c1f5; }
+html[data-samos-theme="night"] .weather-alert-side { border-left-color: var(--night-line); }
+html[data-samos-theme="night"] .weather-alert-divider { border-top-color: var(--night-line); }

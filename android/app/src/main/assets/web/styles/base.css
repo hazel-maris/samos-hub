@@ -1,6 +1,8 @@
+
 /* =========================================================
    SAMOS HUB
    External-display-first stylesheet
+   Pastel Vaporwave / Windows 95
    ========================================================= */
 
 
@@ -18,22 +20,35 @@
 
 
 /* =========================================================
-   THEME
+   THEME — MORNING
    ========================================================= */
 
 :root {
-  --paper: #f3e8c8;
-  --paper-dark: #ead8af;
+  /* Main surfaces */
 
-  --tab: #d9b566;
-  --tab-hover: #e3c37a;
+  --paper: #fff0f0;
+  --paper-dark: #e8d3e8;
 
-  --button: #e6cc93;
-  --button-hover: #efd9ab;
+  /* Tabs */
 
-  --border: #7a5a3a;
-  --shadow: #b69a73;
-  --text: #2f2a24;
+  --tab: #e6b5d3;
+  --tab-hover: #f2c9df;
+
+  /* Buttons */
+
+  --button: #b8d9e9;
+  --button-hover: #d1e9f5;
+
+  /* Outlines and shadows */
+
+  --border: #755478;
+  --shadow: #ad8cb1;
+
+  /* Text */
+
+  --text: #392b48;
+
+  /* Layout — unchanged */
 
   --journal-gap: clamp(28px, 3vw, 48px);
   --panel-gap: 14px;
@@ -66,8 +81,14 @@ body {
   width: 100%;
   height: 100%;
   border: 0;
-  background: #e4d4b8;
+
+  background: #e8d5ee;
 }
+
+
+/* =========================================================
+   BODY — BLUE TO PINK
+   ========================================================= */
 
 body {
   min-height: 100vh;
@@ -78,33 +99,43 @@ body {
   font-family: "vt323", sans-serif;
   color: var(--text);
 
-  background-color: #e4d4b8;
+  background-color: #d9e8ff;
 
   background-image:
     linear-gradient(
       90deg,
-      rgba(120, 76, 45, 0.045) 1px,
+      rgba(104, 80, 139, 0.045) 1px,
       transparent 1px
     ),
     linear-gradient(
-      rgba(120, 76, 45, 0.045) 1px,
+      rgba(104, 80, 139, 0.045) 1px,
       transparent 1px
     ),
     linear-gradient(
       90deg,
-      rgba(176, 106, 57, 0.035) 50%,
+      rgba(255, 255, 255, 0.09) 50%,
       transparent 50%
     ),
     linear-gradient(
-      rgba(111, 88, 57, 0.025) 50%,
+      rgba(255, 255, 255, 0.09) 50%,
       transparent 50%
+    ),
+    linear-gradient(
+      180deg,
+      #c8e2ff 0%,
+      #dcdafa 42%,
+      #f1d2e9 72%,
+      #ffd7de 100%
     );
 
   background-size:
     48px 48px,
     48px 48px,
     96px 96px,
-    96px 96px;
+    96px 96px,
+    100% 100%;
+
+  background-repeat: repeat, repeat, repeat, repeat, no-repeat;
 }
 
 
@@ -152,7 +183,7 @@ body {
 .journal-tab {
   display: inline-flex;
   align-items: center;
-  justify-content: center;  
+  justify-content: center;
 
   padding: 10px 18px;
 
@@ -160,13 +191,20 @@ body {
   font-size: clamp(1.1rem, 1.4vw, 1.5rem);
 
   color: var(--text);
-  background: var(--tab);
+
+  background:
+    linear-gradient(
+      180deg,
+      #f2c8df 0%,
+      var(--tab) 100%
+    );
 
   border: 3px solid var(--border);
   border-bottom: none;
 
   box-shadow:
-    2px -2px 0 rgba(79, 57, 38, 0.35);
+    inset 2px 2px 0 rgba(255, 255, 255, 0.58),
+    2px -2px 0 rgba(75, 49, 94, 0.22);
 
   text-decoration: none;
 
@@ -174,13 +212,24 @@ body {
 }
 
 .journal-tab:hover {
-  background: var(--tab-hover);
+  background:
+    linear-gradient(
+      180deg,
+      #ffe1ee 0%,
+      var(--tab-hover) 100%
+    );
 }
+
 
 .journal-tab.active {
   position: relative;
 
-  background: var(--paper);
+  background:
+    linear-gradient(
+      180deg,
+      #eaf2ff 0%,
+      #d8e7ff 100%
+    );
 
   transform: translateY(2px);
 
@@ -198,8 +247,9 @@ body {
 
   height: 5px;
 
-  background: var(--paper);
+  background: #d8e7ff;
 }
+
 
 
 /* =========================================================
@@ -234,11 +284,19 @@ body {
     clamp(30px, 3vw, 48px)
     18px;
 
-  background: var(--paper);
+  background:
+    linear-gradient(
+      180deg,
+      #f0efff 0%,
+      #f9e7f1 48%,
+      #ffe5e6 100%
+    );
 
   border: 4px solid var(--border);
 
   box-shadow:
+    inset 3px 3px 0 rgba(255, 255, 255, 0.65),
+    inset -3px -3px 0 rgba(122, 84, 130, 0.12),
     6px 6px 0 var(--shadow);
 }
 
@@ -255,15 +313,15 @@ body {
 
   background:
     linear-gradient(
-      to bottom,
-      rgba(255, 255, 255, 0.12),
-      rgba(122, 90, 58, 0.06)
+      180deg,
+      rgba(255, 255, 255, 0.68) 0%,
+      rgba(255, 232, 239, 0.34) 100%
     );
 
   border: 3px solid var(--border);
 
   box-shadow:
-    inset 2px 2px 0 rgba(255, 255, 255, 0.3),
-    inset -2px -2px 0 rgba(79, 57, 38, 0.12),
-    3px 3px 0 rgba(79, 57, 38, 0.18);
+    inset 2px 2px 0 rgba(255, 255, 255, 0.75),
+    inset -2px -2px 0 rgba(112, 75, 132, 0.15),
+    3px 3px 0 rgba(102, 74, 117, 0.25);
 }
