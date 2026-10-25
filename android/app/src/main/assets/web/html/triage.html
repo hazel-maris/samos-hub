@@ -8,12 +8,8 @@
   <link rel="stylesheet" href="../styles/base.css">
   <link rel="stylesheet" href="../styles/mobile.css">
   <link rel="stylesheet" href="../styles/triage.css">
-  <!-- Load after all other stylesheets -->
   <link rel="stylesheet" href="../styles/night.css">
-
-  <!-- Load in the head -->
   <script src="../scripts/night-mode.js"></script>
-
 </head>
 <body data-root="..">
   <main class="home"><section class="journal-shell">
@@ -21,13 +17,34 @@
     <section class="journal triage-journal"><section class="triage-area">
       <div class="game-panel triage-panel">
         <h1>Triage</h1>
-        <p class="triage-description">Get it out of your head. Figure it out later.</p>
-        <form id="triage-form" class="triage-form">
-          <input id="triage-input" type="text" maxlength="1000" placeholder="What's on your mind?" aria-label="New thought" autocomplete="off">
-          <button type="submit" id="triage-add">Add</button>
-        </form>
+        <p class="triage-description">Get it out of your head. One task at a time.</p>
         <p id="triage-message" role="status" aria-live="polite"></p>
-        <div id="triage-list" class="triage-list" aria-live="polite">Loading…</div>
+
+        <div class="triage-columns">
+          <section aria-labelledby="inbox-heading" class="triage-section triage-inbox-panel">
+            <div class="triage-heading">
+              <h2 id="inbox-heading">Brain Dump</h2>
+              <span class="triage-note">No sorting required</span>
+            </div>
+            <form id="triage-form" class="triage-form">
+              <input id="triage-input" type="text" maxlength="1000"
+                     placeholder="What's on your mind?" aria-label="New thought"
+                     autocomplete="off" required>
+              <button type="submit" id="triage-add">+</button>
+            </form>
+            <div id="triage-list" class="triage-list triage-scroll">Loading…</div>
+          </section>
+
+          <section aria-labelledby="goals-heading" class="triage-section triage-goals-panel">
+            <div class="triage-heading"><h2 id="goals-heading">Goals</h2></div>
+            <form id="triage-goal-form" class="triage-form">
+              <input id="triage-goal-input" type="text" maxlength="240"
+                     placeholder="What's the big goal?" aria-label="New goal" required>
+              <button type="submit">+</button>
+            </form>
+            <div id="triage-goals" class="triage-goals triage-scroll">Loading goals…</div>
+          </section>
+        </div>
       </div>
     </section></section>
   </section></main>

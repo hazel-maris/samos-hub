@@ -1,47 +1,291 @@
+/* SamOS Hub — Triage v2. Preserves existing theme variables. */
+.triage-journal { display:block;width:100%;min-width:0 }
+.triage-area { display:flex;justify-content:center;width:100%;min-width:0 }
+.triage-panel { box-sizing:border-box;width:100%;max-width:900px;margin-inline:auto;padding:clamp(16px,2.5vw,32px) }
+.triage-panel * { box-sizing:border-box }
+.triage-panel h1 { margin:0 0 6px;font-size:clamp(1.5rem,4vw,2rem) }
+.triage-description { margin:0 0 18px;opacity:.75 }
+.triage-section { margin-block:22px }
+.triage-heading { display:flex;align-items:baseline;justify-content:space-between;gap:10px }
+.triage-heading h2 { margin:0 0 12px;font-size:1.25rem }
+.triage-note {font-size:.82rem;opacity:.7}
+.triage-form { display:flex;align-items:stretch;gap:9px }
+.triage-form input { flex:1;min-width:0;min-height:46px;padding:10px 12px;border:1px solid var(--border);border-radius:8px;background:#fff5fa;color:var(--text);font:inherit;font-size:16px }
+.triage-form input:focus-visible {outline:2px solid #879cda;outline-offset:2px}
+.triage-panel button {min-height:40px;padding:8px 12px;border:1px solid var(--border);border-radius:8px;background:linear-gradient(180deg,#edf4ff,#c6ddfc);color:var(--text);cursor:pointer;font:inherit}
+.triage-panel button:hover:not(:disabled) {filter:brightness(1.05)}
+.triage-panel button:focus-visible {outline:2px solid #879cda;outline-offset:2px}
+.triage-panel button:disabled {opacity:.5;cursor:wait}
+#triage-add, .triage-primary {background:linear-gradient(180deg,#d9f2ec,#a9d9d2)!important;font-weight:600}
+#triage-message {min-height:1em;margin:10px 0;font-size:.9rem}
+#triage-message:empty {display:none}
+#triage-message.error {color:#a12f55}
+.triage-goals {display:grid;gap:13px;margin-top:14px}
+.triage-goal-card {min-width:0;border:1px solid var(--border);border-radius:12px;padding:14px;background:rgba(255,255,255,.12)}
+.triage-goal-head {display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.triage-goal-summary {min-width:0}
+.triage-goal-head h3 {margin:0 0 5px;font-size:1.1rem;overflow-wrap:anywhere}
+.triage-progress {margin:0;font-size:.82rem;opacity:.7}
+.triage-priority {font-size:.76rem;border:1px solid var(--border);border-radius:50px;padding:4px 8px;white-space:nowrap}
+.triage-next {margin-top:14px;padding:13px;border-radius:10px;background:rgba(164,194,230,.18)}
+.triage-eyebrow {font-size:.72rem;font-weight:700;letter-spacing:.07em;opacity:.7}
+.triage-next-title {margin:8px 0 13px;font-weight:600;overflow-wrap:anywhere}
+.triage-expand {display:block;margin-top:9px;background:transparent!important;border:0!important;text-decoration:underline;min-height:36px!important}
+.triage-details {border-top:1px solid var(--border);padding-top:12px;margin-top:6px}
+.triage-task-row {display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid rgba(117,84,120,.17)}
+.triage-check-label {display:flex;align-items:flex-start;gap:9px;min-width:0;overflow-wrap:anywhere}
+.triage-check-label input {margin-top:4px}
+.triage-done {opacity:.65;text-decoration:line-through}
+.triage-task-actions,.triage-goal-actions {display:flex;flex-wrap:wrap;gap:6px}
+.triage-task-actions button,.triage-goal-actions button {min-height:34px;padding:5px 8px;font-size:.82rem}
+.triage-task-form {margin-top:12px}
+.triage-goal-actions {margin-top:13px}
+.triage-danger {color:#962d52!important}
+.triage-row {display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 4px;border-bottom:1px solid rgba(117,84,120,.22)}
+.triage-row span {min-width:0;overflow-wrap:anywhere;white-space:pre-wrap}
+.triage-remove {flex-shrink:0;background:transparent!important}
+.triage-empty {padding:16px 4px;opacity:.7}
+@media (max-width:900px) and (orientation:portrait) {
+ .triage-journal {display:flex;flex-direction:column;flex:1 1 auto;width:100%;height:auto;min-height:0;padding:12px 12px 16px}
+ .triage-area {display:flex;flex-direction:column;flex:1 1 auto;width:100%;min-height:0}
+ .triage-panel {width:100%;max-width:none;height:auto;min-height:0;margin:0;padding:16px}
+ .triage-form {gap:8px}
+ .triage-panel button {padding-inline:10px}
+ .triage-task-row {align-items:flex-start}
+}
+@media(max-width:420px) {.triage-goal-head{flex-wrap:wrap}.triage-task-actions{justify-content:flex-end}}
+
+
+/* Triage v2.1 — side-by-side panes, independent scrolling */
+.triage-journal,
+.triage-area {
+  width: 100%;
+  min-width: 0;
+}
+.triage-panel {
+  width: 100%;
+  max-width: none;
+  height: calc(100dvh - 175px);
+  min-height: 420px;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+}
+.triage-panel > h1,
+.triage-panel > .triage-description,
+.triage-panel > #triage-message {
+  flex: 0 0 auto;
+}
+.triage-columns {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+  gap: 18px;
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
+}
+.triage-columns > .triage-section {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 18px;
+  min-width: 0;
+  min-height: 0;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: rgba(255,255,255,.09);
+}
+.triage-columns .triage-heading,
+.triage-columns .triage-form {
+  flex: 0 0 auto;
+}
+.triage-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-gutter: stable;
+}
+.triage-goals,
+.triage-list {
+  margin-top: 14px;
+}
+.triage-goals {
+  display: block;
+}
+.triage-goal-card + .triage-goal-card {
+  margin-top: 13px;
+}
+/* Keep columns on landscape tablets, stack and use natural page scrolling on narrow screens. */
+@media (max-width: 760px) {
+  .triage-panel {
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+  }
+  .triage-columns {
+    display: flex;
+    flex-direction: column;
+  }
+  .triage-columns > .triage-section {
+    min-height: 260px;
+  }
+  .triage-scroll {
+    flex: none;
+    min-height: 0;
+    max-height: min(46dvh, 460px);
+  }
+}
+/* The existing portrait layout rules set flex: 1 on the panel;
+   override their height assumptions here for portrait phones. */
+@media (max-width: 760px) and (orientation: portrait) {
+  .triage-panel { flex: 0 0 auto; }
+}
+
+
 /* =========================================================
-   SAMOS HUB — TRIAGE
+   SAMOS TRIAGE v2.2 — MINIMAL BUTTONS
    ========================================================= */
 
-/* JOURNAL */
-.triage-journal { display: block; width: 100%; min-width: 0; }
+.triage-icon-btn,
+#triage-add,
+#triage-goal-add {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  min-width: 44px;
+  height: 44px;
+  min-height: 44px;
+  padding: 0;
+  font-size: 1.35rem;
+  font-weight: bold;
+  line-height: 1;
+}
 
-/* TRIAGE CONTAINER */
-.triage-area { display: flex; justify-content: center; width: 100%; max-width: none; min-width: 0; }
+/* Green Add buttons */
+#triage-add,
+#triage-goal-add,
+.triage-add-task {
+  background: linear-gradient(180deg, #d9f2ec, #a9d9d2);
+  color: var(--text);
+}
 
-/* TRIAGE PANEL */
-.triage-panel { box-sizing: border-box; width: 100%; max-width: 900px; margin-inline: auto; padding: clamp(16px, 2.5vw, 32px); }
-.triage-panel * { box-sizing: border-box; }
-.triage-panel h1 { margin: 0 0 6px; font-size: clamp(1.5rem, 4vw, 2rem); }
-.triage-description { margin: 0 0 20px; opacity: 0.75; }
+/* Completion checkmark */
+.triage-complete-btn {
+  background: linear-gradient(180deg, #d9f2ec, #a9d9d2);
+  font-size: 1.45rem;
+}
 
-/* ADD THOUGHT */
-.triage-form { display: flex; align-items: stretch; gap: 10px; }
-.triage-form input { flex: 1; min-width: 0; min-height: 46px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; background: #fff5fa; color: var(--text); font: inherit; font-size: 16px; }
-.triage-form input:focus-visible { outline: 2px solid #879cda; outline-offset: 2px; }
-.triage-panel button { min-height: 44px; padding: 8px 15px; border: 1px solid var(--border); border-radius: 8px; background: linear-gradient(180deg, #edf4ff, #c6ddfc); color: var(--text); cursor: pointer; font: inherit; }
-.triage-panel button:hover:not(:disabled) { filter: brightness(1.05); }
-#triage-add { color: var(--text); background: linear-gradient(180deg, #d9f2ec, #a9d9d2); border-color: var(--border); font-weight: bold; }
-.triage-panel button:disabled { opacity: 0.5; cursor: wait; }
+/* Remove buttons */
+.triage-remove {
+  background: transparent !important;
+  color: #a12f55;
+  font-size: 1.4rem;
+}
 
-/* STATUS */
-#triage-message { min-height: 1em; margin: 10px 0; font-size: 0.9rem; }
-#triage-message:empty { display: none; }
-#triage-message.error { color: #a12f55; }
+/* Expand/collapse caret */
+.triage-expand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  min-width: 36px;
+  height: 36px;
+  min-height: 36px;
+  padding: 0;
+  margin-top: 8px;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none;
+  font-size: 1.5rem;
+}
 
-/* BRAIN DUMP LIST */
-.triage-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 11px 4px; border-bottom: 1px solid rgba(117, 84, 120, 0.22); }
-.triage-row span { min-width: 0; overflow-wrap: anywhere; white-space: pre-wrap; }
-.triage-remove { flex-shrink: 0; background: transparent !important; color: inherit; }
-.triage-empty { padding: 16px 4px; opacity: 0.7; }
+/* Small action groups */
+.triage-task-actions,
+.triage-goal-actions,
+.triage-next-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.triage-next-actions {
+  margin-top: 10px;
+}
+
 
 /* =========================================================
-   MOBILE — FULL-HEIGHT TRIAGE
+   SAMOS TRIAGE v2.3 — CHUNKIER ICON CONTROLS
    ========================================================= */
-@media (max-width: 900px) and (orientation: portrait) {
-  .triage-journal { display: flex; flex-direction: column; flex: 1 1 auto; width: 100%; height: auto; min-height: 0; padding: 12px 12px 16px; }
-  .triage-area { display: flex; flex-direction: column; flex: 1 1 auto; width: 100%; min-height: 0; }
-  .triage-panel { display: flex; flex-direction: column; flex: 1 1 auto; width: 100%; max-width: none; height: auto; min-height: 0; margin: 0; padding: 16px; }
-  .triage-form { gap: 8px; flex-shrink: 0; }
-  .triage-panel button { padding-inline: 12px; }
-  #triage-list { flex: 1 1 auto; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+
+/* Bigger, bolder plus signs */
+#triage-add,
+#triage-goal-add,
+.triage-add-task {
+  font-family: Arial, sans-serif;
+  font-size: 30px;
+  font-weight: 900;
+  line-height: 1;
+  width: 46px;
+  min-width: 46px;
+  height: 46px;
+  min-height: 46px;
+  padding: 0;
+  background: linear-gradient(180deg, #d9f2ec, #a9d9d2);
+}
+
+/* Smaller button, chunkier checkmark */
+.triage-panel .triage-complete-btn {
+  width: 34px;
+  min-width: 34px;
+  height: 34px;
+  min-height: 34px;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  font-size: 26px;
+  font-weight: 900;
+  line-height: 1;
+  background: linear-gradient(180deg, #d9f2ec, #a9d9d2);
+}
+
+/* Move expand control to bottom-right */
+.triage-goal-card {
+  position: relative;
+}
+
+.triage-panel .triage-expand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 8px 0 0 auto;
+
+  width: 36px;
+  min-width: 36px;
+  height: 36px;
+  min-height: 36px;
+  padding: 0;
+
+  border: 1px solid var(--border) !important;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.4) !important;
+
+  font-family: Arial, sans-serif;
+  font-size: 29px;
+  font-weight: 900;
+  line-height: 1;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.triage-panel .triage-expand:hover {
+  background: rgba(198,221,252,0.75) !important;
+}
+
+.triage-panel .triage-expand:focus-visible {
+  outline: 2px solid #879cda;
+  outline-offset: 3px;
 }
