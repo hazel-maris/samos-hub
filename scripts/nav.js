@@ -48,6 +48,8 @@ function setActiveNavTab() {
     currentPage = "triage";
   } else if (path.includes("groceries.html")) {
     currentPage = "groceries";
+  } else if (path.includes("kitchen.html")) {
+    currentPage = "kitchen";
   } else if (path.includes("quotes.html")) {
     currentPage = "quotes";
   }
