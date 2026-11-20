@@ -16,3 +16,19 @@
 html[data-samos-theme="night"] .kitchen-import-actions button,
 html[data-samos-theme="night"] .kitchen-import-refresh { background: #455d85; color: #f1efff; border-color: #93a0c9; }
 html[data-samos-theme="night"] #kitchen-import-status.error { color: #ffb8d0; }
+
+/* Review individual converter warnings before deciding whether to import. */
+.kitchen-import-preview { list-style: none; padding: 0; max-height: 420px; }
+.kitchen-import-preview > li { margin: 7px 0; }
+.kitchen-import-recipe-details { border: 1px solid var(--border); border-radius: 7px; background: rgba(255,255,255,.16); }
+.kitchen-import-recipe-details > summary { cursor: pointer; padding: 9px 11px; line-height: 1.5; }
+.kitchen-import-recipe-details > summary:focus-visible,
+.kitchen-import-original > summary:focus-visible { outline: 3px solid currentColor; outline-offset: 2px; }
+.kitchen-import-recipe-content { padding: 0 13px 12px; border-top: 1px solid var(--border); }
+.kitchen-import-recipe-content h4 { margin: 12px 0 5px; }
+.kitchen-import-recipe-content ul { margin: 5px 0 10px; padding-left: 23px; }
+.kitchen-import-recipe-content li { margin-bottom: 5px; }
+.kitchen-import-recipe-content p { margin: 10px 0 0; }
+.kitchen-import-original { margin: 12px 0 2px; }
+.kitchen-import-original > summary { cursor: pointer; font-weight: bold; }
+.kitchen-import-original pre { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 300px; overflow-y: auto; border: 1px solid var(--border); padding: 10px; font: inherit; }
