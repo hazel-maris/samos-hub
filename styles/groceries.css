@@ -381,3 +381,53 @@
     inset 2px 2px 0 rgba(255, 255, 255, 0.45),
     inset -1px -1px 0 rgba(117, 84, 120, 0.08);
 }
+
+
+/* ============================================
+   SamOS Groceries — Mobile breathing room
+   ============================================ */
+
+@media (max-width: 760px) {
+
+  .groceries-area > .groceries-panel {
+    height: auto;
+    min-height: 0;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .grocery-workspace {
+    display: flex;
+    flex-direction: column;
+    overflow: visible;
+    flex: none;
+    min-height: 0;
+  }
+
+  .grocery-sidebar,
+  .grocery-results,
+  .grocery-results #grocery-list {
+    height: auto;
+    max-height: none;
+    min-height: 0;
+    overflow: visible;
+    flex: none;
+  }
+
+  .grocery-item {
+    min-height: 60px;
+    padding: 12px 6px;
+    gap: 12px;
+  }
+
+  .grocery-item-info {
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+
+  .grocery-item-actions {
+    flex: 0 0 auto;
+    gap: 6px;
+  }
+
+}
