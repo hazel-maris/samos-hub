@@ -1,0 +1,18 @@
+/* Import stays collapsed unless requested; no changes to the Kitchen browser layout. */
+.kitchen-import-panel { margin: 4px 0 14px; border: 2px solid var(--border); border-radius: 9px; background: rgba(255,255,255,.28); }
+.kitchen-import-panel > summary { cursor: pointer; padding: 10px 14px; font-size: 1.25rem; font-weight: bold; }
+.kitchen-import-body { border-top: 1px solid var(--border); padding: 12px 14px 15px; font-size: 1.15rem; line-height: 1.4; }
+.kitchen-import-body p { margin: 0 0 12px; }
+.kitchen-import-actions { display: flex; flex-wrap: wrap; gap: 9px; margin: 10px 0; align-items: center; }
+.kitchen-import-actions button, .kitchen-import-refresh { font: inherit; font-size: 1.1rem; min-height: 42px; padding: 7px 12px; border: 2px solid var(--border); border-radius: 6px; background: var(--button); color: var(--text); cursor: pointer; }
+.kitchen-import-actions button:disabled { opacity: .5; cursor: not-allowed; }
+#kitchen-import-name { min-width: 0; overflow-wrap: anywhere; }
+#kitchen-import-status.error { color: #a12857; }
+.kitchen-import-summary { font-weight: bold; }
+.kitchen-import-notes p { margin: 9px 0; }
+.kitchen-import-preview { padding: 0 0 0 23px; margin: 8px 0 0; max-height: 280px; overflow: auto; }
+.kitchen-import-preview li { margin: 6px 0; overflow-wrap: anywhere; }
+.kitchen-import-preview span { opacity: .85; }
+html[data-samos-theme="night"] .kitchen-import-actions button,
+html[data-samos-theme="night"] .kitchen-import-refresh { background: #455d85; color: #f1efff; border-color: #93a0c9; }
+html[data-samos-theme="night"] #kitchen-import-status.error { color: #ffb8d0; }
