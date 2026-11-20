@@ -8,17 +8,7 @@
   <link rel="manifest" href="../manifest.webmanifest">
   <link rel="stylesheet" href="../styles/base.css">
   <link rel="stylesheet" href="../styles/mobile.css">
-  <style>
-    .kitchen-area { padding: 1rem; }
-    .kitchen-panel { max-width: 900px; margin: 0 auto; padding: clamp(1rem, 3vw, 2rem); }
-    .kitchen-panel h1 { margin-top: 0; }
-    .kitchen-intro { line-height: 1.55; }
-    .kitchen-flow { display: flex; flex-wrap: wrap; gap: .5rem; margin: 1rem 0; align-items: center; }
-    .kitchen-flow span { padding: .45rem .7rem; border: 1px solid currentColor; border-radius: .65rem; font-size: .9rem; }
-    .kitchen-flow b { opacity: .6; }
-    .kitchen-notice { margin-top: 1.5rem; padding: 1rem; border: 1px solid currentColor; border-radius: .8rem; line-height: 1.55; }
-    .kitchen-notice h2 { margin-top: 0; font-size: 1.15rem; }
-  </style>
+  <link rel="stylesheet" href="../styles/kitchen.css">
   <link rel="stylesheet" href="../styles/night.css">
   <script src="../scripts/night-mode.js"></script>
 </head>
@@ -29,23 +19,49 @@
       <section class="journal kitchen-journal">
         <section class="kitchen-area">
           <div class="game-panel kitchen-panel">
-            <h1>Kitchen 🍲</h1>
-            <p class="kitchen-intro">Your SamOS Recipe Book is coming home. This page will let you find recipes, follow cooking steps, and eventually use groceries you already keep on hand.</p>
-            <h2>Recipe lifecycle</h2>
-            <div class="kitchen-flow" aria-label="Recipe lifecycle">
-              <span>Generated</span><b aria-hidden="true">→</b><span>Ready</span><b aria-hidden="true">→</b><span>Tested</span><b aria-hidden="true">→</b><span>Final</span>
-            </div>
-            <p>ChatGPT generates. You verify. Recipes won't move to Ready, Tested, or Final automatically.</p>
-            <section class="kitchen-notice" aria-label="Kitchen setup progress">
-              <h2>Next: Bring in the Recipe Book</h2>
-              <p>The original Markdown recipes are preserved in your private SamOS repository. We haven't imported or changed them yet.</p>
-              <p>Next we'll map the existing metadata, ingredients, steps, storage, and source attribution into a private Supabase recipe collection.</p>
+            <header class="kitchen-heading">
+              <div>
+                <h1>Kitchen 🍲</h1>
+                <p>Your recipe book, from first draft to familiar favorite.</p>
+              </div>
+              <span class="kitchen-readonly">Recipe Book · View only</span>
+            </header>
+            <p id="kitchen-message" class="kitchen-message" role="status" aria-live="polite">Loading your recipe book…</p>
+            <section class="kitchen-controls" aria-label="Find recipes">
+              <label class="kitchen-field kitchen-search">Search recipes
+                <input id="kitchen-search" type="search" placeholder="Search titles, ingredients, or tags" autocomplete="off">
+              </label>
+              <label class="kitchen-field">Category
+                <select id="kitchen-category"><option value="">All categories</option></select>
+              </label>
+              <label class="kitchen-field">Status
+                <select id="kitchen-status">
+                  <option value="">All statuses</option>
+                  <option value="Generated">Generated</option>
+                  <option value="Ready">Ready</option>
+                  <option value="Tested">Tested</option>
+                  <option value="Final">Final</option>
+                </select>
+              </label>
             </section>
+            <div class="kitchen-list-heading">
+              <h2>Recipe Book <span id="kitchen-count"></span></h2>
+              <div class="kitchen-list-actions">
+                <button type="button" id="kitchen-expand-all">Expand all</button>
+                <button type="button" id="kitchen-collapse-all">Collapse all</button>
+              </div>
+            </div>
+            <div id="kitchen-list" class="kitchen-list" aria-live="polite"></div>
+            <p class="kitchen-footer-note">Generated → Ready → Tested → Final · ChatGPT generates. You verify.</p>
           </div>
         </section>
       </section>
     </section>
   </main>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../config.js"></script>
+  <script src="../scripts/app.js"></script>
   <script src="../scripts/nav.js"></script>
+  <script src="../scripts/kitchen.js"></script>
 </body>
 </html>
