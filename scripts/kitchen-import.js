@@ -236,11 +236,7 @@
     const newCount = work.filter(r=>r.kind==='new').length;
     const updateCount = work.length-newCount;
     const flagged = work.filter(r=>r.recipe.review_flags.length).length;
-    if (!window.confirm(`Save ${newCount} new and ${updateCount} updated recipes?
-
-${flagged} have review notes.
-
-Your current recipes will change only where you approved an update.`)) return;
+    if (!window.confirm(`Save ${newCount} new and ${updateCount} updated recipes?\n\n${flagged} have review notes.\n\nYour current recipes will change only where you approved an update.`)) return;
     busy = true; submit.disabled = true; check.disabled=true; picker.disabled=true; choose.disabled=true;
     let created=0, updated=0, skipped=0; const failures=[];
     try {
