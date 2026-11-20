@@ -43,6 +43,16 @@
                     </select>
                   </label>
                 </section>
+                <section class="kitchen-tag-search" aria-label="Filter recipes by tags">
+                  <label for="kitchen-tag-input">Filter by tags</label>
+                  <div id="kitchen-tag-chips" class="kitchen-tag-chips" aria-live="polite"></div>
+                  <input id="kitchen-tag-input" type="text" placeholder="Type a tag, press Enter" autocomplete="off" spellcheck="false">
+                  <p id="kitchen-tag-feedback" role="status" aria-live="polite"></p>
+                  <details class="kitchen-tag-reference">
+                    <summary>Tag reference</summary>
+                    <div id="kitchen-tag-reference" class="kitchen-tag-reference-list"></div>
+                  </details>
+                </section>
                 <p id="kitchen-message" class="kitchen-message" role="status" aria-live="polite">Loading your recipe book…</p>
               </aside>
               <section class="kitchen-results" aria-label="Recipe book results">
@@ -86,6 +96,7 @@
   <script src="../scripts/app.js"></script>
   <script src="../scripts/nav.js"></script>
   <script src="../scripts/kitchen.js"></script>
+  <script src="../scripts/kitchen-tags.js"></script>
   <script src="../scripts/kitchen-import.js"></script>
 </body>
 </html>
