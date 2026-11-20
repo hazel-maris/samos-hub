@@ -97,10 +97,38 @@
     for (const r of rows) {
       const item = node('li');
       const label = r.kind === 'ready' ? 'NEW' : r.kind === 'exists' ? 'SKIP (already exists)' : 'INVALID';
-      item.append(node('strong', `${r.recipe.title || '(untitled)'} — ${label}`));
-      const extra = r.kind === 'invalid' ? r.issues.join('; ') :
+      const heading = `${r.recipe.title || '(untitled)'} — ${label}`;
+      const extra = r.kind === 'invalid' ? `${r.issues.length} validation issue(s)` :
         `${r.recipe.category} · ${r.recipe.status} · ${r.recipe.review_flags.length} review note(s)`;
-      item.append(node('span', ` · ${extra}`));
+      const details = node('details', undefined, 'kitchen-import-recipe-details');
+      const toggle = node('summary');
+      toggle.append(node('strong', heading), node('span', ` · ${extra}`));
+      details.append(toggle);
+
+      const content = node('div', undefined, 'kitchen-import-recipe-content');
+      if (r.issues.length) {
+        content.append(node('h4', 'Validation issues'));
+        const issues = node('ul');
+        r.issues.forEach(problem => issues.append(node('li', problem)));
+        content.append(issues);
+      }
+      const flags = Array.isArray(r.recipe.review_flags) ? r.recipe.review_flags : [];
+      if (flags.length) {
+        content.append(node('h4', `Converter review notes (${flags.length})`));
+        const flagList = node('ul');
+        flags.forEach(flag => flagList.append(node('li', flag)));
+        content.append(flagList);
+      } else {
+        content.append(node('p', 'No converter review notes for this recipe.'));
+      }
+      if (typeof r.recipe.original_markdown === 'string' && r.recipe.original_markdown.trim()) {
+        const original = node('details', undefined, 'kitchen-import-original');
+        original.append(node('summary', 'View original recipe Markdown'));
+        original.append(node('pre', r.recipe.original_markdown));
+        content.append(original);
+      }
+      details.append(content);
+      item.append(details);
       preview.append(item);
     }
     notes.replaceChildren();
