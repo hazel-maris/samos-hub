@@ -160,7 +160,8 @@
     const filtered = recipes.filter(recipe =>
       (!query || searchable(recipe).includes(query)) &&
       (!category.value || recipe.category === category.value) &&
-      (!status.value || recipe.status === status.value)
+      (!status.value || recipe.status === status.value) &&
+      (!window.SAMOS_KITCHEN_TAGS || window.SAMOS_KITCHEN_TAGS.matches(recipe))
     );
     count.textContent = "(" + filtered.length + ")";
     list.replaceChildren();
@@ -194,6 +195,7 @@
         .limit(1000);
       if (error) throw error;
       recipes = data || [];
+      window.dispatchEvent(new CustomEvent("samos-kitchen-recipes", { detail: recipes }));
       renderCategories();
       render();
       setMessage(recipes.length ? "Recipes are ready to browse." : "");
@@ -210,6 +212,7 @@
   search.addEventListener("input", render);
   category.addEventListener("change", render);
   status.addEventListener("change", render);
+  window.addEventListener("samos-kitchen-tag-filter", render);
   $("kitchen-expand-all").addEventListener("click", () => list.querySelectorAll("details").forEach(card => { card.open = true; }));
   $("kitchen-collapse-all").addEventListener("click", () => list.querySelectorAll("details").forEach(card => { card.open = false; }));
   load();
