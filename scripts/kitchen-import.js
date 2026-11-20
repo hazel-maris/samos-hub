@@ -222,7 +222,7 @@
     const ready = rows.filter(r => r.kind === 'ready');
     if (!ready.length) return;
     const flagged = ready.filter(r => r.recipe.review_flags.length).length;
-    const answer = window.confirm(`Import up to ${ready.length} NEW recipes into your private Kitchen?\n\n${flagged} contain converter review notes. Existing recipes will be skipped; no existing records will be overwritten.\n\nThis writes to Supabase and cannot be undone automatically.`);
+    const answer = window.confirm(`Import ${ready.length} recipes?\n\n${flagged} recipes have review notes.\n\nExisting recipes won't be changed.\n\nThis will save the new recipes to Kitchen.`);
     if (!answer) return;
     busy = true;
     commit.disabled = true;
