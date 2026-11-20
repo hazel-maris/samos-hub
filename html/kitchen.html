@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#e4d4b8">
+  <title>SamOS Hub · Kitchen</title>
+  <link rel="manifest" href="../manifest.webmanifest">
+  <link rel="stylesheet" href="../styles/base.css">
+  <link rel="stylesheet" href="../styles/mobile.css">
+  <style>
+    .kitchen-area { padding: 1rem; }
+    .kitchen-panel { max-width: 900px; margin: 0 auto; padding: clamp(1rem, 3vw, 2rem); }
+    .kitchen-panel h1 { margin-top: 0; }
+    .kitchen-intro { line-height: 1.55; }
+    .kitchen-flow { display: flex; flex-wrap: wrap; gap: .5rem; margin: 1rem 0; align-items: center; }
+    .kitchen-flow span { padding: .45rem .7rem; border: 1px solid currentColor; border-radius: .65rem; font-size: .9rem; }
+    .kitchen-flow b { opacity: .6; }
+    .kitchen-notice { margin-top: 1.5rem; padding: 1rem; border: 1px solid currentColor; border-radius: .8rem; line-height: 1.55; }
+    .kitchen-notice h2 { margin-top: 0; font-size: 1.15rem; }
+  </style>
+  <link rel="stylesheet" href="../styles/night.css">
+  <script src="../scripts/night-mode.js"></script>
+</head>
+<body data-root="..">
+  <main class="home">
+    <section class="journal-shell">
+      <div id="nav-container"></div>
+      <section class="journal kitchen-journal">
+        <section class="kitchen-area">
+          <div class="game-panel kitchen-panel">
+            <h1>Kitchen 🍲</h1>
+            <p class="kitchen-intro">Your SamOS Recipe Book is coming home. This page will let you find recipes, follow cooking steps, and eventually use groceries you already keep on hand.</p>
+            <h2>Recipe lifecycle</h2>
+            <div class="kitchen-flow" aria-label="Recipe lifecycle">
+              <span>Generated</span><b aria-hidden="true">→</b><span>Ready</span><b aria-hidden="true">→</b><span>Tested</span><b aria-hidden="true">→</b><span>Final</span>
+            </div>
+            <p>ChatGPT generates. You verify. Recipes won't move to Ready, Tested, or Final automatically.</p>
+            <section class="kitchen-notice" aria-label="Kitchen setup progress">
+              <h2>Next: Bring in the Recipe Book</h2>
+              <p>The original Markdown recipes are preserved in your private SamOS repository. We haven't imported or changed them yet.</p>
+              <p>Next we'll map the existing metadata, ingredients, steps, storage, and source attribution into a private Supabase recipe collection.</p>
+            </section>
+          </div>
+        </section>
+      </section>
+    </section>
+  </main>
+  <script src="../scripts/nav.js"></script>
+</body>
+</html>
