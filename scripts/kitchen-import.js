@@ -183,11 +183,11 @@
         return { recipe: recipe || { title: `Record ${index + 1}`, review_flags: [] }, issues, kind: issues.length ? 'invalid' : 'ready' };
       });
       const invalid = rows.filter(r => r.kind === 'invalid').length;
-      summary.textContent = `${rows.length} recipes loaded · ${invalid} invalid. Check signed-in account for duplicates.`;
+      summary.textContent = `${rows.length} recipes loaded · ${invalid} invalid. Preview to check for duplicates.`;
       check.disabled = false;
       preview.replaceChildren();
       notes.replaceChildren();
-      message('File loaded locally. Click “Check existing recipes” to finish previewing.');
+      message('File loaded locally. Select “Preview Changes” to check for duplicates.');
     } catch (error) {
       clearReview();
       message('Cannot read this JSON: ' + error.message, true);
