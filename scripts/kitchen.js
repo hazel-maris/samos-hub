@@ -127,11 +127,16 @@
     }
     if (recipe.notes_markdown) {
       makeSection(body, "Notes");
-      appendText(body, "p", recipe.notes_markdown, "kitchen-text-block");
+      const markdown = element("div", "kitchen-md");
+      window.SAMOS_KITCHEN_MARKDOWN.renderMarkdown(markdown,
+        recipe.notes_markdown.replace(/^\s*##\s+Notes\s*\n/i, ""));
+      body.append(markdown);
     }
     if (recipe.canning_method_markdown) {
       makeSection(body, "Canning Method");
-      appendText(body, "p", recipe.canning_method_markdown, "kitchen-text-block");
+      const markdown = element("div", "kitchen-md");
+      window.SAMOS_KITCHEN_MARKDOWN.renderMarkdown(markdown, recipe.canning_method_markdown);
+      body.append(markdown);
     }
     if (Array.isArray(recipe.review_flags) && recipe.review_flags.length) {
       makeSection(body, "Needs review");
