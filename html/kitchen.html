@@ -19,40 +19,44 @@
       <section class="journal kitchen-journal">
         <section class="kitchen-area">
           <div class="game-panel kitchen-panel">
-            <header class="kitchen-heading">
-              <div>
-                <h1>Kitchen 🍲</h1>
-                <p>Your recipe book, from first draft to familiar favorite.</p>
-              </div>
-              <span class="kitchen-readonly">Recipe Book · View only</span>
-            </header>
-            <p id="kitchen-message" class="kitchen-message" role="status" aria-live="polite">Loading your recipe book…</p>
-            <section class="kitchen-controls" aria-label="Find recipes">
-              <label class="kitchen-field kitchen-search">Search recipes
-                <input id="kitchen-search" type="search" placeholder="Search titles, ingredients, or tags" autocomplete="off">
-              </label>
-              <label class="kitchen-field">Category
-                <select id="kitchen-category"><option value="">All categories</option></select>
-              </label>
-              <label class="kitchen-field">Status
-                <select id="kitchen-status">
-                  <option value="">All statuses</option>
-                  <option value="Generated">Generated</option>
-                  <option value="Ready">Ready</option>
-                  <option value="Tested">Tested</option>
-                  <option value="Final">Final</option>
-                </select>
-              </label>
-            </section>
-            <div class="kitchen-list-heading">
-              <h2>Recipe Book <span id="kitchen-count"></span></h2>
-              <div class="kitchen-list-actions">
-                <button type="button" id="kitchen-expand-all">Expand all</button>
-                <button type="button" id="kitchen-collapse-all">Collapse all</button>
-              </div>
+            <div class="kitchen-workspace">
+              <aside class="kitchen-sidebar" aria-label="Recipe search and filters">
+                <header class="kitchen-heading">
+                  <h1>Kitchen 🍲</h1>
+                  <p>Your recipe book, from first draft to familiar favorite.</p>
+                </header>
+                <section class="kitchen-controls" aria-label="Find recipes">
+                  <label class="kitchen-field kitchen-search">Search recipes
+                    <input id="kitchen-search" type="search" placeholder="Search titles, ingredients, or tags" autocomplete="off">
+                  </label>
+                  <label class="kitchen-field">Category
+                    <select id="kitchen-category"><option value="">All categories</option></select>
+                  </label>
+                  <label class="kitchen-field">Status
+                    <select id="kitchen-status">
+                      <option value="">All statuses</option>
+                      <option value="Generated">Generated</option>
+                      <option value="Ready">Ready</option>
+                      <option value="Tested">Tested</option>
+                      <option value="Final">Final</option>
+                    </select>
+                  </label>
+                </section>
+                <p id="kitchen-message" class="kitchen-message" role="status" aria-live="polite">Loading your recipe book…</p>
+                <p class="kitchen-footer-note">Generated → Ready → Tested → Final · ChatGPT generates. You verify.</p>
+              </aside>
+              <section class="kitchen-results" aria-label="Recipe book results">
+                <div class="kitchen-list-heading">
+                  <h2>Recipe Book <span id="kitchen-count"></span></h2>
+                  <div class="kitchen-list-actions">
+                    <button type="button" id="kitchen-expand-all">Expand all</button>
+                    <button type="button" id="kitchen-collapse-all">Collapse all</button>
+                  </div>
+                </div>
+                <span class="kitchen-readonly">Recipe Book · View only</span>
+                <div id="kitchen-list" class="kitchen-list" aria-live="polite"></div>
+              </section>
             </div>
-            <div id="kitchen-list" class="kitchen-list" aria-live="polite"></div>
-            <p class="kitchen-footer-note">Generated → Ready → Tested → Final · ChatGPT generates. You verify.</p>
           </div>
         </section>
       </section>
