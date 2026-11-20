@@ -89,3 +89,17 @@ html[data-samos-theme="night"] .kitchen-message.error { color: #ffb8d0; }
 .kitchen-tag-reference-list { display: flex; flex-wrap: wrap; gap: 6px; padding: 9px 0; }
 .kitchen-tag-reference-item { border: 1px solid var(--border); border-radius: 6px; padding: 3px 7px; }
 html[data-samos-theme="night"] .kitchen-tag-search input { background: #293450; color: #f1efff; border-color: #939bc8; }
+
+/* v1.7.9: visually distinct metadata and rendered Markdown notes. */
+.kitchen-card-meta > span:not(.kitchen-status-pill) {
+  display: inline-block; border: 1px solid var(--border); border-radius: 6px;
+  padding: 2px 7px; background: rgba(255,255,255,.20);
+}
+.kitchen-detail-grid > span { border-right: 1px solid var(--border); padding-right: 12px; }
+.kitchen-md p { margin: 8px 0; }
+.kitchen-md h3, .kitchen-md h4, .kitchen-md h5 { margin: 12px 0 5px; }
+.kitchen-md blockquote { margin: 9px 0; padding: 9px 13px; border-left: 3px solid var(--border); background: rgba(255,255,255,.2); }
+.kitchen-md-callout { border: 1px solid var(--border); border-left-width: 4px !important; border-radius: 7px; }
+.kitchen-md-callout > strong { display: block; margin-bottom: 4px; }
+.kitchen-md :is(ul, ol) { margin: 8px 0; padding-left: 24px; }
+.kitchen-md a { text-decoration: underline; overflow-wrap: anywhere; }
