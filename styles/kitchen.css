@@ -1,4 +1,4 @@
-/* SamOS Kitchen — recipe browsing only; desktop and mobile */
+/* SamOS Kitchen — recipe browsing and tag search; desktop and mobile */
 .kitchen-journal {
   grid-template-columns: minmax(0, 1fr);
   grid-template-rows: minmax(0, 1fr);
@@ -75,3 +75,17 @@ html[data-samos-theme="night"] .kitchen-message.error { color: #ffb8d0; }
   .kitchen-journal { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto; }
   .kitchen-panel { height: auto; overflow: visible; }
 }
+
+/* Tag filter uses a text field and removable chips, not a dropdown. */
+.kitchen-tag-search { border: 2px solid var(--border); border-radius: 8px; background: rgba(255,255,255,.3); padding: 12px; margin-bottom: 12px; font-size: 1.15rem; }
+.kitchen-tag-search label { display: block; margin-bottom: 6px; }
+.kitchen-tag-search input { box-sizing: border-box; width: 100%; min-height: 44px; padding: 9px; font: inherit; border: 2px solid var(--border); border-radius: 6px; background: var(--paper); color: var(--text); }
+.kitchen-tag-search input.kitchen-tag-recognized { border-color: #4e8b77; box-shadow: inset 0 0 0 1px #4e8b77; }
+.kitchen-tag-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 6px; }
+.kitchen-tag-chips:empty { display: none; }
+.kitchen-tag-chip { border: 2px solid var(--border); border-radius: 20px; padding: 4px 10px; font: inherit; background: var(--button); color: var(--text); cursor: pointer; }
+#kitchen-tag-feedback { min-height: 1em; font-size: 1rem; margin: 5px 0; }
+.kitchen-tag-reference summary { cursor: pointer; }
+.kitchen-tag-reference-list { display: flex; flex-wrap: wrap; gap: 6px; padding: 9px 0; }
+.kitchen-tag-reference-item { border: 1px solid var(--border); border-radius: 6px; padding: 3px 7px; }
+html[data-samos-theme="night"] .kitchen-tag-search input { background: #293450; color: #f1efff; border-color: #939bc8; }
