@@ -1,141 +1,91 @@
-// SamOS Kitchen: explicit, user-confirmed import of a local converter JSON preview.
-// Never uploads files or writes recipes until the user presses Import and confirms.
+// SamOS Kitchen v1.7.9: explicitly confirmed insert/update from timestamped exports.
+// Read-only until the user presses Submit AND accepts the confirmation prompt.
 (() => {
   'use strict';
-
   const el = id => document.getElementById(id);
   const picker = el('kitchen-import-file');
   const choose = el('kitchen-import-choose');
   const check = el('kitchen-import-check');
-  const commit = el('kitchen-import-submit');
+  const submit = el('kitchen-import-submit');
   const summary = el('kitchen-import-summary');
   const notes = el('kitchen-import-notes');
   const preview = el('kitchen-import-preview');
   const status = el('kitchen-import-status');
   const selectedName = el('kitchen-import-name');
-  if (![picker, choose, check, commit, summary, notes, preview, status, selectedName].every(Boolean)) return;
+  if (![picker, choose, check, submit, summary, notes, preview, status, selectedName].every(Boolean)) return;
 
   const MAX_FILE_BYTES = 20 * 1024 * 1024;
   const MAX_RECORDS = 500;
-  const CATEGORIES = new Set(['Breakfast', 'Lunch', 'Dinner', 'Snackies & Appies', 'Sides',
-    'Sauces, Spices & Condiments', 'Dessert', 'Drinks', 'Bread', 'Soup', 'Unknown']);
-  const STATUSES = new Set(['Generated', 'Ready', 'Tested', 'Final']);
-  const DIFFICULTIES = new Set(['Easy', 'Medium', 'Hard', 'Unknown', 'N/A']);
-  const YES_NO = new Set(['Yes', 'No', 'Unknown', 'N/A']);
-  const FIELDS = ['slug', 'title', 'status', 'difficulty', 'category', 'servings', 'prep_time',
-    'cook_time', 'total_time', 'equipment', 'tags', 'meal_prep_friendly', 'freezer_friendly',
-    'last_cooked', 'author', 'sources', 'source_last_updated', 'ingredients', 'steps',
-    'storage', 'notes_markdown', 'canning_method_markdown', 'original_markdown',
-    'source_repo', 'source_path', 'review_flags'];
-  const TEXT_FIELDS = ['servings', 'prep_time', 'cook_time', 'total_time', 'last_cooked',
-    'author', 'sources', 'source_last_updated', 'notes_markdown', 'canning_method_markdown',
-    'original_markdown', 'source_repo', 'source_path'];
+  const CATEGORIES = new Set(['Breakfast','Lunch','Dinner','Snackies & Appies','Sides',
+    'Sauces, Spices & Condiments','Dessert','Drinks','Bread','Soup','Unknown']);
+  const STATUSES = ['Generated', 'Ready', 'Tested', 'Final'];
+  const DIFFICULTIES = new Set(['Easy','Medium','Hard','Unknown','N/A']);
+  const YES_NO = new Set(['Yes','No','Unknown','N/A']);
+  const FIELDS = ['slug','title','status','difficulty','category','servings','prep_time',
+    'cook_time','total_time','equipment','tags','meal_prep_friendly','freezer_friendly',
+    'last_cooked','author','sources','source_last_updated','ingredients','steps','storage',
+    'notes_markdown','canning_method_markdown','original_markdown','source_repo','source_path','review_flags'];
+  const TEXT_FIELDS = ['servings','prep_time','cook_time','total_time','last_cooked',
+    'author','sources','source_last_updated','notes_markdown','canning_method_markdown',
+    'original_markdown','source_repo','source_path'];
 
-  let rows = [];
-  let checked = false;
-  let busy = false;
-  let sessionUser = null;
-
+  let rows = [], checked = false, busy = false, sessionUser = null;
+  function node(tag, text, className) {
+    const n = document.createElement(tag);
+    if (text !== undefined) n.textContent = String(text);
+    if (className) n.className = className;
+    return n;
+  }
   function message(text, error = false) {
-    status.textContent = text;
-    status.classList.toggle('error', error);
+    status.textContent = text; status.classList.toggle('error', error);
   }
-  function node(tag, content, className) {
-    const item = document.createElement(tag);
-    if (content !== undefined) item.textContent = String(content);
-    if (className) item.className = className;
-    return item;
+  function reset() {
+    rows = []; checked = false; sessionUser = null;
+    summary.textContent = ''; preview.replaceChildren(); notes.replaceChildren();
+    check.disabled = true; submit.disabled = true;
   }
-  function clearReview() {
-    rows = [];
-    checked = false;
-    sessionUser = null;
-    summary.textContent = '';
-    preview.replaceChildren();
-    notes.replaceChildren();
-    commit.disabled = true;
-    check.disabled = true;
+  function blocksOK(value) {
+    return Array.isArray(value) && value.length > 0 && value.every(block =>
+      block && typeof block === 'object' && !Array.isArray(block) &&
+      typeof block.heading === 'string' && Array.isArray(block.items) && block.items.length > 0 &&
+      block.items.every(item => typeof item === 'string' && item.trim()));
   }
-  function validBlocks(value) {
-    return Array.isArray(value) && value.length > 0 && value.every(b => b &&
-      typeof b === 'object' && !Array.isArray(b) &&
-      typeof b.heading === 'string' && Array.isArray(b.items) && b.items.length > 0 &&
-      b.items.every(item => typeof item === 'string' && item.trim().length > 0));
-  }
-  function validate(raw) {
-    const problems = [];
-    if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return ['Not a recipe object'];
-    if (typeof raw.slug !== 'string' || !/^[a-z0-9-]{1,160}$/.test(raw.slug)) problems.push('Invalid slug');
-    if (typeof raw.title !== 'string' || !raw.title.trim() || raw.title.length > 250) problems.push('Invalid title');
-    if (!STATUSES.has(raw.status)) problems.push('Invalid status');
-    if (!DIFFICULTIES.has(raw.difficulty)) problems.push('Invalid difficulty');
-    if (!CATEGORIES.has(raw.category)) problems.push('Invalid category');
-    if (!YES_NO.has(raw.meal_prep_friendly) || !YES_NO.has(raw.freezer_friendly)) problems.push('Invalid friendly flag');
+  function validate(recipe) {
+    const errors = [];
+    if (!recipe || typeof recipe !== 'object' || Array.isArray(recipe)) return ['Not a recipe object'];
+    if (typeof recipe.slug !== 'string' || !/^[a-z0-9-]{1,160}$/.test(recipe.slug)) errors.push('Invalid slug');
+    if (typeof recipe.title !== 'string' || !recipe.title.trim() || recipe.title.length > 250) errors.push('Invalid title');
+    if (!STATUSES.includes(recipe.status)) errors.push('Invalid status');
+    if (!DIFFICULTIES.has(recipe.difficulty)) errors.push('Invalid difficulty');
+    if (!CATEGORIES.has(recipe.category)) errors.push('Invalid category');
+    if (!YES_NO.has(recipe.meal_prep_friendly) || !YES_NO.has(recipe.freezer_friendly)) errors.push('Invalid friendly flag');
     for (const field of TEXT_FIELDS) {
-      if (field === 'original_markdown' || field === 'source_repo' || field === 'source_path') {
-        if (raw[field] !== null && raw[field] !== undefined && typeof raw[field] !== 'string') problems.push(field + ' must be text');
-      } else if (typeof raw[field] !== 'string') problems.push(field + ' must be text');
+      if (['original_markdown','source_repo','source_path'].includes(field)) {
+        if (recipe[field] != null && typeof recipe[field] !== 'string') errors.push(field + ' must be text');
+      } else if (typeof recipe[field] !== 'string') errors.push(field + ' must be text');
     }
-    if (typeof raw.original_markdown !== 'string' || !raw.original_markdown.trim()) problems.push('Original Markdown missing');
-    for (const field of ['equipment', 'tags', 'review_flags']) {
-      if (!Array.isArray(raw[field]) || !raw[field].every(item => typeof item === 'string')) problems.push('Invalid ' + field);
+    if (typeof recipe.original_markdown !== 'string' || !recipe.original_markdown.trim()) errors.push('Original Markdown missing');
+    for (const field of ['equipment','tags','review_flags']) {
+      if (!Array.isArray(recipe[field]) || !recipe[field].every(v => typeof v === 'string')) errors.push('Invalid ' + field);
     }
-    if (!validBlocks(raw.ingredients)) problems.push('Invalid or empty ingredient groups');
-    if (!validBlocks(raw.steps)) problems.push('Invalid or empty step groups');
-    if (!raw.storage || typeof raw.storage !== 'object' || Array.isArray(raw.storage) ||
-        !['room_temperature', 'refrigerated', 'frozen', 'canned'].every(key => typeof raw.storage[key] === 'string'))
-      problems.push('Invalid storage fields');
-    return problems;
+    if (!blocksOK(recipe.ingredients)) errors.push('Invalid ingredient groups');
+    if (!blocksOK(recipe.steps)) errors.push('Invalid step groups');
+    if (!recipe.storage || typeof recipe.storage !== 'object' || Array.isArray(recipe.storage) ||
+      !['room_temperature','refrigerated','frozen','canned'].every(k => typeof recipe.storage[k] === 'string')) errors.push('Invalid storage');
+    return errors;
   }
-  function render() {
-    const ready = rows.filter(r => r.kind === 'ready');
-    const exists = rows.filter(r => r.kind === 'exists');
-    const invalid = rows.filter(r => r.kind === 'invalid');
-    const flagged = ready.filter(r => r.recipe.review_flags.length).length;
-    summary.textContent = `${rows.length} recipes · ${ready.length} new · ${exists.length} already in Kitchen · ${invalid.length} invalid · ${flagged} new with review notes`;
-    preview.replaceChildren();
-    for (const r of rows) {
-      const item = node('li');
-      const label = r.kind === 'ready' ? 'NEW' : r.kind === 'exists' ? 'SKIP (already exists)' : 'INVALID';
-      const heading = `${r.recipe.title || '(untitled)'} — ${label}`;
-      const extra = r.kind === 'invalid' ? `${r.issues.length} validation issue(s)` :
-        `${r.recipe.category} · ${r.recipe.status} · ${r.recipe.review_flags.length} review note(s)`;
-      const details = node('details', undefined, 'kitchen-import-recipe-details');
-      const toggle = node('summary');
-      toggle.append(node('strong', heading), node('span', ` · ${extra}`));
-      details.append(toggle);
-
-      const content = node('div', undefined, 'kitchen-import-recipe-content');
-      if (r.issues.length) {
-        content.append(node('h4', 'Validation issues'));
-        const issues = node('ul');
-        r.issues.forEach(problem => issues.append(node('li', problem)));
-        content.append(issues);
-      }
-      const flags = Array.isArray(r.recipe.review_flags) ? r.recipe.review_flags : [];
-      if (flags.length) {
-        content.append(node('h4', `Converter review notes (${flags.length})`));
-        const flagList = node('ul');
-        flags.forEach(flag => flagList.append(node('li', flag)));
-        content.append(flagList);
-      } else {
-        content.append(node('p', 'No converter review notes for this recipe.'));
-      }
-      if (typeof r.recipe.original_markdown === 'string' && r.recipe.original_markdown.trim()) {
-        const original = node('details', undefined, 'kitchen-import-original');
-        original.append(node('summary', 'View original recipe Markdown'));
-        original.append(node('pre', r.recipe.original_markdown));
-        content.append(original);
-      }
-      details.append(content);
-      item.append(details);
-      preview.append(item);
-    }
-    notes.replaceChildren();
-    if (invalid.length) notes.append(node('p', 'Invalid recipes cannot be imported. Correct their conversion issues before retrying.'));
-    if (flagged) notes.append(node('p', 'Some new recipes contain converter review notes. Inspect the original recipe and review report before importing, especially variations and canning instructions.'));
-    if (exists.length) notes.append(node('p', 'Existing recipes are never overwritten. Matching is by recipe slug for your signed-in account.'));
-    commit.disabled = !checked || !ready.length || busy;
+  function sortKeys(v) {
+    if (Array.isArray(v)) return v.map(sortKeys);
+    if (v && typeof v === 'object') return Object.fromEntries(Object.keys(v).sort().map(k => [k, sortKeys(v[k])]));
+    return v;
+  }
+  function sameContent(a, b) {
+    return FIELDS.every(field => JSON.stringify(sortKeys(a[field] ?? null)) === JSON.stringify(sortKeys(b[field] ?? null)));
+  }
+  async function hash(md) {
+    if (!crypto?.subtle) throw new Error('Browser cryptography is unavailable; updates are disabled.');
+    const buffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(md));
+    return [...new Uint8Array(buffer)].map(v => v.toString(16).padStart(2,'0')).join('');
   }
   async function getUser() {
     if (typeof supabaseClient === 'undefined' || !supabaseClient) throw new Error('Supabase is not configured.');
@@ -144,132 +94,195 @@
     if (!data?.user?.id) throw new Error('Sign in from Settings first.');
     return data.user.id;
   }
-  async function getExisting(userId) {
-    // Read full set with pagination; do not silently treat an incomplete result as a clean slate.
-    const slugs = new Set();
-    for (let offset = 0; ; offset += 500) {
-      const { data, error } = await supabaseClient.from('recipes').select('slug')
+  async function existingRecords(userId) {
+    const found = new Map();
+    for (let offset=0; offset<50000; offset+=500) {
+      const { data, error } = await supabaseClient.from('recipes').select('*')
         .eq('user_id', userId).order('slug').range(offset, offset + 499);
       if (error) throw error;
-      for (const item of data || []) slugs.add(item.slug);
-      if (!data || data.length < 500) break;
-      if (offset >= 50000) throw new Error('Too many existing recipes to check safely.');
+      for (const record of data || []) found.set(record.slug, record);
+      if (!data || data.length < 500) return found;
     }
-    return slugs;
+    throw new Error('Too many recipes to check safely.');
   }
-  function preparedRecipe(raw) {
-    // Discard wrapper metadata and unknown fields. Only writable schema columns are sent.
-    return Object.fromEntries(FIELDS.map(key => [key, raw[key] ?? (key === 'source_repo' || key === 'source_path' ? null : raw[key])]));
+  function prepared(recipe) {
+    return Object.fromEntries(FIELDS.map(key => [key, recipe[key] ?? (['source_repo','source_path'].includes(key) ? null : recipe[key])]));
   }
-
+  function eligible(r) {
+    return r.kind === 'new' || r.kind === 'update' || (r.kind === 'conflict' && r.approvedConflict);
+  }
+  function render() {
+    const counts = Object.fromEntries(['new','update','unchanged','conflict','invalid'].map(kind => [kind,rows.filter(r=>r.kind===kind).length]));
+    summary.textContent = `${rows.length} recipes · ${counts.new} new · ${counts.update} updated · ${counts.unchanged} unchanged · ${counts.conflict} conflicts · ${counts.invalid} invalid`;
+    preview.replaceChildren();
+    for (const r of rows) {
+      const item = node('li');
+      const details = node('details', undefined, 'kitchen-import-recipe-details');
+      const label = r.kind.toUpperCase();
+      const heading = node('summary');
+      heading.append(node('strong', `${r.recipe.title || '(untitled)'} — ${label}`),
+        node('span', ` · ${r.recipe.category || '?'} · ${r.recipe.status || '?'} · ${(r.recipe.review_flags || []).length} review note(s)`));
+      details.append(heading);
+      const body = node('div', undefined, 'kitchen-import-recipe-content');
+      if (r.issues.length) {
+        body.append(node('h4', r.kind === 'conflict' ? 'Conflict — requires your review' : 'Validation issues'));
+        const list = node('ul'); r.issues.forEach(issue=>list.append(node('li',issue))); body.append(list);
+      }
+      const flags = Array.isArray(r.recipe.review_flags) ? r.recipe.review_flags : [];
+      body.append(node('h4', `Review notes (${flags.length})`));
+      if (flags.length) {
+        const list = node('ul'); flags.forEach(flag => list.append(node('li',flag))); body.append(list);
+      } else body.append(node('p','No converter review notes.'));
+      if (r.kind === 'conflict') {
+        const label = node('label', undefined, 'kitchen-import-conflict-label');
+        const box = node('input'); box.type = 'checkbox'; box.checked = !!r.approvedConflict;
+        box.addEventListener('change', () => { r.approvedConflict = box.checked; updateButtons(); });
+        label.append(box, document.createTextNode(' I reviewed both versions and explicitly approve replacing this Kitchen recipe.'));
+        body.append(label);
+      }
+      if (r.existing?.original_markdown) {
+        const original = node('details', undefined, 'kitchen-import-original');
+        original.append(node('summary','Current Kitchen Markdown'));
+        const md = node('div', undefined, 'kitchen-md');
+        window.SAMOS_KITCHEN_MARKDOWN?.renderMarkdown(md, r.existing.original_markdown);
+        original.append(md); body.append(original);
+      }
+      if (r.recipe.original_markdown) {
+        const proposed = node('details', undefined, 'kitchen-import-original');
+        proposed.append(node('summary','Proposed Markdown'));
+        const md = node('div', undefined, 'kitchen-md');
+        window.SAMOS_KITCHEN_MARKDOWN?.renderMarkdown(md, r.recipe.original_markdown);
+        proposed.append(md); body.append(proposed);
+      }
+      details.append(body); item.append(details); preview.append(item);
+    }
+    notes.replaceChildren();
+    if (counts.conflict) notes.append(node('p','Conflicts are not selected automatically. Expand each conflict, compare both versions, and explicitly approve replacement if appropriate.'));
+    if (counts.invalid) notes.append(node('p','Invalid recipes cannot be submitted.'));
+    updateButtons();
+  }
+  function updateButtons() { submit.disabled = !checked || busy || !rows.some(eligible); }
   choose.addEventListener('click', () => picker.click());
   picker.addEventListener('change', async () => {
-    clearReview();
+    reset();
     const file = picker.files?.[0];
     if (!file) { selectedName.textContent = 'No file chosen'; return; }
     selectedName.textContent = file.name;
     if (!file.name.toLowerCase().endsWith('.json') || file.size > MAX_FILE_BYTES) {
-      message('Choose a .json file smaller than 20 MB.', true); return;
+      message('Choose a JSON file smaller than 20 MB.',true); return;
     }
     try {
       const data = JSON.parse(await file.text());
-      if (!Array.isArray(data) || !data.length || data.length > MAX_RECORDS) throw new Error('Expected an array of 1–500 conversion preview records.');
+      if (!Array.isArray(data) || !data.length || data.length > MAX_RECORDS)
+        throw new Error('Expected 1–500 converted recipes. A deletion-only export does not need importing.');
       const seen = new Set();
-      rows = data.map((entry, index) => {
+      rows = data.map((entry,index) => {
         const recipe = entry?.recipe;
         const issues = validate(recipe);
-        if (recipe && seen.has(recipe.slug)) issues.push('Duplicate slug in selected file');
-        if (recipe && typeof recipe.slug === 'string') seen.add(recipe.slug);
-        return { recipe: recipe || { title: `Record ${index + 1}`, review_flags: [] }, issues, kind: issues.length ? 'invalid' : 'ready' };
+        if (typeof recipe?.slug === 'string') {
+          if (seen.has(recipe.slug)) issues.push('Duplicate slug in JSON file');
+          seen.add(recipe.slug);
+        }
+        const metadata = entry?.preview_metadata || {};
+        if (metadata.previous_source_sha256 != null &&
+            !/^[a-f0-9]{64}$/.test(metadata.previous_source_sha256)) issues.push('Invalid previous source hash');
+        if (metadata.source_sha256 != null &&
+            !/^[a-f0-9]{64}$/.test(metadata.source_sha256)) issues.push('Invalid current source hash');
+        return { recipe: recipe || {title:`Record ${index+1}`,review_flags:[]}, metadata, issues, kind:issues.length?'invalid':'new', approvedConflict:false, existing:null };
       });
-      const invalid = rows.filter(r => r.kind === 'invalid').length;
-      summary.textContent = `${rows.length} recipes loaded · ${invalid} invalid. Preview to check for duplicates.`;
       check.disabled = false;
-      preview.replaceChildren();
-      notes.replaceChildren();
-      message('File loaded locally. Select “Preview Changes” to check for duplicates.');
-    } catch (error) {
-      clearReview();
-      message('Cannot read this JSON: ' + error.message, true);
-    }
+      summary.textContent = `${rows.length} recipes loaded. Select Preview Changes.`;
+      message('File loaded locally. Nothing has been saved.');
+    } catch (e) { reset(); message('Cannot read JSON: '+e.message,true); }
   });
-
   check.addEventListener('click', async () => {
     if (busy || !rows.length) return;
-    busy = true;
-    check.disabled = true;
-    commit.disabled = true;
-    message('Checking Kitchen for matching recipe slugs…');
+    busy = true; check.disabled = true; submit.disabled = true;
+    message('Comparing your recipes with Kitchen…');
     try {
       const userId = await getUser();
-      const existing = await getExisting(userId);
-      sessionUser = userId;
-      for (const r of rows) r.kind = r.issues.length ? 'invalid' : existing.has(r.recipe.slug) ? 'exists' : 'ready';
-      checked = true;
-      message('Preview ready. Nothing has been imported.');
-    } catch (error) {
-      checked = false;
-      message('Could not check duplicates: ' + error.message, true);
-    } finally {
-      busy = false;
-      check.disabled = false;
-      render();
-    }
-  });
-
-  commit.addEventListener('click', async () => {
-    if (busy || !checked) return;
-    const ready = rows.filter(r => r.kind === 'ready');
-    if (!ready.length) return;
-    const flagged = ready.filter(r => r.recipe.review_flags.length).length;
-    const answer = window.confirm(`Import ${ready.length} recipes?\n\n${flagged} recipes have review notes.\n\nExisting recipes won't be changed.\n\nThis will save the new recipes to Kitchen.`);
-    if (!answer) return;
-    busy = true;
-    commit.disabled = true;
-    check.disabled = true;
-    picker.disabled = true;
-    choose.disabled = true;
-    let inserted = 0, skipped = 0;
-    const failures = [];
-    try {
-      const currentUser = await getUser();
-      if (currentUser !== sessionUser) throw new Error('Signed-in account changed. Reload and recheck your import.');
-      // Recheck right before writing to handle repeated imports and concurrent sessions.
-      const existing = await getExisting(currentUser);
-      for (const r of ready) {
-        if (existing.has(r.recipe.slug)) { skipped++; continue; }
-        const record = { ...preparedRecipe(r.recipe), user_id: currentUser };
-        const { error } = await supabaseClient.from('recipes').insert(record);
-        if (error) {
-          if (error.code === '23505') { skipped++; existing.add(r.recipe.slug); continue; }
-          failures.push(`${r.recipe.title}: ${error.message}`);
-        } else { inserted++; existing.add(r.recipe.slug); }
+      const existing = await existingRecords(userId);
+      for (const r of rows) {
+        r.approvedConflict = false;
+        r.existing = existing.get(r.recipe.slug) || null;
+        if (r.issues.length) { r.kind='invalid'; continue; }
+        // Validate the local source fingerprint even for new records.
+        const newHash = await hash(r.recipe.original_markdown);
+        if (r.metadata.source_sha256 && newHash !== r.metadata.source_sha256) {
+          r.kind = 'invalid'; r.issues.push('JSON source hash does not match Markdown'); continue;
+        }
+        if (!r.existing) { r.kind = 'new'; continue; }
+        const currentHash = await hash(r.existing.original_markdown || '');
+        if (sameContent(prepared(r.recipe),r.existing)) { r.kind='unchanged'; continue; }
+        const oldHash = r.metadata.previous_source_sha256;
+        const statusDowngrade = STATUSES.indexOf(r.recipe.status) < STATUSES.indexOf(r.existing.status);
+        if (oldHash && currentHash === oldHash && !statusDowngrade) {
+          r.kind = 'update';
+        } else {
+          r.kind = 'conflict';
+          r.issues.push(statusDowngrade ? 'Recipe status would be downgraded.' :
+            'Kitchen differs from the previous exported version (or no trusted baseline is available).');
+        }
       }
-      message(`Finished: ${inserted} imported, ${skipped} skipped, ${failures.length} failed.${inserted ? ' Refresh Kitchen to see your recipes.' : ''}`, !!failures.length);
+      checked = true; sessionUser = userId;
+      message('Preview ready. Nothing has been saved.'); render();
+    } catch (e) { checked=false; message('Preview failed: '+e.message,true); }
+    finally { busy=false; check.disabled=false; updateButtons(); }
+  });
+  submit.addEventListener('click', async () => {
+    if (busy || !checked) return;
+    const work = rows.filter(eligible);
+    if (!work.length) return;
+    const newCount = work.filter(r=>r.kind==='new').length;
+    const updateCount = work.length-newCount;
+    const flagged = work.filter(r=>r.recipe.review_flags.length).length;
+    if (!window.confirm(`Save ${newCount} new and ${updateCount} updated recipes?
+
+${flagged} have review notes.
+
+Your current recipes will change only where you approved an update.`)) return;
+    busy = true; submit.disabled = true; check.disabled=true; picker.disabled=true; choose.disabled=true;
+    let created=0, updated=0, skipped=0; const failures=[];
+    try {
+      const userId = await getUser();
+      if (userId !== sessionUser) throw new Error('Signed-in account changed. Preview again.');
+      // Recheck all slugs immediately before writing; never trust stale preview rows.
+      const latest = await existingRecords(userId);
+      for (const r of work) {
+        const current = latest.get(r.recipe.slug) || null;
+        const next = { ...prepared(r.recipe), user_id:userId };
+        if (r.kind === 'new') {
+          if (current) { skipped++; continue; }
+          const {error} = await supabaseClient.from('recipes').insert(next);
+          if (error) { if (error.code==='23505') skipped++; else failures.push(`${r.recipe.title}: ${error.message}`); }
+          else created++;
+          continue;
+        }
+        if (!current || current.id!==r.existing?.id || current.updated_at!==r.existing?.updated_at) {
+          failures.push(`${r.recipe.title}: recipe changed since preview; no update applied.`); continue;
+        }
+        // Extra safety: a changed status or content cannot slip in after preview.
+        if (!sameContent(current, r.existing)) {
+          failures.push(`${r.recipe.title}: recipe content changed; no update applied.`); continue;
+        }
+        const {data,error} = await supabaseClient.from('recipes').update(next)
+          .eq('user_id',userId).eq('id',current.id).eq('updated_at',current.updated_at).select('id');
+        if (error) failures.push(`${r.recipe.title}: ${error.message}`);
+        else if (!data || data.length!==1) failures.push(`${r.recipe.title}: concurrent edit detected; no update applied.`);
+        else updated++;
+      }
+      message(`Finished: ${created} added, ${updated} updated, ${skipped} skipped, ${failures.length} failed.${created+updated?' Refresh Kitchen to see changes.':''}`,!!failures.length);
       notes.replaceChildren();
       if (failures.length) {
-        notes.append(node('p', 'Some inserts failed. Successful inserts are not automatically rolled back.'));
-        failures.forEach(text => notes.append(node('p', text)));
+        notes.append(node('p','Some updates failed; successful changes were not rolled back.'));
+        failures.forEach(f => notes.append(node('p',f)));
       }
-      if (inserted) {
-        const reload = node('button', 'Refresh Kitchen', 'kitchen-import-refresh');
-        reload.type = 'button';
-        reload.addEventListener('click', () => window.location.reload());
-        notes.append(reload);
+      if (created+updated) {
+        const refresh = node('button','Refresh Kitchen','kitchen-import-refresh');
+        refresh.type='button'; refresh.addEventListener('click',()=>window.location.reload()); notes.append(refresh);
       }
-      // Force an explicit new file selection/duplicate check before any next write.
-      checked = false;
-      rows = [];
-      picker.value = '';
-      check.disabled = true;
-      commit.disabled = true;
-    } catch (error) {
-      message('Import stopped: ' + error.message, true);
-    } finally {
-      busy = false;
-      picker.disabled = false;
-      choose.disabled = false;
-      commit.disabled = true;
-    }
+      rows=[]; checked=false; sessionUser=null; picker.value=''; check.disabled=true;
+    } catch(e) { message('Submit stopped: '+e.message,true); }
+    finally { busy=false; picker.disabled=false; choose.disabled=false; submit.disabled=true; }
   });
 })();
