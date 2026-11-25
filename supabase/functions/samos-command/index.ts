@@ -129,22 +129,41 @@ Deno.serve(async req=>{
  const uid=pair.user_id;
  let body:any;
  const contentType=req.headers.get("content-type")||"";
- if(contentType.toLowerCase().includes("multipart/form-data")){
-  let form:FormData;
-  try{const bytes=await readLimited(req,MAX_AUDIO+65536);form=await new Response(bytes,{headers:{"Content-Type":contentType}}).formData();}
-  catch{return reply("Recording too large or invalid. Try a shorter recording.",400);}
-  const audio=form.get("audio");
-  const language=form.get("language")==="es"?"es":form.get("language")==="en"?"en":"auto";
+ let bytes:Uint8Array;
+ try{bytes=await readLimited(req,MAX_AUDIO+65536);}catch{return reply("Recording too large. Try a shorter recording.",400);}
+ const head=new TextDecoder().decode(bytes.slice(0,512));
+ const boundary=head.match(/^--([A-Za-z0-9'()+_,.\/:=? -]{1,200})\r\n/);
+ let audio:File|null=null;
+ let language=req.headers.get("x-samos-language")==="es"?"es":req.headers.get("x-samos-language")==="en"?"en":"auto";
+ if(contentType.toLowerCase().includes("multipart/form-data")||boundary){
+  try{
+   const type=boundary?"multipart/form-data; boundary="+boundary[1]:contentType;
+   const form=await new Response(bytes,{headers:{"Content-Type":type}}).formData();
+   const file=form.get("audio");if(file instanceof File)audio=file;
+   if(form.get("language")==="es")language="es";else if(form.get("language")==="en")language="en";
+  }catch{return reply("I couldn't read the audio form.",400);}
+  if(!audio)return reply("The audio field must be a file, not text.",400);
+ }else if(bytes.length>=12 && (head.slice(4,8)==="ftyp"||head.startsWith("RIFF")||head.startsWith("ID3")||head.startsWith("OggS")||head.startsWith("caff"))){
+  const ext=head.slice(4,8)==="ftyp"?"m4a":head.startsWith("RIFF")?"wav":head.startsWith("ID3")?"mp3":head.startsWith("OggS")?"ogg":"caf";
+  if(ext==="caf")return reply("Please record in M4A or WAV format.",400);
+  audio=new File([bytes],"recording."+ext);
+ }else{
+  try{if(bytes.length>4096)throw Error("too_large");body=JSON.parse(new TextDecoder().decode(bytes));}
+  catch{console.warn("SamOS unsupported upload",contentType.split(";")[0].slice(0,100),bytes.length);return reply("I couldn't recognize the recording format. Try sending Recorded Audio as a File.",400);}
+ }
+ if(audio){
   const es=language==="es";
-  if(!(audio instanceof File)||audio.size<100||audio.size>MAX_AUDIO)return reply(es?"No recibí una grabación válida.":"I didn't receive a valid recording.",400);
-  if(!/\.(m4a|mp4|wav|mp3|webm|ogg|flac|mpeg|mpga)$/i.test(audio.name))return reply(es?"Formato de audio no compatible.":"Unsupported recording format.",400);
+  if(audio.size<100||audio.size>MAX_AUDIO)return reply(es?"No recibí una grabación válida.":"I didn't receive a valid recording.",400);
+  if(!/\.(m4a|mp4|wav|mp3|webm|ogg|flac|mpeg|mpga)$/i.test(audio.name)){
+   const signature=new TextDecoder().decode(new Uint8Array(await audio.slice(0,12).arrayBuffer()));
+   const ext=signature.slice(4,8)==="ftyp"?"m4a":signature.startsWith("RIFF")?"wav":null;
+   if(!ext)return reply("Unsupported recording format.",400);
+   audio=new File([audio],"recording."+ext);
+  }
   const key=Deno.env.get("OPENAI_API_KEY");
-  if(!key)return reply(es?"Mi conexión de voz no está configurada.":"My voice connection isn't configured.",503);
+  if(!key)return reply("My voice connection isn't configured.",503);
   try{const transcript=await transcribeAudio(key,audio);if(!transcript)return reply(es?"No te escuché.":"I didn't hear anything.");body={command:transcript,language};}
   catch{return reply(es?"No pude transcribir tu audio. Inténtalo de nuevo.":"I couldn't transcribe your recording. Try again.",503);}
- }else{
-  try{const bytes=await readLimited(req,4096);body=JSON.parse(new TextDecoder().decode(bytes));}
-  catch{return reply("Invalid or oversized command.",400);}
  }
  if(typeof body?.command!=="string"||body.command.length>500) return reply("Please dictate a short command.",400);
  const original=body.command.trim().replace(/[.!?]+$/,"");
