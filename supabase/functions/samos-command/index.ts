@@ -95,6 +95,28 @@ async function aiInterpret(key:string, command:string, history:Turn[], today:str
  const json=await response.json();
  return JSON.parse(json.choices[0].message.content);
 }
+// Audio is processed in memory only, after device authentication.
+const MAX_AUDIO=5*1024*1024;
+async function readLimited(req:Request,max:number){
+ const declared=Number(req.headers.get("content-length")||0);
+ if(declared>max)throw Error("too_large");
+ const reader=req.body?.getReader();if(!reader)return new Uint8Array();
+ const parts:Uint8Array[]=[];let total=0;
+ try{while(true){const {done,value}=await reader.read();if(done)break;total+=value.byteLength;if(total>max){await reader.cancel();throw Error("too_large");}parts.push(value);}}
+ finally{reader.releaseLock();}
+ const out=new Uint8Array(total);let offset=0;for(const part of parts){out.set(part,offset);offset+=part.byteLength;}return out;
+}
+async function transcribeAudio(key:string, audio:File){
+ const form=new FormData();
+ form.append("file",audio,audio.name);
+ form.append("model",Deno.env.get("SAMOS_TRANSCRIBE_MODEL")||"gpt-transcribe");
+ form.append("response_format","json");
+ // No forced source language: allow English, Spanish and code switching.
+ form.append("prompt","Transcribe exactly in the languages spoken, including English, Spanish and Spanglish. Preserve names such as Violet, Violeta, SamOS, Lily Bean, Fern and Little Guy. Do not translate or invent speech.");
+ const response=await fetch("https://api.openai.com/v1/audio/transcriptions",{method:"POST",headers:{Authorization:"Bearer "+key},body:form,signal:AbortSignal.timeout(25000)});
+ if(!response.ok){console.warn("SamOS transcription HTTP",response.status);throw Error("transcription_"+response.status);}
+ const data=await response.json();return typeof data.text==="string"?data.text.trim():"";
+}
 Deno.serve(async req=>{
  if(req.method!=="POST") return reply("Use POST.",405);
  const token=req.headers.get("x-samos-token")||"";
@@ -105,14 +127,30 @@ Deno.serve(async req=>{
  if(pairError) return reply("SamOS pairing unavailable.",503);
  if(!pair) return reply("Pairing invalid or revoked.",401);
  const uid=pair.user_id;
- const raw=await req.text();
- if(raw.length>4096) return reply("Command too long.",400);
- let body; try {body=JSON.parse(raw)} catch {return reply("Invalid command.",400)}
+ let body:any;
+ const contentType=req.headers.get("content-type")||"";
+ if(contentType.toLowerCase().includes("multipart/form-data")){
+  let form:FormData;
+  try{const bytes=await readLimited(req,MAX_AUDIO+65536);form=await new Response(bytes,{headers:{"Content-Type":contentType}}).formData();}
+  catch{return reply("Recording too large or invalid. Try a shorter recording.",400);}
+  const audio=form.get("audio");
+  const language=form.get("language")==="es"?"es":form.get("language")==="en"?"en":"auto";
+  const es=language==="es";
+  if(!(audio instanceof File)||audio.size<100||audio.size>MAX_AUDIO)return reply(es?"No recibí una grabación válida.":"I didn't receive a valid recording.",400);
+  if(!/\.(m4a|mp4|wav|mp3|webm|ogg|flac|mpeg|mpga)$/i.test(audio.name))return reply(es?"Formato de audio no compatible.":"Unsupported recording format.",400);
+  const key=Deno.env.get("OPENAI_API_KEY");
+  if(!key)return reply(es?"Mi conexión de voz no está configurada.":"My voice connection isn't configured.",503);
+  try{const transcript=await transcribeAudio(key,audio);if(!transcript)return reply(es?"No te escuché.":"I didn't hear anything.");body={command:transcript,language};}
+  catch{return reply(es?"No pude transcribir tu audio. Inténtalo de nuevo.":"I couldn't transcribe your recording. Try again.",503);}
+ }else{
+  try{const bytes=await readLimited(req,4096);body=JSON.parse(new TextDecoder().decode(bytes));}
+  catch{return reply("Invalid or oversized command.",400);}
+ }
  if(typeof body?.command!=="string"||body.command.length>500) return reply("Please dictate a short command.",400);
  const original=body.command.trim().replace(/[.!?]+$/,"");
  let command=original;
  let spanish=body.language==="es"||body.language==="es-MX"||(body.language!=="en"&&/[¿¡ñáéíóú]|\b(hola|gracias|mañana|tengo|quiero|puedes|dime|jueves|compras|habla|español|buenas|estoy|necesito|qué|que tal)\b/i.test(original));
- const locale=spanish?"es":body.language==="en"?"en":"auto";
+ const locale=body.language==="es"||body.language==="es-MX"?"es":body.language==="en"?"en":"auto";
  const local=(en:string,es:string)=>spanish?es:en;
  const apiKey=Deno.env.get("OPENAI_API_KEY");
  if(/^(?:what do you remember(?: about me)?|read (?:my |your )?memories|show (?:my |your )?memories)$/i.test(original)){
