@@ -56,6 +56,17 @@
               <button id="supabase-logout" type="button" hidden>Sign out</button>
             </section>
 
+            <section class="settings-section">
+              <h2 class="settings-section-title">SamOS Command · Watch pairing</h2>
+              <p>Sign in, then generate a private shortcut token. Creating a new token replaces your old one.</p>
+              <div class="settings-login">
+                <button type="button" id="watch-pair">Generate pairing token</button>
+                <input id="watch-token" aria-label="Private pairing token" readonly hidden autocomplete="off" spellcheck="false">
+                <button type="button" id="watch-copy" hidden>Copy token</button>
+                <button type="button" id="watch-revoke">Revoke token</button>
+              </div>
+              <p id="watch-status" role="status" aria-live="polite"></p>
+            </section>
             <!-- UPCOMING -->
             <section class="settings-section">
               <h2 class="settings-section-title">Upcoming</h2>
@@ -91,5 +102,6 @@
   <script src="../scripts/app.js"></script>
   <script src="../scripts/nav.js"></script>
   <script src="../scripts/settings.js"></script>
+  <script src="../scripts/watch-pairing.js"></script>
 </body>
 </html>
