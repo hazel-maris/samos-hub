@@ -67,7 +67,12 @@
               </div>
               <p id="watch-status" role="status" aria-live="polite"></p>
             </section>
-            <!-- UPCOMING -->
+            <section class="settings-section">
+<h2 class="settings-section-title">SamOS · Memory Core</h2>
+<p>SamOS can save useful personal preferences and facts from conversations. Saved memories are sent to her AI for context. Avoid secrets or sensitive information. Edit or delete them here.</p>
+<div class="settings-login"><textarea id="memory-input" maxlength="500" aria-label="New memory" placeholder="Something to remember"></textarea><button type="button" id="memory-add">Save memory</button><button type="button" id="memory-refresh">Refresh</button><button type="button" id="memory-clear">Delete all memories</button></div>
+<p id="memory-status" role="status" aria-live="polite"></p><div id="memory-list"></div></section>
+<!-- UPCOMING -->
             <section class="settings-section">
               <h2 class="settings-section-title">Upcoming</h2>
 
@@ -103,5 +108,6 @@
   <script src="../scripts/nav.js"></script>
   <script src="../scripts/settings.js"></script>
   <script src="../scripts/watch-pairing.js"></script>
+  <script src="../scripts/memory-core.js"></script>
 </body>
 </html>
