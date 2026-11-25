@@ -117,6 +117,17 @@ async function transcribeAudio(key:string, audio:File){
  if(!response.ok){console.warn("SamOS transcription HTTP",response.status);throw Error("transcription_"+response.status);}
  const data=await response.json();return typeof data.text==="string"?data.text.trim():"";
 }
+// Opt-in AI voice; existing shortcuts receive exactly the same JSON as before.
+async function voicedReply(message:string,key:string){
+ try{
+ const response=await fetch("https://api.openai.com/v1/audio/speech",{method:"POST",headers:{Authorization:"Bearer "+key,"Content-Type":"application/json"},signal:AbortSignal.timeout(25000),body:JSON.stringify({model:Deno.env.get("SAMOS_TTS_MODEL")||"gpt-4o-mini-tts",voice:"marin",input:message.slice(0,4096),response_format:"mp3",instructions:"Speak warmly and naturally, with a friendly feminine conversational voice, clear articulation, gentle steady pacing and no exaggerated enthusiasm. Pronounce Spanish in natural Latin American Spanish and English in natural American English. Switch languages smoothly within sentences. Do not translate or add words."})});
+ if(!response.ok){console.warn("SamOS speech HTTP",response.status);throw Error("speech unavailable");}
+ const bytes=new Uint8Array(await response.arrayBuffer());
+ if(!bytes.length||bytes.length>5*1024*1024)throw Error("invalid audio size");
+ let binary="";for(let i=0;i<bytes.length;i+=8192)binary+=String.fromCharCode(...bytes.subarray(i,i+8192));
+ return Response.json({ok:true,message,audio_base64:btoa(binary),audio_format:"mp3",voice:"marin",ai_generated_voice:true},{headers:{"Cache-Control":"no-store"}});
+ }catch{return Response.json({ok:true,message,audio_base64:"",audio_format:"mp3",voice:"marin",speech_error:"AI voice unavailable; use device speech."},{headers:{"Cache-Control":"no-store"}});}
+}
 Deno.serve(async req=>{
  if(req.method!=="POST") return reply("Use POST.",405);
  const token=req.headers.get("x-samos-token")||"";
@@ -172,15 +183,17 @@ Deno.serve(async req=>{
  const locale=body.language==="es"||body.language==="es-MX"?"es":body.language==="en"?"en":"auto";
  const local=(en:string,es:string)=>spanish?es:en;
  const apiKey=Deno.env.get("OPENAI_API_KEY");
+ const useVoice=req.headers.get("x-samos-voice")==="ai";
+ const respond=async(message:string,status=200)=>useVoice&&apiKey&&status===200?await voicedReply(message,apiKey):reply(message,status);
  if(/^(?:what do you remember(?: about me)?|read (?:my |your )?memories|show (?:my |your )?memories)$/i.test(original)){
   const {data,error}=await db.from("samos_memories").select("memory").eq("user_id",uid).order("created_at",{ascending:false}).limit(10);
-  if(error)return reply("My Memory Core is unavailable.",503);
-  return reply(data.length?"Here are my most recent saved memories: "+data.map(x=>x.memory).join("; "):"My Memory Core is empty. Tell me something you want me to remember.");
+  if(error)return await respond("My Memory Core is unavailable.",503);
+  return await respond(data.length?"Here are my most recent saved memories: "+data.map(x=>x.memory).join("; "):"My Memory Core is empty. Tell me something you want me to remember.");
  }
- if(/^(?:forget|delete|clear) (?:all (?:my |your )?|my |your )?memories$/i.test(original))return reply("You can delete saved memories in Memory Core in Hub Settings.");
+ if(/^(?:forget|delete|clear) (?:all (?:my |your )?|my |your )?memories$/i.test(original))return await respond("You can delete saved memories in Memory Core in Hub Settings.");
 
  const diagnostic=/^(?:check|test) (?:your )?(?:ai|brain)(?: connection)?$/i.test(original);
- if(diagnostic&&!apiKey)return reply("My AI key is missing.");
+ if(diagnostic&&!apiKey)return await respond("My AI key is missing.");
  let history:Turn[]=[];
  let memories:string[]=[];
  let aiAction="";
@@ -188,7 +201,7 @@ Deno.serve(async req=>{
   if(apiKey&&status===200){
    try{await db.from("samos_command_context").upsert({user_id:uid,history:[...history,{role:"user",content:original.slice(0,500)},{role:"assistant",content:message.slice(0,1800)}].slice(-8),updated_at:new Date().toISOString()});}catch{/* response must still work */}
   }
-  return reply(message,status);
+  return await respond(message,status);
  }
  if(apiKey){
   try{
