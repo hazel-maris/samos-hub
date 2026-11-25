@@ -108,10 +108,11 @@
   ]
 };
   const root = document.documentElement;
-  const message = document.getElementById("daily-quote");
+  const message = document.getElementById("daily-quote") || document.getElementById("quote");
   const label = document.getElementById("quote-mode");
   const next = document.getElementById("quote-next");
   const reset = document.getElementById("quote-reset");
+  if (!message) return;
   let key = "", offset = 0;
   function render() {
     const now = new Date();
@@ -121,12 +122,12 @@
     if (key !== current) { key = current; offset = 0; }
     const pool = messages[mode];
     const index = ((day * 17 + offset) % pool.length + pool.length) % pool.length;
-    label.textContent = mode === "night" ? "☾  Save point · Night edition" : "☀  New game · Morning edition";
-    message.textContent = pool[index];
-    reset.hidden = offset === 0;
+    if (label) label.textContent = mode === "night" ? "☾  Save point · Night edition" : "☀  New game · Morning edition";
+    if (message.textContent !== pool[index]) message.textContent = pool[index];
+    if (reset) reset.hidden = offset === 0;
   }
-  next.addEventListener("click", () => { offset++; render(); });
-  reset.addEventListener("click", () => { offset = 0; render(); next.focus(); });
+  next?.addEventListener("click", () => { offset++; render(); });
+  reset?.addEventListener("click", () => { offset = 0; render(); next?.focus(); });
   new MutationObserver(render).observe(root, {attributes:true,attributeFilter:["data-samos-theme"]});
   document.addEventListener("visibilitychange", () => { if (!document.hidden) render(); });
   window.addEventListener("pageshow", render);

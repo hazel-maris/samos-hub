@@ -79,18 +79,3 @@ setInterval(
 );
 
 
-// ============================================================
-// QUOTE
-// ============================================================
-
-const quote =
-  document.getElementById(
-    "quote"
-  );
-
-
-if (quote) {
-  quote.textContent =
-    CONFIG.quote ||
-    "Build for Future Sam.";
-}
