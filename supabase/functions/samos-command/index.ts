@@ -6,6 +6,36 @@ const day = (delta=0) => {
  const today = new Intl.DateTimeFormat("en-CA",{timeZone:"America/New_York",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
  const d = new Date(today+"T12:00:00Z"); d.setUTCDate(d.getUTCDate()+delta); return d.toISOString().slice(0,10);
 };
+// Match the Hub's calendar-day recurrence rules, independently of daylight saving.
+function occurs(item:{date:string;recurrence:string|null}, date:string) {
+ if(date<item.date)return false;
+ if(!item.recurrence)return item.date===date;
+ if(item.recurrence==="daily")return true;
+ const start=new Date(item.date+"T12:00:00Z"), target=new Date(date+"T12:00:00Z");
+ if(item.recurrence==="weekly")return ((target.getTime()-start.getTime())/86400000)%7===0;
+ if(item.recurrence==="monthly")return start.getUTCDate()===target.getUTCDate();
+ if(item.recurrence==="yearly")return start.getUTCMonth()===target.getUTCMonth()&&start.getUTCDate()===target.getUTCDate();
+ return false;
+}
+function interpretSchedule(command:string){
+ const t=command.toLowerCase().replace(/[’‘]/g,"'").replace(/\s+/g," ").trim();
+ if(/\b(add|delete|remove|cancel|reschedule|create|update|change|move|set|remind|complete|finish)\b/.test(t))return null;
+ const recurring=/\b(recur\w*|reoccurr\w*|repeat\w*|regular|routine[s]?)\b/.test(t);
+ const tomorrow=/\b(tomorrow|next day)\b/.test(t);
+ const today=/\b(today|tonight|this morning|this afternoon|this evening)\b/.test(t);
+ if(tomorrow&&today)return null;
+ if(/\b(weather|temperature|forecast|groceries|shopping|dinner|lunch|breakfast|quote)\b/.test(t))return null;
+ const subject=/\b(schedule|events?|appointments?|tasks?|calendar|plans?|agenda|upcoming|items?|things?)\b/.test(t);
+ const question=/\b(what|anything|do i|have i|tell me|show|read|list|check|any)\b/.test(t);
+ if(recurring)return {delta:tomorrow?1:today?0:null,recurring:true};
+ if((tomorrow||today)&&(subject||question||/^(tomorrow|today|tonight)$/.test(t)))return {delta:tomorrow?1:0,recurring:false};
+ if(subject&&question)return {delta:0,recurring:false};
+ return null;
+}
+function speakTime(value:string){
+ const [h,m]=value.split(":").map(Number);
+ return (h%12||12)+(m?":"+String(m).padStart(2,"0"):"")+(h<12?" AM":" PM");
+}
 Deno.serve(async req=>{
  if(req.method!=="POST") return reply("Use POST.",405);
  const token=req.headers.get("x-samos-token")||"";
@@ -43,14 +73,17 @@ Deno.serve(async req=>{
  }
  return reply("On your shopping list: "+completed.join(", ")+".");
  }
- const scheduleText=command.toLowerCase().replace(/[’‘]/g,"'").replace(/\s+/g," ");
- const scheduleDate=/\btomorrow(?:'s)?\b/.test(scheduleText)?1:/\btoday(?:'s)?\b/.test(scheduleText)?0:null;
- if(scheduleDate!==null && !/^(add|delete|remove|cancel|change|move|reschedule|create|update|set|remind)\b/.test(scheduleText) && (/\b(schedule|events?|appointments?|tasks?|calendar|plans?|agenda|upcoming)\b/.test(scheduleText)||/^(what (?:do i (?:need to do|have)|am i doing)|what(?:'s| is) (?:coming up|happening|on)|what have i got)\b/.test(scheduleText))){
- const date=day(scheduleDate);
- const {data,error}=await db.from("upcoming_items").select("title,time").eq("user_id",uid).eq("date",date).order("time").limit(30);
+ const schedule=interpretSchedule(command);
+ if(schedule){
+ const date=day(schedule.delta??0);
+ const {data,error}=await db.from("upcoming_items").select("title,time,date,recurrence").eq("user_id",uid).order("time");
  if(error)throw error;
- return reply(data.length?data.map(x=>x.time.slice(0,5)+" "+x.title).join("; ")+".":"No directly scheduled items for that date. Recurring items may still apply.");
+ const rows=data.filter(x=>schedule.recurring&&!x.recurrence?false:schedule.delta===null?["daily","weekly","monthly","yearly"].includes(x.recurrence):occurs(x,date));
+ const label=schedule.delta===null?"Your recurring items":schedule.delta===1?"Tomorrow":"Today";
+ if(!rows.length)return reply(schedule.delta===null?"You have no recurring items.":label+": no "+(schedule.recurring?"recurring items":"scheduled items")+".");
+ const spoken=rows.slice(0,30).map(x=>speakTime(x.time)+" "+(x.title||"Untitled item")+(schedule.delta===null?", repeats "+x.recurrence:""));
+ return reply(label+": "+spoken.join("; ")+(rows.length>30?"; and "+(rows.length-30)+" more.":"."));
  }
- return reply("I can add groceries, read your shopping list, or check directly scheduled items for today or tomorrow. Try: Add cheese to my groceries.");
+ return reply("I didn't quite get that.");
  }catch{return reply("SamOS could not complete the command. Please try again.",500);}
 });
