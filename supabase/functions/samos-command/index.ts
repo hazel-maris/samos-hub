@@ -17,19 +17,58 @@ function occurs(item:{date:string;recurrence:string|null}, date:string) {
  if(item.recurrence==="yearly")return start.getUTCMonth()===target.getUTCMonth()&&start.getUTCDate()===target.getUTCDate();
  return false;
 }
-function interpretSchedule(command:string){
- const t=command.toLowerCase().replace(/[’‘]/g,"'").replace(/\s+/g," ").trim();
+function normalizeSpeech(command:string){
+ return command.toLowerCase().replace(/[’‘]/g,"'").replace(/\b(um+|uh+|erm+|hmm+|you know|i mean|kind of|sort of)\b/g," ").replace(/[,?!]/g," ").replace(/\s+/g," ").trim();
+}
+function interpretSchedule(command:string, base=day()){
+ const t=normalizeSpeech(command);
  if(/\b(add|delete|remove|cancel|reschedule|create|update|change|move|set|remind|complete|finish)\b/.test(t))return null;
- const recurring=/\b(recur\w*|reoccurr\w*|repeat\w*|regular|routine[s]?)\b/.test(t);
- const tomorrow=/\b(tomorrow|next day)\b/.test(t);
- const today=/\b(today|tonight|this morning|this afternoon|this evening)\b/.test(t);
- if(tomorrow&&today)return null;
  if(/\b(weather|temperature|forecast|groceries|shopping|dinner|lunch|breakfast|quote)\b/.test(t))return null;
+ const recurring=/\b(recur\w*|reoccurr\w*|repeat\w*|regular|routine[s]?)\b/.test(t);
  const subject=/\b(schedule|events?|appointments?|tasks?|calendar|plans?|agenda|upcoming|items?|things?)\b/.test(t);
- const question=/\b(what|anything|do i|have i|tell me|show|read|list|check|any)\b/.test(t);
- if(recurring)return {delta:tomorrow?1:today?0:null,recurring:true};
- if((tomorrow||today)&&(subject||question||/^(tomorrow|today|tonight)$/.test(t)))return {delta:tomorrow?1:0,recurring:false};
- if(subject&&question)return {delta:0,recurring:false};
+ const question=/\b(what|anything|something|do i|have i|tell me|show|read|list|check|any|wondering|have got|have to)\b/.test(t);
+ const anchor=new Date(base+"T12:00:00Z");
+ const iso=(d:Date)=>d.toISOString().slice(0,10);
+ const shift=(n:number)=>{const d=new Date(anchor);d.setUTCDate(d.getUTCDate()+n);return iso(d);};
+ const valid=(y:number,m:number,d:number)=>{if(y<1900||y>9999||m<1||m>12||d<1||d>31)return null;const x=new Date(Date.UTC(y,m-1,d,12));return x.getUTCMonth()===m-1&&x.getUTCDate()===d?iso(x):null;};
+ const months=["january","february","march","april","may","june","july","august","september","october","november","december"];
+ const weekdays=["sunday","monday","tuesday","wednesday","thursday","friday","saturday"];
+ const dates:string[]=[];
+ let invalid=false;
+ const addDate=(date:string|null)=>{if(date)dates.push(date);else invalid=true;};
+ const numeric=t.match(/\b(\d{4})-(\d{1,2})-(\d{1,2})\b/);
+ const slash=t.match(/\b(\d{1,2})\/(\d{1,2})(?:\/(\d{4}|\d{2}))?\b/);
+ const named=t.match(new RegExp("\\b("+months.join("|")+")\\s+(?:the\\s+)?(\\d{1,2})(?:st|nd|rd|th)?(?:\\s+(\\d{4}))?\\b"));
+ const reverse=t.match(new RegExp("\\b(?:the\\s+)?(\\d{1,2})(?:st|nd|rd|th)?\\s+(?:of\\s+)?("+months.join("|")+")\\b"));
+ if(numeric)addDate(valid(+numeric[1],+numeric[2],+numeric[3]));
+ else if(slash||named||reverse){
+ const m=slash?+slash[1]:named?months.indexOf(named[1])+1:months.indexOf(reverse![2])+1;
+ const d=slash?+slash[2]:named?+named[2]:+reverse![1];
+ const given=slash?.[3]||named?.[3];
+ const y=given?(given.length===2?2000+Number(given):Number(given)):anchor.getUTCFullYear();
+ let date=valid(y,m,d);
+ if(!given&&date&&date<base)date=valid(y+1,m,d);
+ addDate(date);
+ }
+ const relative=t.match(/\b(?:in\s+(\d{1,3}|one|two|three|four|five|six|seven|eight|nine|ten)\s+days?|(\d{1,3}|one|two|three|four|five|six|seven|eight|nine|ten)\s+days?\s+from now)\b/);
+ if(relative){const n=relative[1]||relative[2];const words=["zero","one","two","three","four","five","six","seven","eight","nine","ten"];addDate(shift(/^\d+$/.test(n)?+n:words.indexOf(n)));}
+ if(/\bday after tomorrow\b/.test(t))addDate(shift(2));
+ else if(/\b(tomorrow|next day)\b/.test(t))addDate(shift(1));
+ if(/\b(today|tonight|this morning|this afternoon|this evening)\b/.test(t))addDate(base);
+ if(/\byesterday\b/.test(t))addDate(shift(-1));
+ for(const match of t.matchAll(/\b(?:(next|last|this|coming)\s+)?(sunday|monday|tuesday|wednesday|thursday|friday|saturday)\b/g)){
+ const wd=weekdays.indexOf(match[2]), current=anchor.getUTCDay();
+ let n=(wd-current+7)%7;
+ if(match[1]==="next")n+=7;
+ if(match[1]==="last")n=n===0?-7:n-7;
+ addDate(shift(n));
+ }
+ const unique=[...new Set(dates)];
+ if(invalid||unique.length>1)return {date:null,recurring,clarify:true};
+ if(unique.length===1)return {date:unique[0],recurring,clarify:false};
+ if(recurring)return {date:null,recurring:true,clarify:false};
+ if(/\b(next week|this week|next month|this month|weekend|next year|on the \d+)\b/.test(t))return {date:null,recurring:false,clarify:true};
+ if(subject&&question)return {date:base,recurring:false,clarify:false};
  return null;
 }
 function speakTime(value:string){
@@ -75,13 +114,14 @@ Deno.serve(async req=>{
  }
  const schedule=interpretSchedule(command);
  if(schedule){
- const date=day(schedule.delta??0);
+ if(schedule.clarify)return reply("Which date did you mean?");
+ const date=schedule.date??day();
  const {data,error}=await db.from("upcoming_items").select("title,time,date,recurrence").eq("user_id",uid).order("time");
  if(error)throw error;
- const rows=data.filter(x=>schedule.recurring&&!x.recurrence?false:schedule.delta===null?["daily","weekly","monthly","yearly"].includes(x.recurrence):occurs(x,date));
- const label=schedule.delta===null?"Your recurring items":schedule.delta===1?"Tomorrow":"Today";
- if(!rows.length)return reply(schedule.delta===null?"You have no recurring items.":label+": no "+(schedule.recurring?"recurring items":"scheduled items")+".");
- const spoken=rows.slice(0,30).map(x=>speakTime(x.time)+" "+(x.title||"Untitled item")+(schedule.delta===null?", repeats "+x.recurrence:""));
+ const rows=data.filter(x=>schedule.recurring&&!x.recurrence?false:schedule.date===null?["daily","weekly","monthly","yearly"].includes(x.recurrence):occurs(x,date));
+ const label=schedule.date===null?"Your recurring items":date===day(1)?"Tomorrow":date===day()?"Today":new Intl.DateTimeFormat("en-US",{weekday:"long",month:"long",day:"numeric",year:"numeric",timeZone:"UTC"}).format(new Date(date+"T12:00:00Z"));
+ if(!rows.length)return reply(schedule.date===null?"You have no recurring items.":label+": no "+(schedule.recurring?"recurring items":"scheduled items")+".");
+ const spoken=rows.slice(0,30).map(x=>speakTime(x.time)+" "+(x.title||"Untitled item")+(schedule.date===null?", repeats "+x.recurrence:""));
  return reply(label+": "+spoken.join("; ")+(rows.length>30?"; and "+(rows.length-30)+" more.":"."));
  }
  return reply("I didn't quite get that.");
