@@ -43,8 +43,10 @@ Deno.serve(async req=>{
  }
  return reply("On your shopping list: "+completed.join(", ")+".");
  }
- if(/^(what do i need to do|what(?:'s| is) (?:on my schedule|coming up)|show (?:my )?(?:tasks|schedule)) (today|tomorrow)$/i.test(command)){
- const date=day(/tomorrow$/i.test(command)?1:0);
+ const scheduleText=command.toLowerCase().replace(/[’‘]/g,"'").replace(/\s+/g," ");
+ const scheduleDate=/\btomorrow(?:'s)?\b/.test(scheduleText)?1:/\btoday(?:'s)?\b/.test(scheduleText)?0:null;
+ if(scheduleDate!==null && !/^(add|delete|remove|cancel|change|move|reschedule|create|update|set|remind)\b/.test(scheduleText) && (/\b(schedule|events?|appointments?|tasks?|calendar|plans?|agenda|upcoming)\b/.test(scheduleText)||/^(what (?:do i (?:need to do|have)|am i doing)|what(?:'s| is) (?:coming up|happening|on)|what have i got)\b/.test(scheduleText))){
+ const date=day(scheduleDate);
  const {data,error}=await db.from("upcoming_items").select("title,time").eq("user_id",uid).eq("date",date).order("time").limit(30);
  if(error)throw error;
  return reply(data.length?data.map(x=>x.time.slice(0,5)+" "+x.title).join("; ")+".":"No directly scheduled items for that date. Recurring items may still apply.");
