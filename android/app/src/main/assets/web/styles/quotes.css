@@ -1,20 +1,20 @@
-/* =========================================================
-   SAMOS HUB — QUOTES
-   ========================================================= */
-/* DESKTOP */
-.quotes-journal { display: block; padding: clamp(22px, 3vw, 42px); }
-.quotes-panel { position: relative; width: 100%; height: 100%; min-height: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-.quotes-title { position: absolute; top: 28px; left: 34px; font-size: clamp(1.7rem, 2.4vw, 2.5rem); text-transform: uppercase; }
-.quotes-message { font-size: clamp(2.2rem, 5vw, 5rem); color: var(--border); text-align: center; }
-/* =========================================================
-   MOBILE — FULL HEIGHT JOURNAL
-   ========================================================= */
-@media (max-width: 900px) and (orientation: portrait) {
-  body:has(.quotes-journal) { min-height: 100dvh; overflow-x: hidden; overflow-y: auto; }
-  body:has(.quotes-journal) .home { min-height: 100dvh; align-items: stretch; justify-content: flex-start; padding: max(22px, env(safe-area-inset-top)) 10px max(16px, env(safe-area-inset-bottom)); }
-  body:has(.quotes-journal) .journal-shell { width: 100%; height: auto; min-height: calc(100dvh - max(22px, env(safe-area-inset-top)) - max(16px, env(safe-area-inset-bottom))); margin: 0; }
-  .quotes-journal { flex: 1 1 auto; display: flex; flex-direction: column; min-height: 0; padding: 12px; }
-  .quotes-panel { flex: 1 1 auto; width: 100%; min-height: 350px; padding: 70px 18px 24px; }
-  .quotes-title { top: 20px; left: 20px; font-size: 2rem; }
-  .quotes-message { font-size: clamp(2rem, 7vw, 3rem); line-height: 1.2; }
+/* SamOS Hub — Quotes.exe */
+.quotes-journal { display:flex; flex-direction:column; padding:clamp(12px,3vw,42px); }
+.quotes-panel { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:clamp(12px,3vh,30px); padding:clamp(14px,4vw,48px); overflow:auto; }
+.quotes-title { font-size:clamp(1.7rem,2.5vw,2.6rem); align-self:flex-start; }
+.quote-window { width:min(100%,920px); border:3px solid var(--border); background:var(--paper); color:var(--text); box-shadow:5px 5px 0 var(--shadow); }
+.quote-mode { padding:10px 16px; background:var(--tab); border-bottom:2px solid var(--border); font-size:clamp(1.3rem,2.2vw,2rem); }
+.quote-body { min-height:clamp(200px,36vh,420px); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:clamp(16px,4vw,48px); gap:24px; }
+.quotes-message { margin:0; text-align:center; overflow-wrap:anywhere; font-size:clamp(2rem,4.3vw,4.5rem); line-height:1.15; color:var(--text); }
+.quote-actions { display:flex; flex-wrap:wrap; justify-content:center; gap:12px; }
+.quote-actions button { font:inherit; font-size:clamp(1.25rem,2vw,1.8rem); min-height:44px; padding:8px 16px; color:var(--text); background:var(--button); border:2px solid var(--border); box-shadow:inset 2px 2px 0 #ffffff55,2px 2px 0 var(--shadow); cursor:pointer; }
+.quote-actions button:hover { background:var(--button-hover); }
+.quote-actions button:focus-visible { outline:3px solid var(--border); outline-offset:4px; }
+.quote-status { background:var(--paper-dark); border-top:2px solid var(--border); padding:8px 12px; font-size:1.2rem; }
+@media (max-width:900px) and (orientation:portrait) {
+ body:has(.quotes-journal) { min-height:100dvh; overflow-x:hidden; overflow-y:auto; }
+ body:has(.quotes-journal) .home { min-height:100dvh; align-items:stretch; justify-content:flex-start; padding:max(22px,env(safe-area-inset-top)) 10px max(16px,env(safe-area-inset-bottom)); }
+ body:has(.quotes-journal) .journal-shell { width:100%; height:auto; min-height:calc(100dvh - max(22px,env(safe-area-inset-top)) - max(16px,env(safe-area-inset-bottom))); margin:0; }
+ .quotes-panel { min-height:350px; padding:18px 12px; }
+ .quotes-message { font-size:clamp(2rem,7vw,3rem); }
 }

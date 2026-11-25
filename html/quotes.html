@@ -30,8 +30,18 @@
 
       <section class="journal quotes-journal">
         <div class="game-panel quotes-panel">
-          <div class="quotes-title">Quotes</div>
-          <div class="quotes-message">Under Construction</div>
+          <header class="quotes-title">Quotes.exe</header>
+          <div class="quote-window">
+            <div id="quote-mode" class="quote-mode">Daily splash</div>
+            <div class="quote-body">
+              <p id="daily-quote" class="quotes-message" aria-live="polite" aria-atomic="true">Loading a little joy…</p>
+              <div class="quote-actions">
+                <button id="quote-next" type="button">Another little joy</button>
+                <button id="quote-reset" type="button" hidden>Today's message</button>
+              </div>
+            </div>
+            <footer class="quote-status">100 little joys · No quests required</footer>
+          </div>
         </div>
       </section>
 
@@ -39,6 +49,7 @@
   </main>
 
   <script src="../scripts/nav.js"></script>
+  <script src="../scripts/quotes.js"></script>
 
 </body>
 </html>
